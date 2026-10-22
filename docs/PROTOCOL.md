@@ -86,6 +86,23 @@
     - `Bit 0` ($P_0$): $b_6 \oplus b_4 \oplus b_2$
     - Guarantees 100% detection of all 8 single-bit error patterns.
 
+
+### Bit Manipulation, CRC, and Whitening (Step 8)
+
+#### CRC-16 Specification
+- **Algorithm**: CRC-16/CCITT-FALSE
+- **Polynomial**: `0x1021` ($x^{16} + x^{12} + x^5 + 1$)
+- **Initial Value**: `0xFFFF`
+- **Reflection**: None (`refIn = false`, `refOut = false`)
+- **Final XOR**: `0x0000`
+- **Known Answer**: `"123456789"` -> `0x29B1`
+
+#### PN9 Whitening Specification
+- **Polynomial**: $x^9 + x^5 + 1$ (LFSR mask `0x1FF`)
+- **Seed Mapping**: State $S_0 = ((	ext{seed} \ \& \ 0x0F) \ll 5) \oplus 0x1FF$
+- **Feedback**: $	ext{bit}_8 \oplus 	ext{bit}_4$
+- **Operation**: Involutory bitwise XOR. Guaranteed max run of identical symbols $\le 3$ (strictly below 6) on all-zero payloads.
+
 ## Change Log
 
 ### 2026-10-22 - Step 6: Initial Protocol v1 Baseline
@@ -98,3 +115,7 @@
 - Specified exact frame marker `[13, 2, 10, 4]`.
 - Defined 8-bit mode block bitfield with orthogonal 2-bit parity checksum for 100% single-bit error detection.
 - Documented full tone frequency tables for Stealth (17.6-20.0 kHz) and Retro (1.5-3.5 kHz) bands at 48 kHz and 44.1 kHz.
+
+### 2026-10-22 - Step 8: Bit Serialization, CRC-16, and Whitening Formalized
+- Standardized table-driven CRC-16/CCITT-FALSE with verified 0x29B1 test vector.
+- Formally specified PN9 LFSR ($x^9 + x^5 + 1$) whitening sequence with confirmed statistical uniformity.

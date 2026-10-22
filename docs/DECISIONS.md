@@ -132,3 +132,18 @@
 
 ### DEC-024: Zero-Sidelobe Sync Word and Non-Overlapping Frame Marker
 - **Decision**: Sync word pattern selected as `[3, 11, 7, 14, 1, 9, 5, 12]` (8 distinct tones) ensuring 0 non-zero aperiodic autocorrelation matches. Frame marker selected as `[13, 2, 10, 4]` ensuring zero collision with the sync word.
+
+## 2026-10-22 - Step 8: Bit Utilities, CRC-16, and Whitening Decisions
+
+### DEC-025: CRC-16/CCITT-FALSE Specification
+- **Decision**: Adopted standard CRC-16/CCITT-FALSE with:
+  - Generator polynomial: `0x1021` ($x^{16} + x^{12} + x^5 + 1$)
+  - Initial value: `0xFFFF`
+  - RefIn / RefOut: `false`
+  - Final XOR: `0x0000`
+- **Verification**: Verified against mandatory known answer: ASCII `"123456789"` yields `0x29B1`.
+
+### DEC-026: PN9 LFSR Spectral Whitening Specification
+- **Decision**: Implemented PN9 LFSR with polynomial $x^9 + x^5 + 1$ (mask `0x1FF`).
+- **Initial State**: Derived deterministically from frame seed via `((seed and 0x0F) shl 5) xor 0x1FF`.
+- **Properties**: Verified on all-zero 60-byte payload across seeds 0..15: maximum identical consecutive symbol run is 3 (limit <= 6), and chi-square goodness of fit against uniform 16-symbol distribution ranges from 6.67 to 12.80.
