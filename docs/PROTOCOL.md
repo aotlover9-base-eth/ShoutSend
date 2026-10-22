@@ -203,6 +203,31 @@ where:
      - Tag `0x02`: Phone Number (up to 2 entries, 1..20 chars each from `[0-9+\-() ]`)
      - Tag `0x03`: Email Address (optional, 1..80 bytes)
 
+### Payload Compaction Specifications (Step 14)
+
+#### URL Dictionary Tables
+- **Prefix Table (16 entries, 1 byte index)**:
+  `0: https://www.`, `1: https://`, `2: http://www.`, `3: http://`, `4: https://maps.google.com/?q=`, `5: https://maps.app.goo.gl/`, `6: https://github.com/`, `7: https://t.me/`, `8: https://wa.me/`, `9: https://x.com/`, `10: https://instagram.com/`, `11: https://youtube.com/watch?v=`, `12: https://youtu.be/`, `13: https://linkedin.com/in/`, `14: https://spotify.link/`, `15: ""` (empty/raw).
+- **Suffix Table (16 entries, 1 byte index)**:
+  `0: ""`, `1: /`, `2: .com`, `3: .com/`, `4: .org`, `5: .org/`, `6: .net`, `7: .net/`, `8: .io`, `9: .io/`, `10: .in`, `11: .in/`, `12: .co`, `13: .co/`, `14: .html`, `15: .php`.
+- **Wire Format**: `[PrefixByte (1B)] [SuffixByte (1B)] [MiddleUTF-8 (N bytes)]`
+
+#### Text 7-Bit ASCII Packing
+- Used only when all characters are ASCII (0..127).
+- Format: `[CharCount (2B big-endian)] [Dense 7-bit packed bitstream]`
+
+#### Compact Wi-Fi Binary Format
+- Format: `[Flags (1B)] [SSID Length (1B)] [SSID Data] [Pass Length (1B)]? [Pass Data]?`
+- Flags bitfield:
+  - `Bits 1..0`: Security (0: OPEN, 1: WPA2, 2: WPA3)
+  - `Bit 2`: isHidden
+  - `Bit 3`: hasPassword
+  - `Bit 4`: ssidIs7BitAscii
+  - `Bit 5`: passIs7BitAscii
+
+#### Contact Compact TLV
+- Replaces raw UTF-8 phone numbers with 4-bit BCD (Tag `0x22`) for digit-only phones, or 7-bit packed ASCII (Tag `0x12`).
+
 ## Change Log
 
 ### 2026-10-22 - Step 6: Initial Protocol v1 Baseline
@@ -243,5 +268,11 @@ where:
 ### 2026-10-23 - Step 13: Payload Codecs and Wire Formats Formalized
 - Specified canonical payload wire representations for Text, Url, Wi-Fi (QR-format), and Contact (binary TLV).
 - Formalized URL safety analysis heuristics.
+
+### 2026-10-23 - Step 14: Payload Compaction Formats and Dictionaries Formalized
+- Formalized 16-entry URL prefix and suffix dictionary tables.
+- Standardized 7-bit ASCII bit packing and 4-bit BCD contact phone encoding.
+- Formally specified strict shortest-representation chooser logic.
+
 
 

@@ -208,5 +208,16 @@
   - `Contact`: Binary TLV format (tags 0x01 name, 0x02 phone, 0x03 email).
 - **UrlSafety**: Pure URL heuristic evaluator checking `userInfo` deception, IPv4/IPv6 literals, Punycode/Unicode homoglyphs, non-standard ports, and URL length > 200 characters.
 
+## 2026-10-23 - Step 14: Payload Compaction and Chooser
+
+### DEC-033: Domain-Specific Compaction and Shortest-Representation Chooser
+- **Rationale**: Audio transmissions take ~0.05 seconds per byte. Every byte saved directly reduces chirp duration and acoustic exposure. General-purpose compression libraries (e.g. gzip/brotli) inflate small payloads with metadata headers and dictionaries; dedicated micro-compactors achieve up to 60.7% savings with 0-byte header overhead.
+- **URL Compaction**: 16-entry prefix table + 16-entry suffix table with 2-byte dictionary indices.
+- **7-Bit Text Packing**: Packs 7-bit ASCII characters without padding bits.
+- **Wi-Fi Compaction**: 1-byte header bitfield + 7-bit packed ASCII SSID and password.
+- **Contact Compaction**: 4-bit BCD packing for digit-only phone numbers (40% savings) and 7-bit packing for formatted phone numbers.
+- **Chooser Guarantees**: `PayloadCompactor` evaluates candidate compact size vs canonical size. Compact is chosen ONLY when strictly shorter (`compactSize < canonicalSize`), setting the `isCompact` frame flag. Payloads where compaction provides no savings (e.g. non-ASCII Hindi text) remain canonical with zero penalty.
+
+
 
 

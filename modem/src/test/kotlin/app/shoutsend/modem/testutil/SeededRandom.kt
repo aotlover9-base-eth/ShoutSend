@@ -19,4 +19,6 @@ class SeededRandom(seed: Long = 42L) {
     fun nextFloat(): Float = rng.nextFloat()
 
     fun nextDouble(): Double = rng.nextDouble()
+
+    fun nextBoolean(): Boolean = rng.nextBoolean()
 }
