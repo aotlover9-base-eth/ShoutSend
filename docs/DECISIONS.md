@@ -117,3 +117,18 @@
 ### DEC-021: Automated Modem Purity Guard (`checkModemPurity`) (Rule 22)
 - **Decision**: Implemented `ModemPurityGuard` in `buildSrc` to scan `:modem` source files for any `import android.*` or `import androidx.*`.
 - **Reason**: Permanently guards against accidental leaks of Android framework code into the DSP engine.
+
+## 2026-10-22 - Step 7: Acoustic Profiles & Physical Constants Decisions
+
+### DEC-022: Physical Tone Plans and Frequency Allocation
+- **Decision**: Implemented exact frequency grids from Protocol v1:
+  - Stealth: 16 data tones from 17,600 Hz to 19,850 Hz (150 Hz steps), Sync tones S0 = 17,450 Hz, S1 = 20,000 Hz.
+  - Retro: 16 data tones from 1,500 Hz to 3,375 Hz (125 Hz steps), Sync tones S0 = 1,375 Hz, S1 = 3,500 Hz.
+- **Validation**: Enforced that all frequencies are below `sampleRate / 2 - 1500 Hz` (Nyquist guard band) and inter-tone spacing >= 100 Hz.
+
+### DEC-023: Orthogonal Parity Mode Block Encoding
+- **Decision**: Mode block packs scheme (2 bits), speed (2 bits), and rsProfileId (2 bits) with 2 orthogonal parity bits ($P_1 = b_7 \oplus b_5 \oplus b_3$, $P_0 = b_6 \oplus b_4 \oplus b_2$).
+- **Reason**: Guarantees 100% detection of all 8 single-bit error permutations (verified across 192 test cases). The mode block is repeated once at MFSK16 Normal (30ms) speed for robustness.
+
+### DEC-024: Zero-Sidelobe Sync Word and Non-Overlapping Frame Marker
+- **Decision**: Sync word pattern selected as `[3, 11, 7, 14, 1, 9, 5, 12]` (8 distinct tones) ensuring 0 non-zero aperiodic autocorrelation matches. Frame marker selected as `[13, 2, 10, 4]` ensuring zero collision with the sync word.

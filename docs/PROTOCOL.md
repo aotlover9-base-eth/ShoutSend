@@ -62,8 +62,39 @@
 
 ---
 
+
+### Physical Layer Constants (Step 7)
+
+#### Sync Word Pattern
+- **Length**: 8 MFSK16 symbols
+- **Pattern**: `[3, 11, 7, 14, 1, 9, 5, 12]`
+- **Properties**: All 8 tone indices are distinct; aperiodic autocorrelation matches are 8 at lag 0 and 0 at all non-zero lags.
+
+#### Frame Marker Pattern
+- **Length**: 4 MFSK16 symbols
+- **Pattern**: `[13, 2, 10, 4]`
+- **Properties**: Zero tone collision with the sync word.
+
+#### Mode Block Bit Layout
+- **Encoding**: 8-bit mode byte encoded into 2 MFSK16 symbols (high nibble, low nibble), repeated once (4 symbols total), sent at MFSK16 Normal (30ms) timing.
+- **Bit Fields**:
+  - `Bits 7..6`: Modulation Scheme (`00` = MFSK16, `01` = DTFSK, `10..11` reserved)
+  - `Bits 5..4`: Speed Preset (`00` = Robust, `01` = Normal, `10` = Fast, `11` reserved)
+  - `Bits 3..2`: Reed-Solomon Profile (`00` = RS(60,48), `01` = RS(40,28), `10` = RS(24,16), `11` reserved)
+  - `Bits 1..0`: 2-bit Orthogonal Parity Checksum:
+    - `Bit 1` ($P_1$): $b_7 \oplus b_5 \oplus b_3$
+    - `Bit 0` ($P_0$): $b_6 \oplus b_4 \oplus b_2$
+    - Guarantees 100% detection of all 8 single-bit error patterns.
+
 ## Change Log
 
 ### 2026-10-22 - Step 6: Initial Protocol v1 Baseline
 - Adopted Protocol v1 specification verbatim from Section 6 of `SHOUTSEND_ROADMAP.md`.
 - Pure Kotlin JVM module `:modem` established.
+
+
+### 2026-10-22 - Step 7: Acoustic Profiles & Physical Constants Formalized
+- Specified exact sync word `[3, 11, 7, 14, 1, 9, 5, 12]` with proven zero side-lobes.
+- Specified exact frame marker `[13, 2, 10, 4]`.
+- Defined 8-bit mode block bitfield with orthogonal 2-bit parity checksum for 100% single-bit error detection.
+- Documented full tone frequency tables for Stealth (17.6-20.0 kHz) and Retro (1.5-3.5 kHz) bands at 48 kHz and 44.1 kHz.
