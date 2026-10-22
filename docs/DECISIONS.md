@@ -218,6 +218,20 @@
 - **Contact Compaction**: 4-bit BCD packing for digit-only phone numbers (40% savings) and 7-bit packing for formatted phone numbers.
 - **Chooser Guarantees**: `PayloadCompactor` evaluates candidate compact size vs canonical size. Compact is chosen ONLY when strictly shorter (`compactSize < canonicalSize`), setting the `isCompact` frame flag. Payloads where compaction provides no savings (e.g. non-ASCII Hindi text) remain canonical with zero penalty.
 
+## 2026-10-23 - Step 15: Secure Mode Cryptography
+
+### DEC-034: Authenticated Encryption Specification, Security Model, and Trade-offs
+- **Rationale**: Anyone in acoustic proximity can capture soundwaves with an everyday microphone. Secure Mode offers end-to-end passphrase protection for users who require confidentiality over an open acoustic channel.
+- **Threat Model & Limits**: Because an adversary can record chirps and mount unbounded offline dictionary and brute-force attacks against the 60,000-iteration PBKDF2 hash, short or low-entropy passphrases provide weak security. `PassphraseEvaluator` actively warns users regarding dictionary vulnerability on weak choices.
+- **Cryptographic Suite**:
+  - KDF: `PBKDF2WithHmacSHA256` with 60,000 iterations and a 4-byte random salt.
+  - AEAD: `AES-256-GCM` with a 12-byte random nonce and a 12-byte (96-bit) authentication tag.
+  - AAD Binding: Associated data contains `[version (0x01), typeId]`, cryptographically preventing cross-type ciphertext manipulation.
+  - Overhead: Exactly 28 bytes (`salt [4] + nonce [12] + tag [12]`).
+- **Pipeline Order**: Compaction runs BEFORE encryption, maximizing compression ratio before high-entropy ciphertext generation.
+- **Ephemeral State**: All derived key arrays are zeroed in `finally` blocks; passphrases are never persisted.
+
+
 
 
 

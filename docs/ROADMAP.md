@@ -17,7 +17,7 @@
 | 12 | B Protocol | Packet format, fragmentation, reassembly | No | **Done** |
 | 13 | B Protocol | Payload model and codecs | No | **Done** |
 | 14 | B Protocol | Payload compaction | No | **Done** |
-| 15 | B Protocol | Secure mode crypto | No | Todo |
+| 15 | B Protocol | Secure mode crypto | No | **Done** |
 | 16 | C Modem | Tone synthesizer and windowing | No | Todo |
 | 17 | C Modem | Modulator | No | Todo |
 | 18 | C Modem | Goertzel detector | No | Todo |

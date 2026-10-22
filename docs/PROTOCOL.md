@@ -228,6 +228,25 @@ where:
 #### Contact Compact TLV
 - Replaces raw UTF-8 phone numbers with 4-bit BCD (Tag `0x22`) for digit-only phones, or 7-bit packed ASCII (Tag `0x12`).
 
+### Secure Mode Cryptography (Step 15)
+
+#### Cryptographic Suite & Parameters
+- **Key Derivation (KDF)**:
+  - Algorithm: `PBKDF2WithHmacSHA256`
+  - Salt: 4 bytes cryptographically random entropy
+  - Iterations: 60,000 rounds
+  - Derived Key Length: 256 bits (32 bytes)
+- **Authenticated Encryption (AEAD)**:
+  - Cipher: `AES-256-GCM` (`AES/GCM/NoPadding`)
+  - Nonce (IV): 12 bytes random entropy
+  - Tag Length: 96 bits (12 bytes)
+  - Associated Authenticated Data (AAD): `[Version Byte (0x01), MessageType ID Byte]`
+- **On-Air Wire Container Layout**:
+  `[Salt (4B)] [Nonce (12B)] [Ciphertext (N bytes)] [GCM Auth Tag (12B)]`
+  - Fixed Overhead: exactly 28 bytes.
+  - Frame Header Flag: Bit 2 (`isEncrypted`) set to 1.
+  - Compaction precedes encryption (`Payload -> Compact -> Seal`).
+
 ## Change Log
 
 ### 2026-10-22 - Step 6: Initial Protocol v1 Baseline
@@ -273,6 +292,11 @@ where:
 - Formalized 16-entry URL prefix and suffix dictionary tables.
 - Standardized 7-bit ASCII bit packing and 4-bit BCD contact phone encoding.
 - Formally specified strict shortest-representation chooser logic.
+
+### 2026-10-23 - Step 15: Secure Mode Cryptography Formalized
+- Formalized PBKDF2WithHmacSHA256 (60,000 iterations) and AES-256-GCM AEAD encryption pipeline.
+- Bound Version and MessageType to GCM AAD and verified exactly 28-byte on-air wire overhead.
+
 
 
 
