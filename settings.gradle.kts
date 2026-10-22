@@ -21,3 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "ShoutSend"
 include(":app")
+include(":modem")

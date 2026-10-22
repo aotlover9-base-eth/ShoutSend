@@ -10,8 +10,8 @@
 - **Package**: `app.shoutsend`
 
 ## 2. Architecture & Modules
-- `:app`: Android application module with multi-flavor setup (`dev` and `user`).
-- `:modem` (upcoming in Step 6): Pure Kotlin JVM module for audio synthesis, DSP, error correction, and channel simulation.
+- `:app`: Android application module with multi-flavor setup (`dev` and `user`). Depends on `:modem`.
+- `:modem`: Pure Kotlin JVM module (`explicitApi()` enabled) for audio synthesis, DSP, error correction, codecs, and channel simulation. 100% free of Android SDK dependencies.
 
 ## 3. Product Flavors
 - Dimension: `audience`
@@ -58,3 +58,4 @@ app/src/user/java/app/shoutsend/core/devtools/  # No-op dev tools implementation
 - Step 3 completed: Token state and persistence, `ThemeController` StateFlow, debounced DataStore in `src/dev`, `NoOpTokenOverridesRepository` in `src/user`.
 - Step 4 completed: Developer panel (dev flavor only), floating edge handle, `DeveloperPanel` bottom sheet with Colors and Shapes tabs, pure Kotlin HSV color picker, escape hatch reset guard, export/import JSON via clipboard, 0 forbidden dev strings in User APK, full unit test suite passing in both flavors.
 - Step 5 completed: Architectural verification guards in `buildSrc` (`StyleGuard`, `ApkPurityGuard`, `PermissionsGuard`). Automated Gradle tasks `checkNoHardcodedStyle`, `verifyUserApkClean`, `verifyPermissions`, and `verifyChirpRules` bound to `check`. Full verification passed on User APK, and dev marker detection was proven by failure run against Dev APK. Clean manifest and strict offline zero-internet policy enforced.
+- Step 6 completed: Pure Kotlin JVM `:modem` module scaffolded with `explicitApi()` enabled. Created `AudioSpec` (48kHz & 44.1kHz), test harness (`SeededRandom`, `TonePcm`, `PcmMath`, `PcmBufferBuilder`), and `checkModemPurity` guard in `buildSrc` (proven with failure run). Formalized Protocol v1 in `docs/PROTOCOL.md`. Smoke tests passing in `:modem:test`.

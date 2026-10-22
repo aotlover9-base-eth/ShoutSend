@@ -72,6 +72,7 @@ tasks.register("assembleBothDebug") {
 }
 
 dependencies {
+    implementation(project(":modem"))
     val composeBom = platform(libs.compose.bom)
     implementation(composeBom)
     androidTestImplementation(composeBom)
@@ -121,7 +122,7 @@ val verifyPermissions = tasks.register<app.shoutsend.buildtools.tasks.VerifyPerm
 val verifyChirpRules = tasks.register("verifyChirpRules") {
     group = "verification"
     description = "Runs all ShoutSend architectural guards (style, user APK purity, and offline permissions)."
-    dependsOn(checkNoHardcodedStyle, verifyUserApkClean, verifyPermissions)
+    dependsOn(checkNoHardcodedStyle, verifyUserApkClean, verifyPermissions, ":modem:checkModemPurity")
 }
 
 tasks.named("check") {

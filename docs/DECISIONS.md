@@ -103,3 +103,17 @@
 ### DEC-018: Strict Manifest Permissions Policy (Rule 24 & Rule 26)
 - **Decision**: `verifyPermissions` parses the merged manifests of all flavors and enforces that the permission set contains only approved entries (`RECORD_AUDIO`, `VIBRATE`, and dynamic receiver permission).
 - **Rule**: Hard-fails on `INTERNET` and `ACCESS_NETWORK_STATE`, ensuring 100% offline acoustic operation.
+
+## 2026-10-22 - Step 6: :modem Module Scaffold Decisions
+
+### DEC-019: Pure Kotlin JVM Architecture for :modem (Rule 21 & Rule 27)
+- **Decision**: Created `:modem` as a pure Kotlin JVM library without any Android SDK, NDK, or third-party audio/DSP dependencies.
+- **Reason**: Enables fast compilation, zero-overhead simulation, and 100% JVM-executable unit tests for the entire acoustic stack.
+
+### DEC-020: Explicit API Mode (`explicitApi()`) (Rule 23)
+- **Decision**: Configured Kotlin `explicitApi()` in `modem/build.gradle.kts`.
+- **Reason**: Forces all exposed types and methods in `:modem` to declare explicit visibility (`public`, `internal`, `private`) and explicit return types, ensuring a disciplined and leak-proof API boundary.
+
+### DEC-021: Automated Modem Purity Guard (`checkModemPurity`) (Rule 22)
+- **Decision**: Implemented `ModemPurityGuard` in `buildSrc` to scan `:modem` source files for any `import android.*` or `import androidx.*`.
+- **Reason**: Permanently guards against accidental leaks of Android framework code into the DSP engine.
