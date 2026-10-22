@@ -12,3 +12,5 @@
 *.apk
 *.jks
 *.keystore
+
+buildSrc/build/
