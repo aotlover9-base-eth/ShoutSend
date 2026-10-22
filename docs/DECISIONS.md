@@ -181,3 +181,19 @@
 - **Rationale**: Reed-Solomon operates natively on bytes over GF(256). Physical acoustic echo and multipath interference corrupt contiguous sequences of audio symbols. Because symbols naturally map to adjacent bytes in the un-interleaved stream, a short burst error only corrupts a small number of adjacent bytes (e.g. an $L$-symbol burst damages at most $\lceil L \cdot \text{bitsPerSymbol} / 8 \rceil + 1$ bytes). Interleaving symbols within a single codeword would scatter burst damage across many distinct bytes throughout the entire codeword, multiplying the number of corrupted bytes and exceeding RS correction capacity. Acoustic robustness is achieved through short frames, PN9 whitening, repeat transmissions, and symbol-level erasure marking.
 - **Erasure Mapping**: For DTFSK (where 6-bit symbols cross 8-bit byte boundaries), any symbol with confidence below the threshold ($0.5$) marks all bytes it overlaps ($\lfloor 6s/8 \rfloor$ through $\lfloor (6s+5)/8 \rfloor$) as Reed-Solomon erasures. Evaluated 500-message trials proved this boosts recovery rate by up to $+63.6\%$ under noise.
 
+## 2026-10-22 - Step 12: Packet Format, Fragmentation, Reassembly, and Air-Time
+
+### DEC-031: Frame Structure, Fragmentation, Reassembly, and Air-Time Modeling
+- **Frame Layout**: Standardized 4-byte header:
+  - Byte 0: version (bits 7..6 = 1), type (bits 5..3 = `MessageType`), flags (bits 2..0 = encrypted, compact, reserved).
+  - Byte 1: message ID (0..255).
+  - Byte 2: fragment index (bits 7..4 = 0..15), fragment count (bits 3..0 = `count - 1` representing 1..16).
+  - Byte 3: payload length $L \in [0, k - 6]$.
+  - Bytes 4 until $4 + L - 1$: payload slice.
+  - Bytes $4 + L$ until $k - 3$: zero padding.
+  - Bytes $k - 2$ .. $k - 1$: CRC-16/CCITT-FALSE over bytes $0 \dots 4 + L - 1$ (header and payload).
+- **Limits**: `MAX_AIR_BYTES = 320`, `MAX_FRAGMENTS = 16`. Empty payloads are rejected.
+- **MessageAssembler**: Injected clock, 60s timeout for incomplete message purging, duplicate frame rejection, stream conflict detection with state reset, and exactly-once delivery semantics.
+- **AirTime**: Pure calculation: $T = 0.84\text{s} + (\text{frameCount} \cdot \text{repeats} \cdot (4 + \text{codewordSymbols}) \cdot T_{\text{symbol}})$. Verified against hand-computed test cases.
+
+

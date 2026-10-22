@@ -150,6 +150,39 @@
 - Acoustic noise bursts and echo corrupt consecutive symbols. With contiguous mapping, an $L$-symbol burst damages at most $\lceil L \cdot \text{bitsPerSymbol} / 8 \rceil + 1$ bytes.
 - Interleaving would disperse these errors across many non-adjacent bytes, vastly increasing the number of corrupted bytes and causing decoding failure. Burst robustness is instead achieved through short frames, PN9 whitening, multi-frame repeat transmissions, and symbol-level erasure marking.
 
+### Transport Framing & Packet Protocol (Step 12)
+
+#### Frame Content Layout (Pre-FEC)
+For an RS profile with data parameter $k$ ($k=48$ for STANDARD, $k=54$ for LIGHT, $k=40$ for STRONG):
+- **Byte 0**:
+  - `Bits 7..6`: Version (fixed value `1` = `0b01`)
+  - `Bits 5..3`: Message Type (0: TEXT, 1: URL, 2: WIFI, 3: CONTACT; 4..7 reserved)
+  - `Bits 2..0`: Message Flags (Bit 2: encrypted, Bit 1: compact, Bit 0: reserved)
+- **Byte 1**: Message ID ($0 \dots 255$, randomly generated per message)
+- **Byte 2**:
+  - `Bits 7..4`: Fragment Index ($0 \dots 15$)
+  - `Bits 3..0`: Fragment Count minus 1 ($0 \dots 15$, representing count $1 \dots 16$)
+- **Byte 3**: Payload Length $L \in [0, k - 6]$
+- **Bytes 4 to $4 + L - 1$**: Payload slice
+- **Bytes $4 + L$ to $k - 3$**: Zero padding
+- **Bytes $k - 2$ to $k - 1$**: CRC-16/CCITT-FALSE (big-endian) computed over bytes $0 \dots 4 + L - 1$ (header + payload)
+
+#### Frame Decoding Validation Rules & Errors
+Decoded $k$-byte blocks are validated in sequence:
+1. `VersionMismatch`: Byte 0 bits 7..6 != 1.
+2. `UnknownMessageType`: Byte 0 bits 5..3 not in 0..3.
+3. `BadLength`: Byte 3 payload length $> k - 6$.
+4. `BadCrc`: Suffix CRC-16 != computed CRC over bytes $0 \dots 4 + L - 1$.
+5. `BadFragmentField`: Fragment count not in $1 \dots 16$, or fragment index $\ge$ fragment count.
+
+#### Air-Time Duration Formula
+$$T_{\text{air}} = T_{\text{header}} + (\text{frameCount} \cdot \text{repeats} \cdot T_{\text{frame}})$$
+where:
+- $T_{\text{header}} = (16 + 8 + 4) \cdot 30\text{ ms} = 840\text{ ms} = 0.84\text{ s}$
+- $T_{\text{frame}} = (4 + \text{codewordSymbols}) \cdot T_{\text{symbol}}$
+- $\text{codewordSymbols} = \frac{n \cdot 8}{\text{bitsPerSymbol}}$ (120 for MFSK16, 80 for DTFSK on $n=60$)
+- $T_{\text{symbol}}$: 60 ms (Robust), 30 ms (Normal), 20 ms (Fast)
+
 ## Change Log
 
 ### 2026-10-22 - Step 6: Initial Protocol v1 Baseline
@@ -180,3 +213,10 @@
 - Implemented `CodewordSymbolizer` with PN9 whitening and DTFSK/MFSK16 bit packing.
 - Formalized and proved symbol-to-byte erasure mapping bounds ($\le \lceil L \cdot \text{bitsPerSymbol} / 8 \rceil + 1$).
 - Formally documented the rejection rationale for intra-codeword interleaving.
+
+### 2026-10-22 - Step 12: Packet Format, Fragmentation, and Reassembly Formalized
+- Standardized 4-byte frame header, payload slicing, CRC-16 check, and typed decoder errors.
+- Implemented `Fragmenter` with `MAX_AIR_BYTES = 320` and `MAX_FRAGMENTS = 16`.
+- Implemented `MessageAssembler` with duplicate suppression, stream conflict auto-reset, and injected clock timeout.
+- Implemented `AirTime` estimator with proven hand-calculated test vectors.
+
