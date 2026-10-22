@@ -272,6 +272,15 @@
 - **Sync Word Correlation Boundary Selection**: During sync verification, candidate boundaries ($T - \text{hopSize}, T, T + \text{hopSize}$) are tested by calculating the cumulative Goertzel energy of expected sync word data tones (`SYNC_WORD_PATTERN`). The boundary maximizing expected-tone energy correlation is selected, achieving sub-hop symbol boundary alignment within $\pm 0.17$ symbol periods across 200 random start offsets and high noise levels.
 - **Timing Drift Tracking**: In the `LOCKED` state, `TimingTracker` applies early/late loop energy correction on 4-symbol frame markers, maintaining lock across $\pm 100$ ppm sample rate clock drift.
 
+## 2026-10-23 - Step 25: Spectrum Analyzer (FFT) for Waterfall
+
+### DEC-042: Precomputed Radix-2 FFT and Streaming Normalized Waterfall Analyzer
+- **Display-Only FFT Path**: FFT is strictly for waterfall visualization; Goertzel filter bank remains the sole transmission decoder.
+- **Precomputed Cooley-Tukey In-Place FFT**: Size $N=1024$ (power of 2) with precomputed bit-reversal and twiddle factor tables (`twiddleCos`, `twiddleSin`). Zero heap allocations during `transform(real, imag)`.
+- **Hann Window Coherent Gain Correction**: With a Hann window ($w[n] = 0.5(1 - \cos(2\pi n / (N-1)))$), coherent gain is 0.5. Power scaling factor $16 / N^2$ provides calibrated amplitude matching input sinusoidal peak levels within 1 dB.
+- **Dynamic Bin Mapping**: When FFT bins exceed display bins, max-pooling preserves narrow tone peaks without dilution; when display bins exceed FFT bins, linear interpolation provides smooth rendering.
+- **Audio Hop Timing**: Hop interval is 800 samples at 48 kHz and 735 samples at 44.1 kHz, targeting ~60 rows per second with streaming zero-allocation ring buffer ingestion.
+
 ## 2026-10-23 - Step 31: Vault Storage (Room + Keystore)
 
 ### DEC-041: AES-256-GCM Encrypted Room Vault with Graceful Degradation and Secret Masking
