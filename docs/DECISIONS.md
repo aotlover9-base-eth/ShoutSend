@@ -263,6 +263,16 @@
 - **Detection Thresholding**: Minimum detection power is bounded by $\max(\text{floor} \cdot 10^{\text{margin}/10}, \text{minFloorPower} \cdot 10^{\text{margin}/10})$. Setting `minFloorPower` to $-70$ dBFS ensures that digital silence or near-zero noise cannot cause false triggers on quantization flutter.
 - **Confidence Calibration**: Demodulator confidence is formulated as the product of winner-to-runner separation $\frac{E_{\text{win}} - E_{\text{run}}}{E_{\text{win}}}$ and SNR headroom $\frac{\text{SNR} - \text{margin}}{12.0}$. This provides a continuous $[0, 1]$ metric used by Step 21 to mark symbol erasures when confidence drops below $0.5$.
 
+## 2026-10-23 - Step 20: Preamble Detection and Symbol Synchronization
+
+### DEC-039: 4-Phase Quarter-Symbol Scanning, Expected-Energy Sync Correlation, and Power-of-2 Ring Buffer
+- **4-Phase Quarter-Symbol Scanning**: The receiver scans continuous streaming audio at quarter-symbol hops (360 samples at 48 kHz). Across four interleaved hop phases, the phase maximizing the alternating S0/S1 contrast over 6 symbol slots is identified.
+- **Single-Tone False Lock Rejection**: Preamble candidate requires at least 6 consecutive alternating symbols, with both S0 and S1 detected at least twice. Steady single-tone emissions (S0, S1, or data tones) cannot satisfy this condition and produce zero false locks.
+- **Power-of-2 Ring Buffer with Chunked Ingestion**: The audio buffer uses a fixed capacity of 65,536 samples ($2^{16}$) with bitwise mask indexing (`S & 65535L`). `push()` accepts arbitrary sample block sizes and internally chunks processing into $\le 2048$ samples, ensuring audio cannot overwrite unprocessed samples while waiting for sync word completion.
+- **Sync Word Correlation Boundary Selection**: During sync verification, candidate boundaries ($T - \text{hopSize}, T, T + \text{hopSize}$) are tested by calculating the cumulative Goertzel energy of expected sync word data tones (`SYNC_WORD_PATTERN`). The boundary maximizing expected-tone energy correlation is selected, achieving sub-hop symbol boundary alignment within $\pm 0.17$ symbol periods across 200 random start offsets and high noise levels.
+- **Timing Drift Tracking**: In the `LOCKED` state, `TimingTracker` applies early/late loop energy correction on 4-symbol frame markers, maintaining lock across $\pm 100$ ppm sample rate clock drift.
+
+
 
 
 

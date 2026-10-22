@@ -22,7 +22,7 @@
 | 17 | C Modem | Modulator | No | **Done** |
 | 18 | C Modem | Goertzel detector | No | **Done** |
 | 19 | C Modem | Noise floor tracker and SNR | No | **Done** |
-| 20 | C Modem | Preamble detection and symbol sync | No | Todo |
+| 20 | C Modem | Preamble detection and symbol sync | No | **Done** |
 | 21 | C Modem | Demodulator and receive state machine | No | Todo |
 | 22 | C Modem | Channel simulator and loopback harness | No | Todo |
 | 23 | C Modem | Benchmark and preset tuning in simulation | No | Todo |
