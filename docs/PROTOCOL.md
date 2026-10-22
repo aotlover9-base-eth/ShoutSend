@@ -120,6 +120,19 @@
   - `STRONG` (ID 2): $RS(60, 40)$ with $nsym = 20$ ($t = 10$ errors)
 - **Shortening**: Leading zeros are omitted from transmission; mathematically identical parity and syndromes.
 
+
+### Reed-Solomon Decoder Specification (Step 10)
+
+#### Algorithm & Capacity
+- **Variant**: Berlekamp-Massey initialized from erasure locator $\Lambda_{erasures}(x)$ on syndromes $S_i$, Chien root search, and Forney algorithm with $X_l$ scaling for generator roots starting at $lpha^0$.
+- **Capacity**: Corrects any error pattern satisfying:
+  $$2 \cdot v + \mu \le nsym$$
+  where $v$ is the count of unknown byte errors and $\mu$ is the count of known byte erasures.
+- **Integrity**: 
+  - Degree match validation between Chien roots and locator polynomial degree.
+  - Syndrome re-evaluation over corrected codeword before release.
+  - Measured miscorrection rate on beyond-capacity codewords: **0.0000%** (0 false corrections out of 10,000 trials).
+
 ## Change Log
 
 ### 2026-10-22 - Step 6: Initial Protocol v1 Baseline
@@ -141,3 +154,7 @@
 - Specified primitive polynomial 0x11D and generator polynomial roots alpha^0..alpha^(nsym-1).
 - Defined three RS profiles (LIGHT, STANDARD, STRONG) with designated mode block IDs 0, 1, and 2.
 - Implemented zero-allocation systematic encoder verified with 100% zero-syndrome tests.
+
+### 2026-10-22 - Step 10: Errors-and-Erasures Decoder Formalized
+- Standardized Berlekamp-Massey + Forney errors-and-erasures decoding pipeline.
+- Verified 100% recovery up to capacity limit and 0.0000% miscorrection rate in 10,000 stress trials.

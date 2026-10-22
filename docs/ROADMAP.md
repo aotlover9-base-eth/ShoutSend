@@ -12,7 +12,7 @@
 | 7 | B Protocol | Acoustic profiles and tone plan | No | **Done** |
 | 8 | B Protocol | Bit utilities, CRC-16, whitening | No | **Done** |
 | 9 | B Protocol | Reed-Solomon field and encoder | No | **Done** |
-| 10 | B Protocol | Reed-Solomon decoder | No | Todo |
+| 10 | B Protocol | Reed-Solomon decoder | No | **Done** |
 | 11 | B Protocol | Codeword symbolizer and erasure mapping | No | Todo |
 | 12 | B Protocol | Packet format, fragmentation, reassembly | No | Todo |
 | 13 | B Protocol | Payload model and codecs | No | Todo |
