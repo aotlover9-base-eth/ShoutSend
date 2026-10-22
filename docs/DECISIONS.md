@@ -247,6 +247,15 @@
 - **AirTime Calibration**: `AirTime.estimate` was extended with optional `leadInSilenceMs` (default 0) and `tailSilenceMs` (default 0) parameters to retain exact backwards-compatibility with Steps 12-15 while matching `Modulator.durationSeconds` within one symbol period across all schemes, speeds, and payload counts.
 - **Zero-Allocation Hot Path Verification**: Direct array indexing for ramp tables in `RaisedCosineWindow` (`directTable[rampLength]`) eliminates boxing and lambda overhead on the rendering hot path. Verified that streaming 10 seconds of continuous audio emits 0 bytes of heap allocation in steady state.
 
+## 2026-10-23 - Step 18: Goertzel Detector
+
+### DEC-037: Generalized Goertzel Filter Bank, Coherent Hann Calibration, and Streaming Ring Buffer
+- **Generalized Goertzel Coefficients**: Goertzel resonators compute the filter coefficient $2\cos(2\pi f / F_s)$ using the exact target acoustic frequency $f$ rather than rounding to discrete FFT bins. This allows arbitrary tone placements (e.g. 17,450 Hz, 18,350 Hz) and guarantees exact tone tuning across both 48 kHz and 44.1 kHz sample rates.
+- **Hann Window & Coherent Gain Normalization**: Precomputed Hann analysis windows $w[n] = 0.5 (1 - \cos(2\pi (n + 0.5)/N))$ suppress spectral leakage from adjacent tones. Because the coherent gain of a Hann window is $\sum w[n] = N/2$, the raw squared resonator magnitude $|X|^2$ is normalized by $\frac{16}{N^2}$ (and $\frac{4}{N^2}$ for unwindowed mode). A pure sine wave of peak amplitude $A$ produces reported power $A^2$ within 1%.
+- **Measured Crosstalk Rejection**: Full $16 \times 16$ crosstalk leakage matrices proved that off-diagonal leakage is $\le -56.7$ dB (Robust), $\le -43.4$ dB (Normal), and $\le -31.0$ dB (Fast) for Retro, and $\le -44.5$ dB (Normal) and $\le -48.5$ dB (Fast) for Stealth, far exceeding the $\le -25$ dB / $\le -20$ dB roadmap thresholds.
+- **Streaming Ring Buffer (`BlockDetector`)**: Ingestion decouples incoming chunk sizes (e.g. 1024-sample AudioRecord buffers) from the DSP analysis block size ($N$) and hop interval, emitting blocks via `EnergyListener` with 0 heap allocations per block.
+
+
 
 
 

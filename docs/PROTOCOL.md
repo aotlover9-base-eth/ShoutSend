@@ -316,6 +316,16 @@ where:
 - **Fixed Whitening Seed Constant**: `WHITEN_SEED_V1 = 0xA5` is used across all frames, permitting the receiver to de-whiten and decode frame headers without requiring prior knowledge of the fragment index.
 - **AirTime Synchronization**: Measured `Modulator.durationSeconds` strictly matches `AirTime.estimate` within one symbol length across all profiles and payload sizes.
 
+### 2026-10-23 - Step 18: Receiver Front End & Goertzel Detector Formalized
+- **Generalized Second-Order Goertzel Resonator**: Recurrence $q_0 = 2\cos(2\pi f / F_s) q_1 - q_2 + x[n]$ with $|X|^2 = q_1^2 + q_2^2 - \text{coeff} \cdot q_1 \cdot q_2$.
+- **Windowed Coherent Power Calibration**: Precomputed Hann window $w[n] = 0.5 \cdot (1 - \cos(2\pi (n + 0.5) / N))$. Normalization factor $\text{norm} = 16.0 / N^2$ for Hann windowed blocks, and $4.0 / N^2$ for unwindowed blocks, calibrating output power to $A^2$ within 1% for input peak amplitude $A$.
+- **Measured Crosstalk Rejection**:
+  - Robust preset: Leakage $\le -56.7$ dB (Retro) and $\le -62.8$ dB (Stealth).
+  - Normal preset: Leakage $\le -43.4$ dB (Retro) and $\le -44.5$ dB (Stealth).
+  - Fast preset: Leakage $\le -31.0$ dB (Retro) and $\le -48.5$ dB (Stealth).
+- **Streaming Ingestion**: `BlockDetector` circular ring buffer delivers hopping energy evaluations with zero per-block allocations.
+
+
 
 
 
