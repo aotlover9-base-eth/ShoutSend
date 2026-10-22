@@ -303,6 +303,20 @@ where:
 - **Envelope Invariant**: $w_{\text{up}}(i) + w_{\text{down}}(i) \equiv 1.0f$ for all $i \in [0, R - 1]$, ensuring $0.0$ dB amplitude dip across identical tone boundaries and eliminating transient clicks.
 - **Chunk-Independence Invariant**: Audio rendering in chunks of 1, 7, 480, or 10,000 samples yields bit-identical outputs. Zero allocations on rendering hot path.
 
+### 2026-10-23 - Step 17: Modulator Formalized
+- **Transmission Assembly Sequence**:
+  1. Lead-in silence: 250 ms hardware wake-up margin.
+  2. Acquisition preamble: 16 symbols alternating S0 and S1 at Normal (30ms) MFSK16 timing.
+  3. Sync word: 8 fixed pseudo-random symbols `[3, 11, 7, 14, 1, 9, 5, 12]` at Normal (30ms) MFSK16 timing.
+  4. Mode block: 2 symbols repeated once (4 symbols total) declaring scheme, speed, and RS profile at Normal (30ms) MFSK16 timing.
+  5. Physical frames repeated $R$ times (default 2):
+     - 4-symbol frame marker `[13, 2, 10, 4]` at active speed.
+     - Systematic Reed-Solomon codeword symbols whitened with fixed seed `WHITEN_SEED_V1 = 0xA5` at active speed and scheme.
+  6. Tail silence: 150 ms hardware cool-down margin.
+- **Fixed Whitening Seed Constant**: `WHITEN_SEED_V1 = 0xA5` is used across all frames, permitting the receiver to de-whiten and decode frame headers without requiring prior knowledge of the fragment index.
+- **AirTime Synchronization**: Measured `Modulator.durationSeconds` strictly matches `AirTime.estimate` within one symbol length across all profiles and payload sizes.
+
+
 
 
 

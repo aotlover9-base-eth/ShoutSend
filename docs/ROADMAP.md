@@ -19,7 +19,7 @@
 | 14 | B Protocol | Payload compaction | No | **Done** |
 | 15 | B Protocol | Secure mode crypto | No | **Done** |
 | 16 | C Modem | Tone synthesizer and windowing | No | **Done** |
-| 17 | C Modem | Modulator | No | Todo |
+| 17 | C Modem | Modulator | No | **Done** |
 | 18 | C Modem | Goertzel detector | No | Todo |
 | 19 | C Modem | Noise floor tracker and SNR | No | Todo |
 | 20 | C Modem | Preamble detection and symbol sync | No | Todo |

@@ -58,6 +58,12 @@ public object ProtocolConstants {
     public const val DEFAULT_FRAME_REPEATS: Int = 2
 
     /**
+     * Fixed PN9 whitening LFSR seed for Protocol v1 transmissions.
+     * Constant across all frames so receiver can de-whiten without needing prior knowledge of fragment index.
+     */
+    public const val WHITEN_SEED_V1: Int = 0xA5
+
+    /**
      * Maximum payload size on air in bytes for Protocol v1.
      */
     public const val MAX_AIR_PAYLOAD_BYTES: Int = 320

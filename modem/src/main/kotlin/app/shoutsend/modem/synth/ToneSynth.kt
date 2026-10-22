@@ -65,7 +65,8 @@ public object ToneSynth {
         val firstCandidate = schedule.findFirstCandidateIndex(startSample)
 
         val eventCount = schedule.events.size
-        for (i in firstCandidate until eventCount) {
+        var i = firstCandidate
+        while (i < eventCount) {
             val event = schedule.events[i]
             if (event.startSample >= windowEnd) {
                 // Schedule is strictly sorted by startSample; no subsequent events can overlap the window
@@ -124,6 +125,7 @@ public object ToneSynth {
                     out[outIdx] += (envelope * level * osc).toFloat()
                 }
             }
+            i++
         }
 
         // Final amplitude clamp [-1.0f, 1.0f]

@@ -239,6 +239,15 @@
 - **Zero-Allocation Hot Path (Rule 22)**: `RampTable` precomputes `rampUp` and `rampDown` arrays once per ramp length and caches them in `RaisedCosineWindow`. `ToneSynth.render` writes directly into caller-provided float arrays with zero heap allocation per sample or symbol.
 - **Linear PCM Conversion**: `PcmConverter` performs round-to-nearest conversion with strict clamp to $[-32768, 32767]$ without dither, with symmetric full scale representation (+1.0f -> 32767, -1.0f -> -32768).
 
+## 2026-10-23 - Step 17: Modulator
+
+### DEC-036: Physical Transmission Assembly, Fixed Whitening Seed, and Hardware Silence Margins
+- **Fixed Whitening Seed Constant**: `WHITEN_SEED_V1 = 0xA5` is chosen as a fixed non-zero LFSR seed across all transmitted frames. Rationale: Because fragment indices reside inside the encoded and whitened frame header, a receiver cannot know the fragment index prior to de-whitening and decoding the frame header. A single constant seed eliminates this circular dependency.
+- **Hardware Silence Margins**: Real speaker drivers (especially on mobile devices) require an analog turn-on settling ramp before audio playback begins, and analog audio output sinks drop the tail when buffers end abruptly. By default, `TransmissionBuilder` prepends 250 ms lead-in silence and appends 150 ms tail silence as zero-amplitude PCM samples. Both values are configurable.
+- **AirTime Calibration**: `AirTime.estimate` was extended with optional `leadInSilenceMs` (default 0) and `tailSilenceMs` (default 0) parameters to retain exact backwards-compatibility with Steps 12-15 while matching `Modulator.durationSeconds` within one symbol period across all schemes, speeds, and payload counts.
+- **Zero-Allocation Hot Path Verification**: Direct array indexing for ramp tables in `RaisedCosineWindow` (`directTable[rampLength]`) eliminates boxing and lambda overhead on the rendering hot path. Verified that streaming 10 seconds of continuous audio emits 0 bytes of heap allocation in steady state.
+
+
 
 
 

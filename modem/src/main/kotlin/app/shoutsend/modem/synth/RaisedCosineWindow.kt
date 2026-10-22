@@ -21,7 +21,8 @@ public class RampTable(
  */
 public object RaisedCosineWindow {
 
-    private val cache = ConcurrentHashMap<Int, RampTable>()
+    private val directTable: Array<RampTable?> = arrayOfNulls(2048)
+    private val fallbackCache = ConcurrentHashMap<Int, RampTable>()
 
     /**
      * Evaluates a single raised-cosine ramp-up value for index [i] in ramp of length [rampLength].
@@ -45,21 +46,34 @@ public object RaisedCosineWindow {
 
     /**
      * Retrieves or generates the precomputed [RampTable] for [rampLength].
-     * Zero-allocation lookup on cached tables.
+     * Zero-allocation, lock-free lookup for all standard ramp lengths (< 2048).
      */
     public fun getRamp(rampLength: Int): RampTable {
-        return cache.computeIfAbsent(rampLength) { r ->
-            val up = FloatArray(r)
-            val down = FloatArray(r)
-            for (i in 0 until r) {
-                val phase = PI * (i + 0.5) / r
-                val cosVal = cos(phase)
-                val u = ((1.0 - cosVal) / 2.0).toFloat()
-                val d = 1.0f - u // Exact mathematical complement ensures sum == 1.0f
-                up[i] = u
-                down[i] = d
-            }
-            RampTable(r, up, down)
+        if (rampLength in 0 until 2048) {
+            val existing = directTable[rampLength]
+            if (existing != null) return existing
+            val table = createRampTable(rampLength)
+            directTable[rampLength] = table
+            return table
         }
+        val existing = fallbackCache[rampLength]
+        if (existing != null) return existing
+        val table = createRampTable(rampLength)
+        fallbackCache[rampLength] = table
+        return table
+    }
+
+    private fun createRampTable(r: Int): RampTable {
+        val up = FloatArray(r)
+        val down = FloatArray(r)
+        for (i in 0 until r) {
+            val phase = PI * (i + 0.5) / r
+            val cosVal = cos(phase)
+            val u = ((1.0 - cosVal) / 2.0).toFloat()
+            val d = 1.0f - u // Exact mathematical complement ensures sum == 1.0f
+            up[i] = u
+            down[i] = d
+        }
+        return RampTable(r, up, down)
     }
 }
