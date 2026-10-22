@@ -14,3 +14,5 @@
 *.keystore
 
 buildSrc/build/
+
+.kotlin/

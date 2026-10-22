@@ -133,6 +133,23 @@
   - Syndrome re-evaluation over corrected codeword before release.
   - Measured miscorrection rate on beyond-capacity codewords: **0.0000%** (0 false corrections out of 10,000 trials).
 
+
+### Codeword Symbolizer & Erasure Mapping (Step 11)
+
+#### Symbol Mapping Architecture
+- **Whitening**: Bytes are XOR-whitened with the PN9 LFSR sequence initialized by `frameSeed` prior to symbol mapping, avoiding repetitive acoustic tone sequences.
+- **MFSK16**: 4 bits per symbol. Each byte maps to exactly 2 symbols ($s_0 = \text{high nibble}, s_1 = \text{low nibble}$). 60-byte codeword -> 120 symbols.
+- **DTFSK**: 6 bits per symbol (3 bits low group tone 0..7, 3 bits high group tone 8..15). 4 symbols cover exactly 3 bytes (24 bits). 60-byte codeword -> 80 symbols.
+- **Symbol-to-Byte Erasure Mapping**:
+  - Symbol $s$ spans bit range $[6s, 6s + 5]$.
+  - Affected byte range: $[\lfloor 6s / 8 \rfloor, \lfloor (6s + 5) / 8 \rfloor]$.
+  - When demodulator symbol confidence is below threshold ($0.5$), all bytes spanned by that symbol are flagged as Reed-Solomon erasures.
+
+#### Intra-Codeword Interleaving Rejection
+- Interleaving symbols within an individual Reed-Solomon codeword is strictly rejected.
+- Acoustic noise bursts and echo corrupt consecutive symbols. With contiguous mapping, an $L$-symbol burst damages at most $\lceil L \cdot \text{bitsPerSymbol} / 8 \rceil + 1$ bytes.
+- Interleaving would disperse these errors across many non-adjacent bytes, vastly increasing the number of corrupted bytes and causing decoding failure. Burst robustness is instead achieved through short frames, PN9 whitening, multi-frame repeat transmissions, and symbol-level erasure marking.
+
 ## Change Log
 
 ### 2026-10-22 - Step 6: Initial Protocol v1 Baseline
@@ -158,3 +175,8 @@
 ### 2026-10-22 - Step 10: Errors-and-Erasures Decoder Formalized
 - Standardized Berlekamp-Massey + Forney errors-and-erasures decoding pipeline.
 - Verified 100% recovery up to capacity limit and 0.0000% miscorrection rate in 10,000 stress trials.
+
+### 2026-10-22 - Step 11: Codeword Symbolizer & Erasure Mapping Formalized
+- Implemented `CodewordSymbolizer` with PN9 whitening and DTFSK/MFSK16 bit packing.
+- Formalized and proved symbol-to-byte erasure mapping bounds ($\le \lceil L \cdot \text{bitsPerSymbol} / 8 \rceil + 1$).
+- Formally documented the rejection rationale for intra-codeword interleaving.
