@@ -7,7 +7,7 @@
 | 2 | A Foundation | Design system core | No | **Done** |
 | 3 | A Foundation | Token state and persistence | No | **Done** |
 | 4 | A Foundation | Developer panel (dev flavor) | Light | **Done** |
-| 5 | A Foundation | Style guard and User APK purity check | No | Todo |
+| 5 | A Foundation | Style guard and User APK purity check | No | **Done** |
 | 6 | A Foundation | `:modem` module scaffold and test harness | No | Todo |
 | 7 | B Protocol | Acoustic profiles and tone plan | No | Todo |
 | 8 | B Protocol | Bit utilities, CRC-16, whitening | No | Todo |

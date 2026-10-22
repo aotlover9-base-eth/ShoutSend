@@ -57,7 +57,7 @@ class ThemePersistenceTest {
         )
         testScheduler.runCurrent()
 
-        val testColor = Color.Green
+        val testColor = Color(red = 0.1f, green = 0.9f, blue = 0.3f)
         controller.setColor("primary", testColor)
         testScheduler.runCurrent()
 
@@ -100,11 +100,11 @@ class ThemePersistenceTest {
         )
         testScheduler.runCurrent()
 
-        controller.setColor("primary", Color.Blue)
+        controller.setColor("primary", Color(red = 0.2f, green = 0.3f, blue = 0.9f))
         controller.setRadius("medium", 20f)
         testScheduler.runCurrent()
 
-        assertEquals(Color.Blue, controller.tokens.value.colors.primary)
+        assertEquals(Color(red = 0.2f, green = 0.3f, blue = 0.9f), controller.tokens.value.colors.primary)
         assertEquals(RoundedCornerShape(20.dp), controller.tokens.value.shapes.medium)
 
         controller.resetColor("primary")
@@ -145,7 +145,7 @@ class ThemePersistenceTest {
         )
         testScheduler.runCurrent()
 
-        controller.setColor("secondary", Color.Red)
+        controller.setColor("secondary", Color(red = 0.9f, green = 0.2f, blue = 0.2f))
         controller.setRadius("large", 24f)
         testScheduler.runCurrent()
 
@@ -162,7 +162,7 @@ class ThemePersistenceTest {
         val importResult = controller.importFromJson(exported)
         assertTrue(importResult.isSuccess)
         testScheduler.runCurrent()
-        assertEquals(Color.Red, controller.tokens.value.colors.secondary)
+        assertEquals(Color(red = 0.9f, green = 0.2f, blue = 0.2f), controller.tokens.value.colors.secondary)
         assertEquals(RoundedCornerShape(24.dp), controller.tokens.value.shapes.large)
     }
 

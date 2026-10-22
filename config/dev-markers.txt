@@ -1,0 +1,11 @@
+# Dev Markers that MUST NEVER appear in User APK
+# Any occurrence of these class names, packages, or identifiers in User APK DEX will fail the build.
+DevToolsImpl
+DeveloperPanel
+DevPanelViewModel
+FloatingDevHandle
+DevDataStoreTokenOverridesRepository
+DevPanel
+TokenEditor
+ColorEditor
+DspLab

@@ -1,0 +1,4 @@
+# Style Guard Allowlist
+# Every entry here MUST correspond to an approved entry in docs/DECISIONS.md.
+# Format: <relative-path>:<line-pattern-or-rule>
+# Example: app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml:#[0-9A-Fa-f]{6}

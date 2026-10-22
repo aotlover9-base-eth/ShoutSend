@@ -82,3 +82,24 @@
 ### DEC-014: Theme-Safe Escape Hatch Readability Guard
 - **Decision**: Styled the "Reset All" action using un-overridable default tokens (`DefaultTokens.CyberRadioDark.errorContainer` and `onErrorContainer`).
 - **Reason**: Protects developers from being locked out if they accidentally set background and text colors to the same value (e.g. black-on-black).
+
+## 2026-10-22 - Step 5: Style Guard and User APK Purity Decisions
+
+### DEC-015: BuildSrc Kotlin Implementation for Architectural Guards
+- **Decision**: Implemented `StyleGuard`, `ApkPurityGuard`, and `PermissionsGuard` as small, pure Kotlin classes with JUnit tests inside `buildSrc`.
+- **Reason**: Guarantees zero external lint-rule library dependencies while providing instant Gradle task integration and unit testability for architectural invariants.
+
+### DEC-016: Style Guard Tokenization Enforcement Policy & Allowlist (Rules 6 & 7)
+- **Decision**: `StyleGuard` scans all `.kt` and `.xml` source files under `app/src` and fails if:
+  1. Raw hex colors or `Color(0x...)` exist outside `DefaultTokens.kt`.
+  2. Named color constants (`Color.Red`, etc.) are used instead of theme tokens.
+  3. Numeric literals are passed to `dp`, `sp`, or shape constructors outside `core/designsystem`.
+- **Exceptions**: Tracked strictly in `config/style-allowlist.txt`. Currently only `ic_launcher_background.xml` (standard Android adaptive launcher vector) is permitted.
+
+### DEC-017: User APK Dex Inspection & Purity Marker Policy (Rule 15)
+- **Decision**: `verifyUserApkClean` unzips the assembled User APK and verifies that 0 markers from `config/dev-markers.txt` appear in DEX strings or AndroidManifest.
+- **Verification**: Verified and proven by running against the Developer APK, which successfully failed with 6 detected markers.
+
+### DEC-018: Strict Manifest Permissions Policy (Rule 24 & Rule 26)
+- **Decision**: `verifyPermissions` parses the merged manifests of all flavors and enforces that the permission set contains only approved entries (`RECORD_AUDIO`, `VIBRATE`, and dynamic receiver permission).
+- **Rule**: Hard-fails on `INTERNET` and `ACCESS_NETWORK_STATE`, ensuring 100% offline acoustic operation.

@@ -98,3 +98,32 @@ dependencies {
 
     debugImplementation(libs.compose.ui.tooling)
 }
+
+val checkNoHardcodedStyle = tasks.register<app.shoutsend.buildtools.tasks.CheckNoHardcodedStyleTask>("checkNoHardcodedStyle") {
+    sourceDir.set(file("src"))
+    allowlistFile.set(rootProject.file("config/style-allowlist.txt"))
+}
+
+val verifyUserApkClean = tasks.register<app.shoutsend.buildtools.tasks.VerifyUserApkCleanTask>("verifyUserApkClean") {
+    dependsOn("assembleUserDebug")
+    apkFile.set(layout.buildDirectory.file("outputs/apk/user/debug/app-user-debug.apk"))
+    markersFile.set(rootProject.file("config/dev-markers.txt"))
+}
+
+val verifyPermissions = tasks.register<app.shoutsend.buildtools.tasks.VerifyPermissionsTask>("verifyPermissions") {
+    dependsOn("processDevDebugManifest", "processUserDebugManifest")
+    manifestFiles.from(
+        layout.buildDirectory.file("intermediates/merged_manifests/devDebug/processDevDebugManifest/AndroidManifest.xml"),
+        layout.buildDirectory.file("intermediates/merged_manifests/userDebug/processUserDebugManifest/AndroidManifest.xml")
+    )
+}
+
+val verifyChirpRules = tasks.register("verifyChirpRules") {
+    group = "verification"
+    description = "Runs all ShoutSend architectural guards (style, user APK purity, and offline permissions)."
+    dependsOn(checkNoHardcodedStyle, verifyUserApkClean, verifyPermissions)
+}
+
+tasks.named("check") {
+    dependsOn(verifyChirpRules)
+}

@@ -147,3 +147,22 @@ The Developer Panel lives exclusively in `src/dev` (`app.shoutsend.core.devtools
 3. **Shapes & Radii Tab:** Sliders for each corner radius token (`extraSmall` to `extraLarge`) and live preview components (`CdButton`, `CdCard`, `CdTextField`).
 4. **Escape Hatch Readability Guard:** The panel contains a fixed "Reset All" button styled with un-overridable baseline tokens (`DefaultTokens.CyberRadioDark.errorContainer` and `onErrorContainer`). Even if a developer configures low-contrast or illegible colors (e.g. black text on black background), the escape hatch remains legible and operable.
 5. **JSON Export & Import:** Full clipboard integration to export the active sparse `TokenOverrides` JSON or paste an imported token set with schema validation.
+
+---
+
+## 6. Architectural Style Guards & Exception Policy
+
+### Automated Style Guard (`checkNoHardcodedStyle`)
+The project enforces Rules 6 & 7 via the automated Gradle task `checkNoHardcodedStyle` (located in `buildSrc/src/main/kotlin/app/shoutsend/buildtools/StyleGuard.kt`).
+The task inspects all files under `app/src/` and immediately fails the build if:
+- Raw hex literals (`#RRGGBB`, `#AARRGGBB`, `Color(0x...)`) exist outside `DefaultTokens.kt`.
+- Named color constants like `Color.Red`, `Color.White`, or `Color.Black` are referenced.
+- Numeric `dp` or `sp` literals (e.g. `16.dp`, `14.sp`) exist outside `core/designsystem`.
+- Shape constructors (`RoundedCornerShape(`, `CornerSize(`, `CutCornerShape(`) with numeric literals exist outside `core/designsystem`.
+- Inline hex values appear in XML layout or drawable attributes (`android:background`, `android:textColor`).
+
+### Requesting an Exception
+If an external asset (such as an Android adaptive launcher icon) requires raw colors or dimension literals:
+1. Add the file path and reason to `config/style-allowlist.txt`.
+2. Document the exception rationale in `docs/DECISIONS.md`.
+3. Never weaken or bypass the regex rules in `StyleGuard.kt`.
