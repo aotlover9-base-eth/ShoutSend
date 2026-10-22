@@ -15,7 +15,7 @@
 | 10 | B Protocol | Reed-Solomon decoder | No | **Done** |
 | 11 | B Protocol | Codeword symbolizer and erasure mapping | No | **Done** |
 | 12 | B Protocol | Packet format, fragmentation, reassembly | No | **Done** |
-| 13 | B Protocol | Payload model and codecs | No | Todo |
+| 13 | B Protocol | Payload model and codecs | No | **Done** |
 | 14 | B Protocol | Payload compaction | No | Todo |
 | 15 | B Protocol | Secure mode crypto | No | Todo |
 | 16 | C Modem | Tone synthesizer and windowing | No | Todo |

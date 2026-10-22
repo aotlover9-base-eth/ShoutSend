@@ -196,4 +196,17 @@
 - **MessageAssembler**: Injected clock, 60s timeout for incomplete message purging, duplicate frame rejection, stream conflict detection with state reset, and exactly-once delivery semantics.
 - **AirTime**: Pure calculation: $T = 0.84\text{s} + (\text{frameCount} \cdot \text{repeats} \cdot (4 + \text{codewordSymbols}) \cdot T_{\text{symbol}})$. Verified against hand-computed test cases.
 
+## 2026-10-23 - Step 13: Payload Model, Codecs, and URL Safety Analyzer
+
+### DEC-032: Sealed Payload Model, QR/TLV Codecs, and Privacy Guards
+- **Model**: Sealed interface `Payload` (`Text`, `Url`, `WiFi`, `Contact`).
+- **Privacy Guard (Rule 25)**: All `toString()` implementations mask sensitive fields (`WiFi.password` masked as `***`, `Contact` hides detailed phone/email numbers, `Text` and `Url` summarize without raw values in logs). `PayloadValidationError` reasons NEVER contain user input values.
+- **Wire Codecs**:
+  - `Text`: UTF-8 (max 280 bytes).
+  - `Url`: UTF-8 (max 280 bytes, scheme http/https only, control characters rejected, valid host required).
+  - `WiFi`: Standard Wi-Fi QR format `WIFI:T:<WPA|nopass>;S:<ssid>;P:<password>;H:<true|false>;;` with full escaping of `\`, `;`, `,`, `:`, `"`.
+  - `Contact`: Binary TLV format (tags 0x01 name, 0x02 phone, 0x03 email).
+- **UrlSafety**: Pure URL heuristic evaluator checking `userInfo` deception, IPv4/IPv6 literals, Punycode/Unicode homoglyphs, non-standard ports, and URL length > 200 characters.
+
+
 

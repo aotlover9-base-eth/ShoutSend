@@ -183,6 +183,26 @@ where:
 - $\text{codewordSymbols} = \frac{n \cdot 8}{\text{bitsPerSymbol}}$ (120 for MFSK16, 80 for DTFSK on $n=60$)
 - $T_{\text{symbol}}$: 60 ms (Robust), 30 ms (Normal), 20 ms (Fast)
 
+### Application Payload Codecs (Step 13)
+
+#### Wire Encodings by MessageType
+1. **TEXT (Type 0)**:
+   - Raw UTF-8 bytes (1..280 bytes).
+2. **URL (Type 1)**:
+   - Raw UTF-8 string (1..280 bytes).
+   - Scheme restricted strictly to `http` and `https`. Control characters forbidden; valid hostname required.
+3. **WIFI (Type 2)**:
+   - Standard Wi-Fi QR string: `WIFI:T:<WPA|nopass>;S:<ssid>;P:<password>;H:<true|false>;;`
+   - Special characters `\`, `;`, `,`, `:`, `"` escaped with `\`.
+   - SSID: 1..32 UTF-8 bytes.
+   - WPA passphrase: 8..63 printable ASCII characters or exactly 64 hex characters.
+   - Open networks require null/empty password.
+4. **CONTACT (Type 3)**:
+   - Binary Tag-Length-Value (TLV) encoding:
+     - Tag `0x01`: Display Name (1..60 bytes)
+     - Tag `0x02`: Phone Number (up to 2 entries, 1..20 chars each from `[0-9+\-() ]`)
+     - Tag `0x03`: Email Address (optional, 1..80 bytes)
+
 ## Change Log
 
 ### 2026-10-22 - Step 6: Initial Protocol v1 Baseline
@@ -219,4 +239,9 @@ where:
 - Implemented `Fragmenter` with `MAX_AIR_BYTES = 320` and `MAX_FRAGMENTS = 16`.
 - Implemented `MessageAssembler` with duplicate suppression, stream conflict auto-reset, and injected clock timeout.
 - Implemented `AirTime` estimator with proven hand-calculated test vectors.
+
+### 2026-10-23 - Step 13: Payload Codecs and Wire Formats Formalized
+- Specified canonical payload wire representations for Text, Url, Wi-Fi (QR-format), and Contact (binary TLV).
+- Formalized URL safety analysis heuristics.
+
 
