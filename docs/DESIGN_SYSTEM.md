@@ -99,3 +99,34 @@ Column(
 3. Set default arguments to reference `ChirpTheme` tokens (`ChirpTheme.colors`, `ChirpTheme.shapes`, `ChirpTheme.spacing`, `ChirpTheme.strokes`).
 4. Ensure zero raw literals exist in the file (`.dp`, `.sp`, `Color(0x...)`, `RoundedCornerShape`).
 5. Create Compose previews in `app/src/dev/java/app/shoutsend/core/designsystem/previews/` demonstrating Dark and Light themes.
+
+---
+
+## 6. Token Overrides & Persistence Architecture
+
+In the developer flavor (`dev`), tokens can be modified live at runtime and persisted across application restarts. The production user flavor (`user`) binds a zero-overhead no-op repository, guaranteeing complete source purity.
+
+### Architecture Flow
+
+```text
+ Base DesignTokens (Cyber Radio / Dynamic)
+          │
+          ▼
+   [ThemeController] ◄── (overrides: Flow<TokenOverrides>) ── [TokenOverridesRepository]
+          │                                                              │
+          │                                                 ┌────────────┴────────────┐
+          ▼ (StateFlow<DesignTokens>)                       │ (dev flavor)            │ (user flavor)
+    [ChirpTheme]                                            ▼                         ▼
+          │                                       [DevDataStoreRepository]   [NoOpRepository]
+          ▼                                                 │                         │
+     Compose UI                                    [Preferences DataStore]       (No Storage)
+                                                            │
+                                                     (300ms debounce)
+```
+
+### Override Characteristics
+1. **Sparse Storage:** Only explicitly modified tokens are recorded in `TokenOverrides`. Unmodified tokens inherit from factory defaults, allowing baseline tokens to update without corrupting user customizations.
+2. **Instant Recomposition (Rule 11):** Calling `controller.setColor()` or `controller.setRadius()` mutates the in-memory state immediately, updating `ThemeController.tokens` within the current frame.
+3. **Debounced Disk Writes:** DataStore JSON writes are debounced by 300 ms to collapse rapid slider or color picker drags into a single persistence operation.
+4. **Resilience & Validation:** Malformed or corrupt JSON payloads fall back gracefully to factory defaults with a non-sensitive log warning. Unknown token keys and out-of-range radii are strictly rejected.
+5. **Instant Reset:** `resetAll()`, `resetColor(role)`, and `resetRadius(name)` purge overrides and restore baseline tokens immediately.

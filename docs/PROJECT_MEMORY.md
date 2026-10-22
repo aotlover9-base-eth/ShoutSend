@@ -54,4 +54,5 @@ app/src/user/java/app/shoutsend/core/devtools/  # No-op dev tools implementation
 
 ## 7. Current State
 - Step 1 completed: Project setup, multi-flavor build, docs scaffolding, seam architecture verified.
-- Step 2 completed: Design system core, immutable token models (Color, Shape, Typography, Spacing, Stroke, Size, Elevation, Opacity, Motion), single-hex exception `DefaultTokens.kt`, Cyber Radio Dark & Light factory palettes with WCAG AA verified contrast, dynamic-color bridging, 12 component wrappers (`CdButton`, `CdIconButton`, `CdCard`, `CdTextField`, `CdDialog`, `CdBottomSheet`, `CdTopBar`, `CdChip`, `CdSwitch`, `CdSnackbarHost`, `CdDivider`, `CdScaffold`), Compose previews in `src/dev`, token resolution unit tests passing in both flavors, zero raw literal leaks verified.
+- Step 2 completed: Design system core, token models, single-hex exception, Cyber Radio Dark & Light, 12 component wrappers, previews, tests passing.
+- Step 3 completed: Token state and persistence, `ThemeController` StateFlow, sparse `TokenOverrides` model, 300ms debounced DataStore in `src/dev`, `NoOpTokenOverridesRepository` in `src/user`, activity recomposition without restart, verified zero DataStore token classes in User APK, 12 unit tests passing in both flavors.

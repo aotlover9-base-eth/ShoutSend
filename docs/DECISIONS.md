@@ -52,3 +52,19 @@
 ### DEC-008: Previews Isolated to Developer Source Set (`src/dev`)
 - **Decision**: All Compose `@Preview` composables placed strictly in `app/src/dev/java/app/shoutsend/core/designsystem/previews/`.
 - **Reason**: Maintains production `user` flavor cleanliness per Rule 15.
+
+## 2026-10-22 - Step 3: Token State and Persistence Decisions
+
+### DEC-009: Sparse Token Overrides Model
+- **Decision**: Modeled overrides in `TokenOverrides` as sparse maps (`colors: Map<String, Long>`, `radii: Map<String, Float>`).
+- **Reason**: Guarantees that baseline token updates in `DefaultTokens.kt` do not get masked or overwritten unless the developer explicitly customized that specific role.
+- **Validation**: Strict validation rejects unknown role keys and out-of-range radius values (< 0dp or > 100dp).
+
+### DEC-010: Debounced DataStore in `src/dev` Flavor Seam (Rule 15)
+- **Decision**: Token persistence backed by Preferences DataStore with a 300ms debounce loop exists exclusively in `src/dev`. The `user` flavor binds `NoOpTokenOverridesRepository`.
+- **Reason**: Guarantees zero runtime persistence overhead or developer class leakages in the production User APK.
+- **Verification**: Verified via DEX inspection of `app-user-debug.apk` showing 0 DevDataStore classes.
+
+### DEC-011: Live Activity Recomposition Without Restart (Rule 11)
+- **Decision**: `ThemeController` exposes `StateFlow<DesignTokens>` collected directly in `MainActivity.kt` with `collectAsStateWithLifecycle()`.
+- **Reason**: Token changes instantly recompute the theme and recompose the UI hierarchy within the current frame without restarting the Activity.
