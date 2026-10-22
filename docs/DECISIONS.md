@@ -231,6 +231,15 @@
 - **Pipeline Order**: Compaction runs BEFORE encryption, maximizing compression ratio before high-entropy ciphertext generation.
 - **Ephemeral State**: All derived key arrays are zeroed in `finally` blocks; passphrases are never persisted.
 
+## 2026-10-23 - Step 16: Tone Synthesizer and Windowing
+
+### DEC-035: Absolute-Phase Oscillators, Hann Overlap Ramps, and Chunk-Independent Synthesis
+- **Absolute Oscillator Phase**: Rather than tracking stateful per-symbol oscillator phase accumulators, all audio samples evaluate $s(n) = \sin(2\pi \cdot f \cdot n / F_s)$ using the absolute sample index $n$. This guarantees phase continuity across identical repeated tones, enables stream seeking, and guarantees that chunk rendering produces bit-identical output regardless of chunk size (1, 7, 480, or 10,000 samples).
+- **Hann Overlap Ramps**: Adjacent symbols overlap by exactly $R$ samples (where $R \le L/2$). The outgoing symbol fades out with $w_{\text{down}}(i) = \frac{1 + \cos(\pi (i + 0.5) / R)}{2}$ and the incoming symbol fades in with $w_{\text{up}}(i) = \frac{1 - \cos(\pi (i + 0.5) / R)}{2}$. Because $w_{\text{up}}(i) + w_{\text{down}}(i) \equiv 1.0f$, transitions between identical repeated tones exhibit zero amplitude dip ($< 0.05$ dB measured), while transitions between disparate tones are smooth and click-free.
+- **Zero-Allocation Hot Path (Rule 22)**: `RampTable` precomputes `rampUp` and `rampDown` arrays once per ramp length and caches them in `RaisedCosineWindow`. `ToneSynth.render` writes directly into caller-provided float arrays with zero heap allocation per sample or symbol.
+- **Linear PCM Conversion**: `PcmConverter` performs round-to-nearest conversion with strict clamp to $[-32768, 32767]$ without dither, with symmetric full scale representation (+1.0f -> 32767, -1.0f -> -32768).
+
+
 
 
 

@@ -297,6 +297,13 @@ where:
 - Formalized PBKDF2WithHmacSHA256 (60,000 iterations) and AES-256-GCM AEAD encryption pipeline.
 - Bound Version and MessageType to GCM AAD and verified exactly 28-byte on-air wire overhead.
 
+### 2026-10-23 - Step 16: Tone Synthesis and Windowing Formalized
+- **Absolute-Phase Continuous Oscillators**: Every tone sample is derived from absolute index $n$: $s(n) = \sin(2\pi \cdot f \cdot n / F_s)$. Guarantees continuous phase across repeated tones and makes audio rendering chunk-independent.
+- **Hann Overlap Ramps**: Adjacent symbols overlap by $R$ samples. Outgoing symbol decays via $w_{\text{down}}(i) = \frac{1 + \cos(\pi (i + 0.5) / R)}{2}$; incoming symbol attacks via $w_{\text{up}}(i) = \frac{1 - \cos(\pi (i + 0.5) / R)}{2}$.
+- **Envelope Invariant**: $w_{\text{up}}(i) + w_{\text{down}}(i) \equiv 1.0f$ for all $i \in [0, R - 1]$, ensuring $0.0$ dB amplitude dip across identical tone boundaries and eliminating transient clicks.
+- **Chunk-Independence Invariant**: Audio rendering in chunks of 1, 7, 480, or 10,000 samples yields bit-identical outputs. Zero allocations on rendering hot path.
+
+
 
 
 

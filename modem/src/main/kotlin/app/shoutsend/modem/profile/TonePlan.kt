@@ -71,4 +71,14 @@ public class TonePlan(
         require(index in dataTones.indices) { "Data tone index out of range: $index (expected 0..15)" }
         return dataTones[index]
     }
+
+    /**
+     * Retrieves the tone frequency for any valid tone index (0..15 for data, 16 for S0, 17 for S1).
+     */
+    public fun frequency(index: Int): Double = when (index) {
+        in 0..15 -> dataTones[index]
+        16 -> syncTone0
+        17 -> syncTone1
+        else -> throw IllegalArgumentException("Invalid tone index: $index (expected 0..17)")
+    }
 }
