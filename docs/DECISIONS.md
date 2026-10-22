@@ -32,3 +32,23 @@
 ### DEC-004: Zero Permissions in Initial Scaffolding
 - **Decision**: Manifest contains zero permissions at Step 1.
 - **Reason**: Permissions (`RECORD_AUDIO` and `VIBRATE`) will be introduced strictly in Step 26 with proper rationale.
+
+## 2026-10-22 - Step 2: Design System Core Decisions
+
+### DEC-005: Token Model and Single-Hex Architecture (Rules 6 & 7)
+- **Decision**: Created 9 immutable token groups (`ColorTokens`, `ShapeTokens`, `TypographyTokens`, `SpacingTokens`, `StrokeTokens`, `SizeTokens`, `ElevationTokens`, `OpacityTokens`, `MotionTokens`) unified under `DesignTokens`.
+- **Constraint**: `DefaultTokens.kt` is established as the sole exception file containing hex literals and raw dimension numbers.
+- **Enforcement**: Automated regex verification scripts and unit tests guarantee zero raw hex or dp/sp literals exist in any UI file outside `DefaultTokens.kt`.
+
+### DEC-006: Cyber Radio Palette Selection and Contrast Validation
+- **Decision**: Cyber Radio Dark selected as the default palette with `#0B0E14` dark blue-gray surface, `#00F0FF` cyan primary, `#00FF66` neon secondary, `#FFB300` amber tertiary, and high-contrast `#410002` error text over `#FF5449`.
+- **Contrast**: Every key pair verified against WCAG AA standards (>= 4.5:1), with primary, secondary, background, and surface exceeding 9.3:1 to 15.5:1.
+- **Fallback**: System dynamic color supported for Android 12+ (SDK 31+) with graceful fallback to Cyber Radio palettes.
+
+### DEC-007: Material 3 Component Wrappers (`Cd*`)
+- **Decision**: Wrapped 12 core Material 3 components (`CdButton`, `CdIconButton`, `CdCard`, `CdTextField`, `CdDialog`, `CdBottomSheet`, `CdTopBar`, `CdChip`, `CdSwitch`, `CdSnackbarHost`, `CdDivider`, `CdScaffold`) under `app.shoutsend.core.designsystem.components`.
+- **Design**: All wrappers bind default styles, colors, shapes, and elevations strictly to `ChirpTheme` tokens.
+
+### DEC-008: Previews Isolated to Developer Source Set (`src/dev`)
+- **Decision**: All Compose `@Preview` composables placed strictly in `app/src/dev/java/app/shoutsend/core/designsystem/previews/`.
+- **Reason**: Maintains production `user` flavor cleanliness per Rule 15.

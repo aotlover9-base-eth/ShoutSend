@@ -4,7 +4,7 @@
 | :--- | :--- | :--- | :--- | :--- |
 | 0 | A Foundation | Discovery | Done | **Done** |
 | 1 | A Foundation | Project setup, flavors, docs | No | **Done** |
-| 2 | A Foundation | Design system core | No | Todo |
+| 2 | A Foundation | Design system core | No | **Done** |
 | 3 | A Foundation | Token state and persistence | No | Todo |
 | 4 | A Foundation | Developer panel (dev flavor) | Light | Todo |
 | 5 | A Foundation | Style guard and User APK purity check | No | Todo |

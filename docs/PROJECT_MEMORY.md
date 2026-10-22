@@ -54,3 +54,4 @@ app/src/user/java/app/shoutsend/core/devtools/  # No-op dev tools implementation
 
 ## 7. Current State
 - Step 1 completed: Project setup, multi-flavor build, docs scaffolding, seam architecture verified.
+- Step 2 completed: Design system core, immutable token models (Color, Shape, Typography, Spacing, Stroke, Size, Elevation, Opacity, Motion), single-hex exception `DefaultTokens.kt`, Cyber Radio Dark & Light factory palettes with WCAG AA verified contrast, dynamic-color bridging, 12 component wrappers (`CdButton`, `CdIconButton`, `CdCard`, `CdTextField`, `CdDialog`, `CdBottomSheet`, `CdTopBar`, `CdChip`, `CdSwitch`, `CdSnackbarHost`, `CdDivider`, `CdScaffold`), Compose previews in `src/dev`, token resolution unit tests passing in both flavors, zero raw literal leaks verified.
