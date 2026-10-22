@@ -147,3 +147,17 @@
 - **Decision**: Implemented PN9 LFSR with polynomial $x^9 + x^5 + 1$ (mask `0x1FF`).
 - **Initial State**: Derived deterministically from frame seed via `((seed and 0x0F) shl 5) xor 0x1FF`.
 - **Properties**: Verified on all-zero 60-byte payload across seeds 0..15: maximum identical consecutive symbol run is 3 (limit <= 6), and chi-square goodness of fit against uniform 16-symbol distribution ranges from 6.67 to 12.80.
+
+## 2026-10-22 - Step 9: Reed-Solomon Field and Encoder Decisions
+
+### DEC-027: Galois Field GF(2^8) Parameter Selection
+- **Decision**: Implemented GF(256) over primitive polynomial `0x11D` ($x^8 + x^4 + x^3 + x^2 + 1$) with generator element $lpha = 2$.
+- **Optimization**: Exponentiation lookup table is doubled to 512 entries, avoiding modulo reduction during multiplications.
+
+### DEC-028: Reed-Solomon Code Profiles and Generator Polynomials
+- **Decision**: Three systematic error correction profiles defined:
+  - `LIGHT` (ID 0): $RS(60, 54)$ — corrects up to 3 byte errors ($nsym = 6$).
+  - `STANDARD` (ID 1): $RS(60, 48)$ — corrects up to 6 byte errors ($nsym = 12$) (Default).
+  - `STRONG` (ID 2): $RS(60, 40)$ — corrects up to 10 byte errors ($nsym = 20$).
+- **Roots**: Generator polynomial roots are $lpha^0, lpha^1, \dots, lpha^{nsym-1}$ (first consecutive root 0).
+- **Shortening**: Full support for shortened codewords ($L < k$) with zero-padding equivalence.

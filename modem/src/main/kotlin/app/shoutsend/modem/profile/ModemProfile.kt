@@ -13,7 +13,7 @@ public data class ModemProfile(
     }
 
     public val rsProfile: RsProfile
-        get() = RsProfile.fromId(rsProfileId) ?: RsProfile.RS_60_48
+        get() = RsProfile.fromId(rsProfileId) ?: RsProfile.STANDARD
 
     public companion object {
         public val DEFAULT_STEALTH: ModemProfile = ModemProfile(

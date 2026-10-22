@@ -103,6 +103,23 @@
 - **Feedback**: $	ext{bit}_8 \oplus 	ext{bit}_4$
 - **Operation**: Involutory bitwise XOR. Guaranteed max run of identical symbols $\le 3$ (strictly below 6) on all-zero payloads.
 
+
+### Reed-Solomon Error Correction Codec (Step 9)
+
+#### Galois Field Specification
+- **Field**: $GF(2^8)$
+- **Primitive Polynomial**: `0x11D` ($x^8 + x^4 + x^3 + x^2 + 1$)
+- **Primitive Element**: $lpha = 2$ ($0x02$)
+- **Lookup Tables**: 512-entry exponent table, 256-entry logarithm table.
+
+#### Generator Polynomials & Profiles
+- **Generator Form**: $g(x) = \prod_{i=0}^{nsym-1} (x - lpha^i) = \prod_{i=0}^{nsym-1} (x + lpha^i)$ (first root $lpha^0 = 1$)
+- **Profiles**:
+  - `LIGHT` (ID 0): $RS(60, 54)$ with $nsym = 6$ ($t = 3$ errors)
+  - `STANDARD` (ID 1): $RS(60, 48)$ with $nsym = 12$ ($t = 6$ errors) [Default]
+  - `STRONG` (ID 2): $RS(60, 40)$ with $nsym = 20$ ($t = 10$ errors)
+- **Shortening**: Leading zeros are omitted from transmission; mathematically identical parity and syndromes.
+
 ## Change Log
 
 ### 2026-10-22 - Step 6: Initial Protocol v1 Baseline
@@ -119,3 +136,8 @@
 ### 2026-10-22 - Step 8: Bit Serialization, CRC-16, and Whitening Formalized
 - Standardized table-driven CRC-16/CCITT-FALSE with verified 0x29B1 test vector.
 - Formally specified PN9 LFSR ($x^9 + x^5 + 1$) whitening sequence with confirmed statistical uniformity.
+
+### 2026-10-22 - Step 9: Reed-Solomon GF(256) and Systematic Encoder Formalized
+- Specified primitive polynomial 0x11D and generator polynomial roots alpha^0..alpha^(nsym-1).
+- Defined three RS profiles (LIGHT, STANDARD, STRONG) with designated mode block IDs 0, 1, and 2.
+- Implemented zero-allocation systematic encoder verified with 100% zero-syndrome tests.
