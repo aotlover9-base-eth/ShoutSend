@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -94,6 +95,10 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.datastore.preferences)
 
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
 
@@ -127,4 +132,8 @@ val verifyChirpRules = tasks.register("verifyChirpRules") {
 
 tasks.named("check") {
     dependsOn(verifyChirpRules)
+}
+
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
