@@ -255,6 +255,15 @@
 - **Measured Crosstalk Rejection**: Full $16 \times 16$ crosstalk leakage matrices proved that off-diagonal leakage is $\le -56.7$ dB (Robust), $\le -43.4$ dB (Normal), and $\le -31.0$ dB (Fast) for Retro, and $\le -44.5$ dB (Normal) and $\le -48.5$ dB (Fast) for Stealth, far exceeding the $\le -25$ dB / $\le -20$ dB roadmap thresholds.
 - **Streaming Ring Buffer (`BlockDetector`)**: Ingestion decouples incoming chunk sizes (e.g. 1024-sample AudioRecord buffers) from the DSP analysis block size ($N$) and hop interval, emitting blocks via `EnergyListener` with 0 heap allocations per block.
 
+## 2026-10-23 - Step 19: Noise Floor Tracker and SNR
+
+### DEC-038: Asymmetric Noise Floor Tracking, Freezing Lock, and Dynamic Thresholding
+- **Asymmetric Smoothing Rationale**: Acoustic environments (cafes, streets) feature sudden impulse noises and speech bursts that must not rapidly desensitize the modem. Setting a slow upward time constant ($\tau_{\text{attack}} = 1.5$s) and a fast downward time constant ($\tau_{\text{decay}} = 0.25$s) forces the tracker to follow the true quiet troughs beneath ambient bursts.
+- **Acquisition Freezing Lock**: During transmission preamble locking and frame reception, the tracker is explicitly frozen (`freeze()`). Evaluated tests confirmed that an unfrozen tracker would raise the noise floor by $>10\times$ within 3 seconds of loud tone reception, severely degrading sensitivity for subsequent symbols.
+- **Detection Thresholding**: Minimum detection power is bounded by $\max(\text{floor} \cdot 10^{\text{margin}/10}, \text{minFloorPower} \cdot 10^{\text{margin}/10})$. Setting `minFloorPower` to $-70$ dBFS ensures that digital silence or near-zero noise cannot cause false triggers on quantization flutter.
+- **Confidence Calibration**: Demodulator confidence is formulated as the product of winner-to-runner separation $\frac{E_{\text{win}} - E_{\text{run}}}{E_{\text{win}}}$ and SNR headroom $\frac{\text{SNR} - \text{margin}}{12.0}$. This provides a continuous $[0, 1]$ metric used by Step 21 to mark symbol erasures when confidence drops below $0.5$.
+
+
 
 
 

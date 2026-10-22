@@ -325,6 +325,14 @@ where:
   - Fast preset: Leakage $\le -31.0$ dB (Retro) and $\le -48.5$ dB (Stealth).
 - **Streaming Ingestion**: `BlockDetector` circular ring buffer delivers hopping energy evaluations with zero per-block allocations.
 
+### 2026-10-23 - Step 19: Noise Floor Tracker and SNR Formalized
+- **Asymmetric Smoothing**: Time constants $\tau_{\text{attack}} = 1.5$s (slow upward adaptation) and $\tau_{\text{decay}} = 0.25$s (fast downward adaptation to quiet minima), converted via $\alpha = 1 - e^{-\Delta t / \tau}$.
+- **Transmission Freezing Lock**: Floor adaptation is frozen during signal acquisition so loud transmissions are not integrated into ambient noise.
+- **Dynamic Thresholding**: Minimum detection energy per tone is $\text{threshold}(k) = \max(\text{floor}[k] \cdot 10^{\text{margin}/10}, \text{minFloorPower} \cdot 10^{\text{margin}/10})$ with default margin $+6.0$ dB and min floor $-70$ dBFS ($10^{-7}$).
+- **Confidence Metric**: Combining winner-to-runner separation and SNR margin:
+  $C = \left(\frac{E_{\text{win}} - E_{\text{run}}}{E_{\text{win}}}\right) \cdot \text{clamp}\left(\frac{\text{SNR}_{\text{dB}} - \text{margin}_{\text{dB}}}{12.0}, 0.0, 1.0\right)$ for $E_{\text{win}} \ge \text{threshold}$, and $0.0$ otherwise.
+
+
 
 
 
