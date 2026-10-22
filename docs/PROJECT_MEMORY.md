@@ -47,10 +47,11 @@ app/src/user/java/app/shoutsend/core/devtools/  # No-op dev tools implementation
 - Theme: Cyber Radio dark default, optional dynamic wallpaper color toggle in Settings.
 - Zero raw hex or radii literals outside token files.
 
-## 6. Permissions
-- Target: Exactly `RECORD_AUDIO` and `VIBRATE` (arriving in Step 26).
-- `INTERNET` permission is strictly forbidden.
-- Step 1 status: 0 permissions.
+## 6. Permissions & Privacy Indicator
+- Strictly `android.permission.RECORD_AUDIO` and `android.permission.VIBRATE`. Zero `INTERNET`.
+- Feature: `<uses-feature android:name="android.hardware.microphone" android:required="true" />`.
+- **Android 12+ Privacy Indicator (Green Dot)**: When ShoutSend actively listens on the Receive screen or runs acoustic calibration, Android 12+ displays a system privacy green dot indicator in the top status bar. This confirms active foreground microphone capture. ShoutSend never runs background services or listens with screen off. Onboarding (Step 36) explicitly educates the user about this expected indicator.
+
 
 ## 7. Current State
 - Step 1 completed: Project setup, multi-flavor build, docs scaffolding, seam architecture verified.
@@ -73,6 +74,8 @@ app/src/user/java/app/shoutsend/core/devtools/  # No-op dev tools implementation
 - Step 18 completed: Goertzel detector and streaming front-end implemented (`GoertzelBank`, `EnergyListener`, `BlockDetector`). Generalized second-order Goertzel resonators with coherent Hann window power calibration ($A^2$ within 1%). Verified 60 dB amplitude linearity (-60 to -6 dBFS), frequency tolerance (+/- 30 Hz at 89.0% power retention), zero-allocation streaming ring buffer, and complete 16x16 crosstalk leakage matrices across Retro and Stealth (worst leakage -31.0 dB to -62.8 dB, exceeding bounds). Micro-benchmark measured 15.4M samples/sec (321.8x realtime audio).
 - Step 19 completed: Noise floor tracker and SNR estimator implemented (`NoiseTrackerParams`, `NoiseFloorTracker`). Verified asymmetric exponential smoothing (decay 0.25s faster than attack 1.5s), white noise floor stability (<3% relative standard deviation), freezing lock preventing signal contamination, digital silence clamping at -70 dBFS, dynamic thresholding with 6 dB margin, and calibrated confidence metric. Zero allocations on update path.
 - Step 20 completed: Preamble detection, fine symbol synchronization, and symbol clock tracking implemented (`SyncState`, `SyncListener`, `TimingTracker`, `SyncDetector`). 4-phase scanning at quarter-symbol hops, single-tone rejection, power-of-2 ring buffer with chunked ingestion preventing overflow, sub-hop fine timing refinement via parabolic interpolation, and expected-energy sync word correlation. Verified 100% lock rate across 200 random start offsets (timing error <= quarter symbol), 0 false locks across 3,000 pure noise hops and steady single tones, speaker wake-up clipping survival (5 cut off symbols), and timing tracker lock maintenance across +/- 100 ppm clock drift. Zero allocations on audio push hot paths.
+- Step 26 completed: Manifest permissions, microphone permission state modeling, and audio hardware configuration implemented (`AudioConfig`, `MicPermissionState`, `MicPermissionRequestedProvider`, `PermissionRepository`). Declared `RECORD_AUDIO`, `VIBRATE`, and microphone required feature. Merged manifests verified clean of `INTERNET`. Exhaustive 8-case truth table verified for permission state resolution.
+
 
 
 

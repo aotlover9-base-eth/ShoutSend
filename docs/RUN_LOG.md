@@ -22,3 +22,4 @@
 | 18 | DONE | 2026-10-23 00:38 | Goertzel detector bank, 16x16 crosstalk rejection passed |
 | 19 | DONE | 2026-10-23 00:43 | Dynamic noise floor tracker, asymmetric smoothing passed |
 | 20 | DONE | 2026-10-23 03:00 | Preamble detector, fine sync, 200 random offsets passed |
+| 26 | DONE | 2026-10-23 03:20 | Permissions logic, AudioConfig, verifyPermissions passed |

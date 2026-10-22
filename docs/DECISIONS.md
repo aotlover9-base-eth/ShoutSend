@@ -272,6 +272,18 @@
 - **Sync Word Correlation Boundary Selection**: During sync verification, candidate boundaries ($T - \text{hopSize}, T, T + \text{hopSize}$) are tested by calculating the cumulative Goertzel energy of expected sync word data tones (`SYNC_WORD_PATTERN`). The boundary maximizing expected-tone energy correlation is selected, achieving sub-hop symbol boundary alignment within $\pm 0.17$ symbol periods across 200 random start offsets and high noise levels.
 - **Timing Drift Tracking**: In the `LOCKED` state, `TimingTracker` applies early/late loop energy correction on 4-symbol frame markers, maintaining lock across $\pm 100$ ppm sample rate clock drift.
 
+## 2026-10-23 - Step 26: Manifest, Permissions Logic, and Audio Configuration
+
+### DEC-040: Two-Permission Offline Manifest, Pure State Resolution, and Hardware Constants
+- **Offline Permissions Compliance (Rule 24)**: `AndroidManifest.xml` explicitly restricts permissions to `RECORD_AUDIO` and `VIBRATE`, declaring `<uses-feature android:name="android.hardware.microphone" android:required="true" />`. Verified that neither `INTERNET` nor network access permissions exist.
+- **Microphone Permission Resolution**: Pure function `resolve(isGranted, shouldShowRationale, hasRequestedBefore)` handles runtime permissions:
+  1. Granted: `isGranted == true`
+  2. ShouldExplain: `shouldShowRationale == true`
+  3. PermanentlyDenied: `!isGranted && !shouldShowRationale && hasRequestedBefore`
+  4. CanAsk: default first-run state
+- **Audio Hardware Specification**: 48 kHz preferred native rate with 44.1 kHz fallback, Mono 16-bit PCM, 20 ms chunk duration (960 samples at 48 kHz), 2.0-second circular ring buffer (96,000 samples).
+
+
 
 
 
