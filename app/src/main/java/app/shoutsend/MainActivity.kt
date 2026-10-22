@@ -22,23 +22,29 @@ class MainActivity : ComponentActivity() {
 
         val app = application as ShoutSendApp
         val themeController = app.appContainer.themeController
+        val devTools = app.appContainer.devTools
 
         setContent {
             val tokens by themeController.tokens.collectAsStateWithLifecycle()
             ChirpTheme(tokens = tokens) {
-                CdScaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(innerPadding),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "ShoutSend",
-                            style = ChirpTheme.typography.headlineMedium,
-                            color = ChirpTheme.colors.primary
-                        )
+                Box(modifier = Modifier.fillMaxSize()) {
+                    CdScaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(innerPadding),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "ShoutSend",
+                                style = ChirpTheme.typography.headlineMedium,
+                                color = ChirpTheme.colors.primary
+                            )
+                        }
                     }
+
+                    // DevTools overlay (rendered in dev flavor, no-op in user flavor)
+                    devTools.entryPoint?.invoke()
                 }
             }
         }

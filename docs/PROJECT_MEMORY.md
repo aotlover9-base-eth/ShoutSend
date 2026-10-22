@@ -55,4 +55,5 @@ app/src/user/java/app/shoutsend/core/devtools/  # No-op dev tools implementation
 ## 7. Current State
 - Step 1 completed: Project setup, multi-flavor build, docs scaffolding, seam architecture verified.
 - Step 2 completed: Design system core, token models, single-hex exception, Cyber Radio Dark & Light, 12 component wrappers, previews, tests passing.
-- Step 3 completed: Token state and persistence, `ThemeController` StateFlow, sparse `TokenOverrides` model, 300ms debounced DataStore in `src/dev`, `NoOpTokenOverridesRepository` in `src/user`, activity recomposition without restart, verified zero DataStore token classes in User APK, 12 unit tests passing in both flavors.
+- Step 3 completed: Token state and persistence, `ThemeController` StateFlow, debounced DataStore in `src/dev`, `NoOpTokenOverridesRepository` in `src/user`.
+- Step 4 completed: Developer panel (dev flavor only), floating edge handle, `DeveloperPanel` bottom sheet with Colors and Shapes tabs, pure Kotlin HSV color picker, escape hatch reset guard, export/import JSON via clipboard, 0 forbidden dev strings in User APK, full unit test suite passing in both flavors.

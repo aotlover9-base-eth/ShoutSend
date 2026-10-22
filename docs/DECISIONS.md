@@ -68,3 +68,17 @@
 ### DEC-011: Live Activity Recomposition Without Restart (Rule 11)
 - **Decision**: `ThemeController` exposes `StateFlow<DesignTokens>` collected directly in `MainActivity.kt` with `collectAsStateWithLifecycle()`.
 - **Reason**: Token changes instantly recompute the theme and recompose the UI hierarchy within the current frame without restarting the Activity.
+
+## 2026-10-22 - Step 4: Developer Panel Decisions
+
+### DEC-012: Developer Panel UI Built Exclusively With Design System Wrappers (Rule 9)
+- **Decision**: The entire Developer Panel (`DeveloperPanel.kt`) and its floating handle (`FloatingDevHandle.kt`) are composed using `CdModalBottomSheet`, `CdButton`, `CdCard`, `CdTextField`, `CdFilterChip`, `CdIconButton`, `CdAlertDialog`, etc.
+- **Reason**: Maintains visual consistency and enforces design-system discipline even within developer tooling.
+
+### DEC-013: Pure Kotlin HSB/HSV Color Transformation
+- **Decision**: Implemented HSB to RGB and RGB to HSB converters directly in Kotlin (`ColorUtils.kt`) rather than using Android's `android.graphics.Color.colorToHSV`.
+- **Reason**: Guarantees fast, robust, 100% JVM-executable unit tests without requiring Android SDK mockers or Robolectric.
+
+### DEC-014: Theme-Safe Escape Hatch Readability Guard
+- **Decision**: Styled the "Reset All" action using un-overridable default tokens (`DefaultTokens.CyberRadioDark.errorContainer` and `onErrorContainer`).
+- **Reason**: Protects developers from being locked out if they accidentally set background and text colors to the same value (e.g. black-on-black).

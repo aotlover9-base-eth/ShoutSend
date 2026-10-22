@@ -1,5 +1,9 @@
 package app.shoutsend.core.devtools
 
 import android.content.Context
+import app.shoutsend.core.designsystem.ThemeController
 
-fun createDevTools(context: Context): DevTools = DevToolsImpl(context)
+fun createDevTools(
+    context: Context,
+    themeController: ThemeController
+): DevTools = DevToolsImpl(context, themeController)

@@ -130,3 +130,20 @@ In the developer flavor (`dev`), tokens can be modified live at runtime and pers
 3. **Debounced Disk Writes:** DataStore JSON writes are debounced by 300 ms to collapse rapid slider or color picker drags into a single persistence operation.
 4. **Resilience & Validation:** Malformed or corrupt JSON payloads fall back gracefully to factory defaults with a non-sensitive log warning. Unknown token keys and out-of-range radii are strictly rejected.
 5. **Instant Reset:** `resetAll()`, `resetColor(role)`, and `resetRadius(name)` purge overrides and restore baseline tokens immediately.
+
+---
+
+## 7. Developer Panel & Tooling (Dev Flavor Only)
+
+The Developer Panel lives exclusively in `src/dev` (`app.shoutsend.core.devtools`) and allows real-time interactive tuning of all design tokens.
+
+### Panel Features
+1. **Floating Edge Handle:** A draggable pill on the right screen edge (`FloatingDevHandle`) attached through the `DevTools` seam.
+2. **Colors Tab:** Lists all 35 token roles organized into logical categories (Primary, Secondary, Tertiary, Error, Surfaces, Outlines, Extended Signal). Each item provides:
+   - Interactive Color Swatch.
+   - Expandable H, S, B sliders (0–360° Hue, 0–100% Saturation, 0–100% Brightness).
+   - Hex text input field with real-time validation.
+   - Individual "Reset" button when modified from factory default.
+3. **Shapes & Radii Tab:** Sliders for each corner radius token (`extraSmall` to `extraLarge`) and live preview components (`CdButton`, `CdCard`, `CdTextField`).
+4. **Escape Hatch Readability Guard:** The panel contains a fixed "Reset All" button styled with un-overridable baseline tokens (`DefaultTokens.CyberRadioDark.errorContainer` and `onErrorContainer`). Even if a developer configures low-contrast or illegible colors (e.g. black text on black background), the escape hatch remains legible and operable.
+5. **JSON Export & Import:** Full clipboard integration to export the active sparse `TokenOverrides` JSON or paste an imported token set with schema validation.

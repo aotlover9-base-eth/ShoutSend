@@ -11,10 +11,10 @@ import kotlinx.coroutines.SupervisorJob
 
 class AppContainer(val context: Context) {
     val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
-    val devTools: DevTools = createDevTools(context)
     val tokenOverridesRepository = createTokenOverridesRepository(context, applicationScope)
     val themeController: ThemeController = ThemeController(
         repository = tokenOverridesRepository,
         scope = applicationScope
     )
+    val devTools: DevTools = createDevTools(context, themeController)
 }
