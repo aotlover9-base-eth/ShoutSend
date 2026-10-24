@@ -272,6 +272,15 @@
 - **Sync Word Correlation Boundary Selection**: During sync verification, candidate boundaries ($T - \text{hopSize}, T, T + \text{hopSize}$) are tested by calculating the cumulative Goertzel energy of expected sync word data tones (`SYNC_WORD_PATTERN`). The boundary maximizing expected-tone energy correlation is selected, achieving sub-hop symbol boundary alignment within $\pm 0.17$ symbol periods across 200 random start offsets and high noise levels.
 - **Timing Drift Tracking**: In the `LOCKED` state, `TimingTracker` applies early/late loop energy correction on 4-symbol frame markers, maintaining lock across $\pm 100$ ppm sample rate clock drift.
 
+## 2026-10-25 - Step 32: Settings Store (Preferences DataStore)
+
+### DEC-043: Typed Preferences DataStore with Clamped Validation and Instant Theme Binding
+- **Typed Immutable Model with Safe Fallbacks**: All user settings are captured in `Settings` data class. Enum parsing (`Band`, `Speed`, `ThemeMode`) utilizes safe fallback to defaults when unknown/corrupt values are encountered.
+- **Range Clamping**: Numerical bounds strictly enforced (`repeats` in `1..3`, `historyMaxEntries` in `50..2000`, `backgroundGraceSeconds` in `0..30`).
+- **Dev-Free User Model (Rule 15)**: `Settings` contains only user preferences. Developer DSP parameters and tuning overrides remain strictly segregated in Step 33 and Step 50.
+- **Instant Theme Reactivity (Rule 11)**: `bindToThemeController` maps `(themeMode, dynamicColor)` directly into `ThemeController`, ensuring UI updates without delay upon setting modification.
+- **Microphone Permission State Integration**: `DataStoreMicPermissionRequestedProvider` connects `MicPermissionRequestedProvider` from Step 26 directly to `settings.micPermissionRequested`.
+
 ## 2026-10-23 - Step 25: Spectrum Analyzer (FFT) for Waterfall
 
 ### DEC-042: Precomputed Radix-2 FFT and Streaming Normalized Waterfall Analyzer

@@ -34,7 +34,7 @@
 | 29 | D Android layer | Capability probe and calibration engine | No | Todo |
 | 30 | D Android layer | Send and receive sessions, audio focus, routes | No | Todo |
 | 31 | D Android layer | Vault storage (Room plus Keystore) | No | **Done** |
-| 32 | D Android layer | Settings store | No | Todo |
+| 32 | D Android layer | Settings store | No | **Done** |
 | 33 | D Android layer | Modem config provider (dev override seam) | No | Todo |
 | 34 | E UI | ShoutSend components and extra tokens | Yes | Todo |
 | 35 | E UI | App shell and navigation | Yes | Todo |
