@@ -316,3 +316,11 @@
 - **Mode Summing and Erasures Demodulation**: Mode block decoding computes coherent energy sums across both 2-repeat symbols before computing the argmax decision. Data symbols calculate confidence metrics to mark byte erasures directly into the Reed-Solomon decoder.
 - **Inter-Message Cooldown Guard**: Enters 300 ms silence cooldown upon completing message reassembly to suppress repeat packet reflection.
 
+## 2026-10-25 - Step 22: Channel Simulator and Loopback Harness
+
+### DEC-046: Deterministic Physical Acoustic Channel Simulation with Multi-Stage Impairments
+- **Physical Impairment Modeling (Rule 27)**: Implements mathematical models of physical acoustic propagation: FIR multipath reflection delay lines, Biquad IIR transducer frequency response, linear resampling clock drift ($\pm \text{ppm}$), AWGN calibrated to in-band signal power, and low-frequency ambient hum + pink noise.
+- **Strict Reproducibility**: Simulator requires a random seed and produces bit-identical waveforms across identical seeds, guaranteeing repeatable test and benchmark execution.
+- **Automated Metric Instrumentation**: `LoopbackHarness` measures exact payload verification, symbol error rate (SER), Reed-Solomon correction distribution, and false-lock occurrences.
+- **Gradle Benchmark Integration**: Registered `:modem:modemBenchmark` task for reproducible benchmark sweeps outputting structured Markdown reports to `docs/DSP_BENCHMARK.md`.
+

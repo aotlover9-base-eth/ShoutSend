@@ -19,3 +19,9 @@ val checkModemPurity = tasks.register<app.shoutsend.buildtools.tasks.CheckModemP
 tasks.named("test") {
     dependsOn(checkModemPurity)
 }
+
+val modemBenchmark = tasks.register<JavaExec>("modemBenchmark") {
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("app.shoutsend.modem.channel.BatchRunner")
+    workingDir = rootDir
+}
