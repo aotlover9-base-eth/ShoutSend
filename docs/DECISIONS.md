@@ -272,6 +272,15 @@
 - **Sync Word Correlation Boundary Selection**: During sync verification, candidate boundaries ($T - \text{hopSize}, T, T + \text{hopSize}$) are tested by calculating the cumulative Goertzel energy of expected sync word data tones (`SYNC_WORD_PATTERN`). The boundary maximizing expected-tone energy correlation is selected, achieving sub-hop symbol boundary alignment within $\pm 0.17$ symbol periods across 200 random start offsets and high noise levels.
 - **Timing Drift Tracking**: In the `LOCKED` state, `TimingTracker` applies early/late loop energy correction on 4-symbol frame markers, maintaining lock across $\pm 100$ ppm sample rate clock drift.
 
+## 2026-10-25 - Step 27: AudioTrack Acoustic Transmitter
+
+### DEC-044: Low-Latency Streaming AudioTrack Transmitter with Click-Free Fade-Out
+- **Native Rate Output Selection**: Transmitter queries `AudioTrack.getNativeOutputSampleRate(AudioManager.STREAM_MUSIC)`, defaulting to 48 kHz (or 44.1 kHz if native), avoiding resampling filters that distort near-ultrasonic tones.
+- **Dedicated Real-Time Audio Dispatcher**: Transmission executes on a dedicated single-thread executor with `Thread.MAX_PRIORITY` (`THREAD_PRIORITY_URGENT_AUDIO`).
+- **Zero-Allocation Streaming Chunks (Rule 22)**: Reuses preallocated `floatChunk` and `pcmChunk` matching `AudioConfig.chunkSamples(sampleRateHz)`, performing in-place PCM 16-bit conversion without heap allocation.
+- **Pop/Click Elimination on Cancellation**: When a transmission is cancelled, a 10 ms cosine ramp-down chunk is synthesized and written before pause/flush/stop/release, eliminating abrupt speaker transients.
+- **Hardware Drain Guarantee**: Wait loop monitors `playbackHeadPosition` to ensure all audio frames have exited the speaker before releasing hardware resources.
+
 ## 2026-10-25 - Step 32: Settings Store (Preferences DataStore)
 
 ### DEC-043: Typed Preferences DataStore with Clamped Validation and Instant Theme Binding

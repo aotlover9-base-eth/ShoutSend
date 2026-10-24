@@ -29,7 +29,7 @@
 | 24 | C Modem | DSP performance and allocation audit | No | Todo |
 | 25 | C Modem | Spectrum analyzer (FFT) for the waterfall | No | **Done** |
 | 26 | D Android layer | Manifest, permissions logic, audio config | No | **Done** |
-| 27 | D Android layer | AudioTrack transmitter | No | Todo |
+| 27 | D Android layer | AudioTrack transmitter | No | **Done** |
 | 28 | D Android layer | AudioRecord receiver | No | Todo |
 | 29 | D Android layer | Capability probe and calibration engine | No | Todo |
 | 30 | D Android layer | Send and receive sessions, audio focus, routes | No | Todo |
