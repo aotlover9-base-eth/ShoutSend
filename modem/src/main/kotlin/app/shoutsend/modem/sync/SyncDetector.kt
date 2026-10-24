@@ -424,11 +424,15 @@ public class SyncDetector(
     /**
      * Resets detector to HUNTING state and clears history.
      */
-    public fun reset() {
+    public fun reset(keepSampleCounter: Boolean = true) {
         currentState = SyncState.HUNTING
         refractoryHopsRemaining = 0
-        totalSamplesIngested = 0L
-        nextHopSample = 0L
+        if (!keepSampleCounter) {
+            totalSamplesIngested = 0L
+            nextHopSample = 0L
+        } else {
+            nextHopSample = ((totalSamplesIngested + hopSize - 1) / hopSize) * hopSize
+        }
         historyWriteIdx = 0
         totalHopsEvaluated = 0L
         preambleSlotsCount = 0

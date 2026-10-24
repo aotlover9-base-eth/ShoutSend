@@ -307,14 +307,12 @@
 - **Graceful Unreadable Degradation**: When decryption fails (corrupted data or missing key), the entry is flagged `isUnreadable = true` and `payload = null`, allowing UI feeds to display an unreadable placeholder rather than crashing.
 - **Starred Preservation Pruning**: `VaultDao.prune(keepCount)` only deletes unstarred entries older than the top `keepCount` newest entries, guaranteeing starred messages persist indefinitely regardless of history limits.
 
+## 2026-10-25 - Step 21: Demodulator and Receive State Machine
 
-
-
-
-
-
-
-
-
-
+### DEC-045: Deterministic Streaming Acoustic Demodulator Pipeline with Sample-Time State Machine
+- **End-to-End Pure Kotlin JVM Pipeline**: Composes `NoiseFloorTracker`, `SyncDetector`, `GoertzelBank`, `CodewordSymbolizer`, `RsDecoder`, `FrameDecoder`, `MessageAssembler`, and `PayloadDecoder` with zero Android imports.
+- **Monotonic Absolute Sample Tracking**: `SyncDetector.reset(keepSampleCounter = true)` preserves `totalSamplesIngested`, ensuring synchronization lock markers map directly to the continuous stream index without phase or timing offset between successive transmissions.
+- **Chunked Ingestion and Overwrite Protection**: Ring buffer capacity set to 1,048,576 samples (21.8 s at 48 kHz). Pushed samples are processed in streaming 960-sample chunks, guaranteeing zero allocation and preventing circular overwrite during multi-fragment reception.
+- **Mode Summing and Erasures Demodulation**: Mode block decoding computes coherent energy sums across both 2-repeat symbols before computing the argmax decision. Data symbols calculate confidence metrics to mark byte erasures directly into the Reed-Solomon decoder.
+- **Inter-Message Cooldown Guard**: Enters 300 ms silence cooldown upon completing message reassembly to suppress repeat packet reflection.
 

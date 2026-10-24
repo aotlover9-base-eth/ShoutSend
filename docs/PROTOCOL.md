@@ -247,6 +247,42 @@ where:
   - Frame Header Flag: Bit 2 (`isEncrypted`) set to 1.
   - Compaction precedes encryption (`Payload -> Compact -> Seal`).
 
+### Demodulator State Machine & Event Semantics (Step 21)
+
+#### Receive Pipeline State Transitions
+```
+                ┌──────────────┐
+                │   HUNTING    │◄─────────────────────────────┐
+                └──────┬───────┘                              │
+                       │ onSyncLocked                         │
+                       ▼                                      │
+              ┌─────────────────┐                             │
+              │  READING_MODE   │───[Parity Fail / Corrupt]───┤
+              └────────┬────────┘                             │
+                       │ ModeDecoded                          │
+                       ▼                                      │
+             ┌───────────────────┐                            │
+             │  READING_FRAMES   │───[Frame Marker Lost]──────┤
+             └─────────┬─────────┘                            │
+                       │ MessageComplete                      │
+                       ▼                                      │
+                ┌──────────────┐                              │
+                │   COOLDOWN   │───[300 ms Silence Elapsed]───┘
+                └──────────────┘
+```
+
+#### Event Semantics
+- `Listening(ambientDbfs)`: Ambient background noise tracking update.
+- `PreambleDetected`: Alternating tone preamble detected by sync detector.
+- `Locked(snrDb)`: Sub-hop symbol boundary locked with SNR estimation.
+- `ModeDecoded(profile)`: Mode block (4 symbols, 2-repeat coherent sum) decoded.
+- `FrameDecoded(fragmentIndex, fragmentCount, correctedBytes)`: Frame CRC passed and RS corrected.
+- `FrameFailed(reason)`: RS error budget exceeded or CRC/header violation.
+- `Progress(receivedFragments, totalFragments)`: Monotonic fragment reception progress.
+- `MessageComplete(message, payload)`: Full payload reconstructed, decrypted, and validated.
+- `Lost(reason)`: Preamble or frame marker tracking lost.
+- `Cooldown`: Inter-message 300 ms silence guard active to ignore residual repeats.
+
 ## Change Log
 
 ### 2026-10-22 - Step 6: Initial Protocol v1 Baseline
