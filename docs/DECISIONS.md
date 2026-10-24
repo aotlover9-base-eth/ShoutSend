@@ -324,3 +324,16 @@
 - **Automated Metric Instrumentation**: `LoopbackHarness` measures exact payload verification, symbol error rate (SER), Reed-Solomon correction distribution, and false-lock occurrences.
 - **Gradle Benchmark Integration**: Registered `:modem:modemBenchmark` task for reproducible benchmark sweeps outputting structured Markdown reports to `docs/DSP_BENCHMARK.md`.
 
+## 2026-10-25 - Step 28: AudioRecord Receiver
+
+### DEC-047: Low-Latency Raw Audio Capture Architecture with SPSC Lock-Free Buffering and Hardware Negation
+- **Input Source Selection Hierarchy**: In order of preference: `AudioSource.UNPROCESSED` (when `AudioManager.getProperty(PROPERTY_SUPPORT_AUDIO_SOURCE_UNPROCESSED)` is "true") -> `AudioSource.VOICE_RECOGNITION` -> `AudioSource.MIC`. Allows developer runtime override for DSP Lab evaluation.
+- **Hardware DSP Preprocessing Negation**: Queries audio session effects and explicitly turns off `AcousticEchoCanceler`, `NoiseSuppressor`, and `AutomaticGainControl` when available to prevent destructive filtering of high-frequency and ultrasound acoustic chirps.
+- **Thread Separation via SPSC Ring Buffer**: Real-time reader thread runs at `THREAD_PRIORITY_URGENT_AUDIO` performing exclusively `AudioRecord.read()` and non-blocking `write()` into a 262,144-sample lock-free single-producer single-consumer ring buffer (`SpscRingBuffer`). The processing coroutine runs asynchronously consuming the ring buffer, feeding `SpectrumAnalyzer` and `ReceiverPipeline`.
+- **Hardware Silence and Acoustic Clipping Detection**:
+  - Digital silence: Emits `ReceiveEvent.Lost("MicrophoneSilent")` after 2.0 continuous seconds of exact zero samples (detects Android 12 privacy toggle, microphone occlusion, or another app holding exclusive focus).
+  - Acoustic clipping: Emits `ReceiveEvent.FrameFailed("InputTooLoud")` when >0.1% of samples reach $\ge 32,440$ (99% full scale) within a 500 ms sliding window.
+- **Spectrum Waterfall Feed**: Emits 256-bin spectrum power vectors at 60 fps over a dedicated bounded channel (`capacity = 60`, `BufferOverflow.DROP_OLDEST`) ensuring decoupled UI rendering without back-pressuring the demodulator.
+- **Hardware-Paced Unit Testing**: Fake PCM source introduces 1 ms chunk pacing during test execution, matching real-time consumption constraints and preventing false overrun drops in synthetic tests without adding test latency.
+
+
