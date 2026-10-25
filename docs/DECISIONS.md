@@ -459,3 +459,20 @@
   - When an acoustic transmission or reception session is active, `BackHandler` is intercepted to display a modal confirmation (`CdAlertDialog`). Prevents accidental transmission aborts or recording loss while allowing normal system back behavior when idle.
 - **Tab State Persistence**:
   - Active tab is tracked via `Settings.lastTab` and persisted asynchronously to Preferences DataStore. Restores the user's preferred operational screen on subsequent cold launches (defaulting to `Receive`).
+
+
+## 2026-10-26 - Step 36: Onboarding Flow, Canvas Animations, and Reusable Permission Architecture
+
+### DEC-055: Four-Page First-Run Onboarding, Vector Canvas Illustrations, and Shared Permission UI
+- **Four-Page Guided Onboarding Architecture**:
+  - Implemented 4 horizontal pager stops: (1) "Talk in sound", (2) "How it works" 3-step emit/listen/verify sequence, (3) "Good to know" acoustic volume and stealth distance guidance, and (4) "Allow the microphone" privacy explanation.
+  - Quick-skip available across pages 1–3 jumping directly to page 4. Completing onboarding marks `onboardingCompleted = true` in DataStore settings.
+- **Pure Canvas Illustrations & Accessibility**:
+  - All illustrations (`TalkInSoundIllustration`, `HowItWorksIllustration`, `GoodToKnowIllustration`, `AllowMicrophoneIllustration`) are rendered purely via Compose Canvas primitives using design system color, stroke, and motion tokens (zero Lottie, zero raster assets).
+  - Reduced Motion awareness via `ChirpTheme.isReducedMotion` renders static wavefront geometries and fixed privacy dots.
+  - Screen reader semantics provide rich textual descriptions (`semantics { contentDescription = "..." }`) and page transitions announce via `LiveRegionMode.Polite`.
+- **Reusable `MicPermissionCard`**:
+  - Unified tokenized card responding to `MicPermissionState` (`CanAsk`, `ShouldExplain`, `PermanentlyDenied`). Reused consistently across Receive and Calibration screens.
+  - Automatically deep-links to system app settings via `createAppSettingsIntent(context)` when permanently denied.
+- **Resource String Formalization**:
+  - All onboarding, permission, and guidance text externalized to `res/values/strings.xml` with zero hardcoded literals in composables.

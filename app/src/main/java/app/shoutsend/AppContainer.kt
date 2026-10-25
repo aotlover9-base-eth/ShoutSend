@@ -1,6 +1,9 @@
 package app.shoutsend
 
 import android.content.Context
+import app.shoutsend.core.audio.permissions.AndroidPermissionRepository
+import app.shoutsend.core.audio.permissions.PermissionRepository
+import app.shoutsend.core.data.settings.DataStoreMicPermissionRequestedProvider
 import app.shoutsend.core.data.settings.SettingsRepository
 import app.shoutsend.core.data.settings.bindToThemeController
 import app.shoutsend.core.data.settings.createSettingsRepository
@@ -16,6 +19,12 @@ class AppContainer(val context: Context) {
     val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     val tokenOverridesRepository = createTokenOverridesRepository(context, applicationScope)
     val settingsRepository: SettingsRepository = createSettingsRepository(context, applicationScope)
+
+    val micPermissionRequestedProvider = DataStoreMicPermissionRequestedProvider(settingsRepository)
+    val permissionRepository: PermissionRepository = AndroidPermissionRepository(
+        context = context,
+        provider = micPermissionRequestedProvider
+    )
 
     val themeController: ThemeController = ThemeController(
         repository = tokenOverridesRepository,

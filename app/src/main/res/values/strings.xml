@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Onboarding Page 1: Talk in sound -->
+    <string name="onboarding_page1_title">Talk in Sound</string>
+    <string name="onboarding_page1_body">Send text, credentials, and data between phones using ultrasonic and audible acoustic synthesis. Zero Wi-Fi, Bluetooth, cellular, or cloud connection required.</string>
+
+    <!-- Onboarding Page 2: How it works -->
+    <string name="onboarding_page2_title">How It Works</string>
+    <string name="onboarding_step1_title">1. Emit</string>
+    <string name="onboarding_step1_body">Encode your message into Goertzel MFSK16 sound tones.</string>
+    <string name="onboarding_step2_title">2. Listen</string>
+    <string name="onboarding_step2_body">Nearby receiving device captures audio via its microphone.</string>
+    <string name="onboarding_step3_title">3. Restore</string>
+    <string name="onboarding_step3_body">Reed-Solomon GF(256) error correction verifies payload integrity.</string>
+
+    <!-- Onboarding Page 3: Good to know -->
+    <string name="onboarding_page3_title">Good to Know</string>
+    <string name="onboarding_bullet1" formatted="false">Volume: Set media speaker volume between 70% and 90% for optimal acoustic SNR.</string>
+    <string name="onboarding_bullet2">Range: Near-ultrasound Stealth mode works reliably up to 0.5 meters.</string>
+    <string name="onboarding_bullet3">Privacy: Sound waves are acoustic—use Secure Mode with a passphrase for confidential data.</string>
+    <string name="onboarding_bullet4">Pets: Near-ultrasound can be audible to domestic pets; keep sound levels considerate.</string>
+
+    <!-- Onboarding Page 4: Allow the microphone -->
+    <string name="onboarding_page4_title">Allow the Microphone</string>
+    <string name="onboarding_page4_body">ShoutSend analyzes acoustic frequencies locally in real-time. Audio is processed strictly in volatile memory, never recorded to storage, and never transmitted over the internet.</string>
+
+    <!-- Onboarding Controls -->
+    <string name="onboarding_btn_allow_mic">Allow Microphone</string>
+    <string name="onboarding_btn_not_now">Not Now</string>
+    <string name="onboarding_btn_get_started">Get Started</string>
+    <string name="onboarding_btn_next">Next</string>
+    <string name="onboarding_btn_skip">Skip</string>
+
+    <!-- Microphone Permission Card & Rationale -->
+    <string name="permission_rationale_title">Microphone Access Required</string>
+    <string name="permission_rationale_body">To receive acoustic transmissions and calibrate frequency response, ShoutSend requires microphone access to detect audio carrier frequencies.</string>
+    <string name="permission_denied_title">Microphone Permission Blocked</string>
+    <string name="permission_denied_body">Microphone permission has been permanently denied. Please enable microphone access in Android application settings to receive sonic data.</string>
+    <string name="permission_btn_open_settings">Open App Settings</string>
+    <string name="permission_btn_grant">Grant Microphone Access</string>
+</resources>

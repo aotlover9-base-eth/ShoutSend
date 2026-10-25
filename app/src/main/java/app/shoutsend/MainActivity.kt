@@ -1,16 +1,23 @@
 package app.shoutsend
 
+import android.Manifest
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
+import app.shoutsend.core.audio.permissions.createAppSettingsIntent
 import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.feature.calibration.CalibrationViewModel
 import app.shoutsend.feature.onboarding.OnboardingViewModel
@@ -22,6 +29,7 @@ import app.shoutsend.navigation.AppScaffold
 import app.shoutsend.navigation.OnboardingRoute
 import app.shoutsend.navigation.ShoutSendNavHost
 import app.shoutsend.navigation.TopLevelDestination
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,11 +39,29 @@ class MainActivity : ComponentActivity() {
         val app = application as ShoutSendApp
         val themeController = app.appContainer.themeController
         val settingsRepository = app.appContainer.settingsRepository
+        val permissionRepository = app.appContainer.permissionRepository
         val devTools = app.appContainer.devTools
 
         setContent {
             val tokens by themeController.tokens.collectAsStateWithLifecycle()
             val settings by settingsRepository.settings.collectAsStateWithLifecycle()
+            val micState by permissionRepository.micState.collectAsStateWithLifecycle()
+            val scope = rememberCoroutineScope()
+
+            LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+                scope.launch {
+                    permissionRepository.refresh()
+                }
+            }
+
+            val micPermissionLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.RequestPermission()
+            ) { _ ->
+                scope.launch {
+                    settingsRepository.setMicPermissionRequested(true)
+                    permissionRepository.refresh()
+                }
+            }
 
             ChirpTheme(tokens = tokens) {
                 Box(modifier = Modifier.fillMaxSize()) {
@@ -46,7 +72,9 @@ class MainActivity : ComponentActivity() {
                     val vaultViewModel = remember { VaultViewModel() }
                     val settingsViewModel = remember { SettingsViewModel(settingsRepository) }
                     val calibrationViewModel = remember { CalibrationViewModel() }
-                    val onboardingViewModel = remember { OnboardingViewModel(settingsRepository) }
+                    val onboardingViewModel = remember {
+                        OnboardingViewModel(settingsRepository, permissionRepository)
+                    }
 
                     val startDestination: Any = remember(settings.onboardingCompleted, settings.lastTab) {
                         if (!settings.onboardingCompleted) {
@@ -70,6 +98,13 @@ class MainActivity : ComponentActivity() {
                             settingsViewModel = settingsViewModel,
                             calibrationViewModel = calibrationViewModel,
                             onboardingViewModel = onboardingViewModel,
+                            micPermissionState = micState,
+                            onRequestPermission = {
+                                micPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                            },
+                            onOpenSettings = {
+                                startActivity(createAppSettingsIntent(this@MainActivity))
+                            },
                             modifier = contentModifier
                         )
                     }

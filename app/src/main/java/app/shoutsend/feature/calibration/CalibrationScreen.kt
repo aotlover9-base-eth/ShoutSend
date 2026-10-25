@@ -10,8 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import app.shoutsend.core.audio.permissions.MicPermissionState
 import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.core.designsystem.components.CdButton
+import app.shoutsend.core.designsystem.components.MicPermissionCard
 import app.shoutsend.core.designsystem.components.NeonCard
 import app.shoutsend.core.designsystem.components.RadioReadout
 import app.shoutsend.core.designsystem.components.ReadoutScale
@@ -20,7 +22,10 @@ import app.shoutsend.core.designsystem.components.ReadoutScale
 fun CalibrationScreen(
     viewModel: CalibrationViewModel,
     onNavigateBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    micPermissionState: MicPermissionState = MicPermissionState.Granted,
+    onRequestPermission: () -> Unit = {},
+    onOpenSettings: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -30,6 +35,14 @@ fun CalibrationScreen(
             .padding(ChirpTheme.spacing.md),
         verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.md)
     ) {
+        if (micPermissionState != MicPermissionState.Granted) {
+            MicPermissionCard(
+                state = micPermissionState,
+                onRequestPermission = onRequestPermission,
+                onOpenSettings = onOpenSettings
+            )
+        }
+
         NeonCard(
             modifier = Modifier.fillMaxWidth()
         ) {

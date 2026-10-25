@@ -13,6 +13,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import app.shoutsend.core.audio.permissions.MicPermissionState
 import app.shoutsend.core.data.settings.SettingsRepository
 import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.feature.calibration.CalibrationScreen
@@ -44,6 +45,9 @@ fun ShoutSendNavHost(
     settingsViewModel: SettingsViewModel,
     calibrationViewModel: CalibrationViewModel,
     onboardingViewModel: OnboardingViewModel,
+    micPermissionState: MicPermissionState = MicPermissionState.Granted,
+    onRequestPermission: () -> Unit = {},
+    onOpenSettings: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     // Capture motion tokens in composable scope for non-composable transition lambdas
@@ -99,7 +103,12 @@ fun ShoutSendNavHost(
                     slideOutVertically(tween(durShort, easing = easeAccel)) { -it / 20 }
             }
         ) {
-            ReceiveScreen(viewModel = receiveViewModel)
+            ReceiveScreen(
+                viewModel = receiveViewModel,
+                micPermissionState = micPermissionState,
+                onRequestPermission = onRequestPermission,
+                onOpenSettings = onOpenSettings
+            )
         }
 
         // --- Top-Level Tab: Vault ---
@@ -197,7 +206,10 @@ fun ShoutSendNavHost(
         ) {
             CalibrationScreen(
                 viewModel = calibrationViewModel,
-                onNavigateBack = { navController.popBackStack() }
+                onNavigateBack = { navController.popBackStack() },
+                micPermissionState = micPermissionState,
+                onRequestPermission = onRequestPermission,
+                onOpenSettings = onOpenSettings
             )
         }
 
