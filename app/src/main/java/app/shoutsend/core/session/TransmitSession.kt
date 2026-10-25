@@ -8,6 +8,7 @@ import app.shoutsend.modem.crypto.SecureBox
 import app.shoutsend.modem.modulator.Modulator
 import app.shoutsend.modem.modulator.OutgoingMessage
 import app.shoutsend.modem.modulator.TransmissionBuilder
+import app.shoutsend.modem.modulator.TransmissionEnvelope
 import app.shoutsend.modem.packet.MessageFlags
 import app.shoutsend.modem.payload.Payload
 import app.shoutsend.modem.payload.PayloadCodec
@@ -32,6 +33,10 @@ import kotlinx.coroutines.withContext
  */
 interface TransmitSession {
     val state: StateFlow<TransmitState>
+    val activeEnvelope: StateFlow<TransmissionEnvelope?>
+    val activePayload: StateFlow<Payload?>
+    val activeProfile: StateFlow<ModemProfile?>
+    val activePassphrase: StateFlow<String?>
 
     /**
      * Compacts, encrypts (if passphrase provided), modulates, and transmits [payload].
@@ -61,6 +66,18 @@ class DefaultTransmitSession(
 
     private val _state = MutableStateFlow<TransmitState>(TransmitState.Idle)
     override val state: StateFlow<TransmitState> = _state.asStateFlow()
+
+    private val _activeEnvelope = MutableStateFlow<TransmissionEnvelope?>(null)
+    override val activeEnvelope: StateFlow<TransmissionEnvelope?> = _activeEnvelope.asStateFlow()
+
+    private val _activePayload = MutableStateFlow<Payload?>(null)
+    override val activePayload: StateFlow<Payload?> = _activePayload.asStateFlow()
+
+    private val _activeProfile = MutableStateFlow<ModemProfile?>(null)
+    override val activeProfile: StateFlow<ModemProfile?> = _activeProfile.asStateFlow()
+
+    private val _activePassphrase = MutableStateFlow<String?>(null)
+    override val activePassphrase: StateFlow<String?> = _activePassphrase.asStateFlow()
 
     @Volatile
     private var activePlaybackJob: Job? = null
@@ -163,6 +180,11 @@ class DefaultTransmitSession(
                 audioSpec = audioSpec,
                 tuning = effectiveTuning
             )
+            val envelope = TransmissionEnvelope.compute(plan)
+            _activePayload.value = payload
+            _activeProfile.value = effectiveProfile
+            _activePassphrase.value = securePassphrase
+            _activeEnvelope.value = envelope
             val modulator = Modulator(plan)
             val totalFrames = plan.frames.size
 

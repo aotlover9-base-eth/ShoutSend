@@ -27,6 +27,7 @@ import app.shoutsend.feature.receive.ReceiveViewModel
 import app.shoutsend.feature.send.ParsedSharedContent
 import app.shoutsend.feature.send.SendViewModel
 import app.shoutsend.feature.send.SharedTextParser
+import app.shoutsend.feature.send.TransmitViewModel
 import app.shoutsend.feature.settings.SettingsViewModel
 import app.shoutsend.feature.vault.VaultViewModel
 import app.shoutsend.navigation.AppScaffold
@@ -49,6 +50,8 @@ class MainActivity : ComponentActivity() {
         val settingsRepository = app.appContainer.settingsRepository
         val permissionRepository = app.appContainer.permissionRepository
         val transmitSession = app.appContainer.transmitSession
+        val vaultRepository = app.appContainer.vaultRepository
+        val audioRouteMonitor = app.appContainer.audioRouteMonitor
         val devTools = app.appContainer.devTools
 
         setContent {
@@ -78,6 +81,15 @@ class MainActivity : ComponentActivity() {
 
                     val sendViewModel = remember {
                         SendViewModel(settingsRepository, transmitSession)
+                    }
+                    val transmitViewModel = remember {
+                        TransmitViewModel(
+                            transmitSession = transmitSession,
+                            settingsRepository = settingsRepository,
+                            vaultRepository = vaultRepository,
+                            audioRouteMonitor = audioRouteMonitor,
+                            context = this@MainActivity
+                        )
                     }
                     val receiveViewModel = remember { ReceiveViewModel() }
                     val vaultViewModel = remember { VaultViewModel() }
@@ -121,6 +133,7 @@ class MainActivity : ComponentActivity() {
                             startDestination = startDestination,
                             settingsRepository = settingsRepository,
                             sendViewModel = sendViewModel,
+                            transmitViewModel = transmitViewModel,
                             receiveViewModel = receiveViewModel,
                             vaultViewModel = vaultViewModel,
                             settingsViewModel = settingsViewModel,

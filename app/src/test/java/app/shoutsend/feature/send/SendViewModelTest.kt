@@ -4,6 +4,7 @@ import app.shoutsend.core.data.settings.FakeSettingsRepository
 import app.shoutsend.core.data.settings.Settings
 import app.shoutsend.core.session.TransmitSession
 import app.shoutsend.core.session.TransmitState
+import app.shoutsend.modem.modulator.TransmissionEnvelope
 import app.shoutsend.modem.payload.Payload
 import app.shoutsend.modem.payload.WifiSecurity
 import app.shoutsend.modem.profile.Band
@@ -36,6 +37,10 @@ class SendViewModelTest {
     private class TestTransmitSession : TransmitSession {
         private val _state = MutableStateFlow<TransmitState>(TransmitState.Idle)
         override val state: StateFlow<TransmitState> = _state.asStateFlow()
+        override val activeEnvelope: StateFlow<TransmissionEnvelope?> = MutableStateFlow(null)
+        override val activePayload: StateFlow<Payload?> = MutableStateFlow(null)
+        override val activeProfile: StateFlow<ModemProfile?> = MutableStateFlow(null)
+        override val activePassphrase: StateFlow<String?> = MutableStateFlow(null)
 
         var lastPayloadSent: Payload? = null
         var lastProfileSent: ModemProfile? = null

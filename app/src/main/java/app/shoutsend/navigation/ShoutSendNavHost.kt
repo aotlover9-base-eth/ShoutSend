@@ -26,6 +26,7 @@ import app.shoutsend.feature.receive.ReceiveViewModel
 import app.shoutsend.feature.send.SendScreen
 import app.shoutsend.feature.send.SendViewModel
 import app.shoutsend.feature.send.TransmitScreen
+import app.shoutsend.feature.send.TransmitViewModel
 import app.shoutsend.feature.settings.SettingsScreen
 import app.shoutsend.feature.settings.SettingsViewModel
 import app.shoutsend.feature.vault.VaultDetailScreen
@@ -41,6 +42,7 @@ fun ShoutSendNavHost(
     startDestination: Any,
     settingsRepository: SettingsRepository,
     sendViewModel: SendViewModel,
+    transmitViewModel: TransmitViewModel,
     receiveViewModel: ReceiveViewModel,
     vaultViewModel: VaultViewModel,
     settingsViewModel: SettingsViewModel,
@@ -116,7 +118,7 @@ fun ShoutSendNavHost(
             }
         ) {
             TransmitScreen(
-                viewModel = sendViewModel,
+                viewModel = transmitViewModel,
                 onNavigateBack = { navController.popBackStack() }
             )
         }

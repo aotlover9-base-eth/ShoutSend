@@ -520,3 +520,28 @@
   - Built `CdCheckbox` wrapping Material 3 Checkbox with ChirpTheme tokenized colors and opacities.
   - 100% compliant with `:app:checkNoHardcodedStyle` and `:app:verifyPermissions`.
 
+
+## 2026-10-26 - Step 39: Transmit Screen with Soundwave Rings, Envelope Sync, and Vault Archiving
+
+### DEC-058: Acoustic Transmission Visual Synchronization, Zero-Allocation Rings Canvas, Hardware Volume Guard, and Vault History
+- **Precomputed Transmission Envelope & Synchronization (`TransmissionEnvelope`)**:
+  - Implemented pure JVM `TransmissionEnvelope` in `:modem` slicing physical transmission plans into discrete 20 ms windows. Precomputes normalized RMS energy and dominant tone indexes directly from `SymbolSchedule` events in $O(N)$ time (< 1 ms overhead).
+  - Synchronizes animations strictly to real acoustic output without requiring live audio stream sniffing or runtime buffer analysis.
+- **Zero-Allocation Soundwave Ripple Canvas (`RingsCanvas`)**:
+  - Preallocates a fixed pool of 12 `Ring` data objects. Time advancement runs on a frame clock via `withFrameNanos`.
+  - Driven completely within the Compose draw phase, ensuring zero heap allocations per animation frame (Rule 22).
+  - Ring ripple spawn intervals and line thicknesses scale dynamically with live audio RMS energy, while ripple coloration dynamically reflects active audio frequencies sampled across the theme band gradient (primary to secondary to tertiary tokens).
+  - Accessible fallback: When `ChirpTheme.isReducedMotion` or `LocalReduceMotion` is active, replaces expanding ripples with a single calm breathing ring.
+- **Center Countdown & Circular Arc Progress**:
+  - Displays remaining transmission time in `RadioReadout` (`readoutLarge`), surrounded by a 360° circular progress arc (`StrokeCap.Round`), frame counter (`Frame X of Y · Repeat A of B`), and active modem mode pill (`StatusPill`).
+  - Upon transmission completion, smoothly transitions center display into a prominent checkmark with "Sent".
+- **Hardware Volume Alert & System Volume Panel Shortcut**:
+  - Monitors media speaker volume via `AudioManager.STREAM_MUSIC`. If volume is below 70%, displays a warning banner with a "Turn up" button that launches the native system volume panel via `AudioManager.adjustStreamVolume` (`ADJUST_SAME | FLAG_SHOW_UI`) without modifying device volume silently.
+  - Monitors peripheral audio routes via `AudioRouteMonitor` and surfaces warnings when wired or Bluetooth headphones are connected.
+- **Automatic Vault History Persistence**:
+  - When transmission completes with `TransmitState.Completed`, `TransmitViewModel` automatically archives the sent payload, modem profile summary, duration, and security state to `VaultRepository` if history is enabled in `SettingsRepository` (`historyEnabled == true`).
+- **Screen Awake Management & Back Cancellation Intercept**:
+  - Enforces `keepScreenOn = true` on the window during active acoustic modulation via `DisposableEffect`, reverting on exit.
+  - Intercepts system back gesture during active transmission with a confirmation dialog to prevent accidental transmission drops. Single-tap "Stop" button available on screen for immediate manual abort.
+
+

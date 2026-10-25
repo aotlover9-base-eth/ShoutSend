@@ -255,3 +255,25 @@ The root app shell provides consistent edge-to-edge window framing, adaptive nav
 ### Transition Standards
 - **Tab Transitions**: Fade-through with 5% vertical shift using `ChirpTheme.motion.durationMedium1` (decelerate).
 - **Sub-screen Transitions**: Shared-axis horizontal slide (enter from right with fade-in, exit to left with fade-out) using `ChirpTheme.motion.durationMedium2`.
+
+---
+
+## 10. Transmit Visuals & Soundwave Rings (Step 39)
+
+The transmit screen provides an immersive cyber-radio visualization synchronized directly with live physical sound synthesis.
+
+### Soundwave Rings (`RingsCanvas`)
+- **Zero-Allocation Ripple Pool**: Employs an array pool of preallocated `Ring` objects. Advancement is driven via `withFrameNanos` frame clock and rendered directly inside `Canvas.drawCircle` using precalculated strokes without per-frame object instantiations (Rule 22).
+- **Audio-Synchronized Ripple Spawning**: Ripple spawn intervals scale dynamically between 80ms and 500ms based on live envelope RMS amplitude. Expanding rings fade gracefully with quadratic distance falloff ($alpha = (1 - r)^2$).
+- **Pitch-Reactive Color Spectrum**: Ring coloration maps dynamically to the active tone frequency:
+  - Data tones 0..5 (low): smoothly interpolate from `primary` (cyan) to `secondary` (magenta).
+  - Data tones 6..10 (mid): smoothly interpolate from `secondary` (magenta) to `tertiary` (amber).
+  - Data tones 11..15 (high): smoothly interpolate from `tertiary` (amber) to `signalPeak` (bright lime).
+  - Sync tones 16..17: rendered in `syncMarker` token.
+- **Accessible Reduced Motion Fallback**: When `ChirpTheme.isReducedMotion` or `LocalReduceMotion` is active, dynamic ripple waves collapse into a single calm static ring with soft tone breathing.
+
+### Circular Countdown & Status Display
+- **360° Circular Arc**: 12 o'clock start position (-90°) with `StrokeCap.Round` tracking fractional transmission completion.
+- **Digital Readout**: Prominent remaining duration rendered in `RadioReadout` (`readoutLarge`), framed by frame counter (e.g. `Frame 3 of 8 · Repeat 1 of 2`) and band/speed status pill.
+- **Completion Checkmark**: On transmission finish, rings smoothly contract into a centered checkmark with "Sent" and "Saved to Vault history" badge.
+

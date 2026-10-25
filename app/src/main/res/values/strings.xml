@@ -109,4 +109,20 @@
     <string name="send_contact_switch_to_manual">Switch to manual entry</string>
     <string name="send_contact_switch_to_picker">Switch to contact picker</string>
     <string name="send_contact_clear">Clear</string>
+
+    <!-- Transmit Screen Soundwave Strings (Step 39) -->
+    <string name="transmit_btn_stop">Stop</string>
+    <string name="transmit_btn_retry">Retry</string>
+    <string name="transmit_btn_send_another">Send Another</string>
+    <string name="transmit_status_sent">Sent</string>
+    <string name="transmit_status_saved_to_vault">Saved to Vault history</string>
+    <string name="transmit_volume_warning_title">Speaker volume is low</string>
+    <string name="transmit_volume_warning_body" formatted="false">Media volume should be above 70% for nearby phones to receive sound reliably.</string>
+    <string name="transmit_volume_warning_action">Turn up</string>
+    <string name="transmit_frame_repeat" formatted="false">Frame %d of %d · Repeat %d of %d</string>
+    <string name="transmit_frame_only" formatted="false">Frame %d of %d</string>
+    <string name="transmit_stop_confirm_title">Stop Transmission?</string>
+    <string name="transmit_stop_confirm_body">Stopping will interrupt the active acoustic sound wave. The receiver will not get the payload.</string>
+    <string name="transmit_stop_confirm_action">Stop Transmission</string>
+    <string name="transmit_stop_keep_playing">Keep Playing</string>
 </resources>

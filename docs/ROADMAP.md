@@ -41,7 +41,7 @@
 | 36 | E UI | Onboarding and permission flow | Yes | **Done** |
 | 37 | E UI | Send: compose screen (text and URL) | Yes | **Done** |
 | 38 | E UI | Send: Wi-Fi and contact forms | Yes | **Done** |
-| 39 | E UI | Transmit screen: soundwave rings | Yes | Todo |
+| 39 | E UI | Transmit screen: soundwave rings | Yes | **Done** |
 | 40 | E UI | Receive screen: spectrogram waterfall | Yes | Todo |
 | 41 | E UI | Receive progress and success states | Yes | Todo |
 | 42 | E UI | Instant action cards | Yes | Todo |
