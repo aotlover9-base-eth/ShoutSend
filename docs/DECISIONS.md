@@ -442,3 +442,20 @@
   - `NeonCard` utilizes multi-pass translucent perimeter strokes within `drawBehind` rather than expensive blur shader passes (`RenderEffect.createBlurEffect`), ensuring 60+ FPS on budget devices without hardware acceleration bottlenecks.
 - **Accessibility & Motion Invariants**:
   - `LocalReduceMotion` checks system-wide `Settings.Global.ANIMATOR_DURATION_SCALE == 0`. Animated elements (`BrandMark`, `StatusPill`) switch cleanly from infinite transitions to static geometric layouts.
+
+
+## 2026-10-26 - Step 35: App Shell, Adaptive Scaffold, and Type-Safe Navigation
+
+### DEC-054: Type-Safe Route Architecture, Adaptive Shell, and Back-Pressure Guard
+- **Type-Safe Route Definition**:
+  - Adopted Navigation Compose 2.8.3 with Kotlinx Serialization (`@Serializable` objects and data classes): `OnboardingRoute`, `SendRoute`, `ReceiveRoute`, `VaultRoute`, `VaultDetailRoute(id: Long)`, `SettingsRoute`, `CalibrationRoute`, `LinkTestRoute`. Eliminates fragile string path concatenation and manual query bundle parsing.
+- **Adaptive Screen Layout (Width $\ge 600$ dp)**:
+  - Computed via lightweight `LocalConfiguration.current.screenWidthDp >= 600` without third-party window size class libraries.
+  - Switches automatically between compact bottom navigation (`CdNavigationBar`) and expanded side navigation rail (`CdNavigationRail`).
+- **Motion Tokenized Transitions**:
+  - Top-level tabs (`Send`, `Receive`, `Vault`) execute subtle vertical fade-through using `ChirpTheme.motion.durationMedium1` and `easingStandardDecelerate`.
+  - Sub-destinations (`Settings`, `Calibration`, `VaultDetail`, `LinkTest`) use shared-axis horizontal slides (`slideInHorizontally` + `fadeIn`). Motion parameters are resolved inside composable scope prior to transition lambdas to avoid `@Composable` invocation errors in non-composable builders.
+- **Active Session Back-Pressure Guard**:
+  - When an acoustic transmission or reception session is active, `BackHandler` is intercepted to display a modal confirmation (`CdAlertDialog`). Prevents accidental transmission aborts or recording loss while allowing normal system back behavior when idle.
+- **Tab State Persistence**:
+  - Active tab is tracked via `Settings.lastTab` and persisted asynchronously to Preferences DataStore. Restores the user's preferred operational screen on subsequent cold launches (defaulting to `Receive`).

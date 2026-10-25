@@ -1,6 +1,9 @@
 package app.shoutsend
 
 import android.content.Context
+import app.shoutsend.core.data.settings.SettingsRepository
+import app.shoutsend.core.data.settings.bindToThemeController
+import app.shoutsend.core.data.settings.createSettingsRepository
 import app.shoutsend.core.designsystem.ThemeController
 import app.shoutsend.core.designsystem.createTokenOverridesRepository
 import app.shoutsend.core.devtools.DevTools
@@ -12,9 +15,16 @@ import kotlinx.coroutines.SupervisorJob
 class AppContainer(val context: Context) {
     val applicationScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     val tokenOverridesRepository = createTokenOverridesRepository(context, applicationScope)
+    val settingsRepository: SettingsRepository = createSettingsRepository(context, applicationScope)
+
     val themeController: ThemeController = ThemeController(
         repository = tokenOverridesRepository,
         scope = applicationScope
     )
+
+    init {
+        settingsRepository.bindToThemeController(themeController, applicationScope)
+    }
+
     val devTools: DevTools = createDevTools(context, themeController)
 }

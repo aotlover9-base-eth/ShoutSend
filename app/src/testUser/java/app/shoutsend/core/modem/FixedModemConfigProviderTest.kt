@@ -60,6 +60,7 @@ class FixedModemConfigProviderTest {
         override suspend fun setMicPermissionRequested(requested: Boolean) {}
         override suspend fun setStealthWarningAccepted(accepted: Boolean) {}
         override suspend fun setBackgroundGraceSeconds(seconds: Int) {}
+        override suspend fun setLastTab(tab: String) {}
     }
 
     @Test

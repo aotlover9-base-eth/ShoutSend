@@ -247,4 +247,18 @@ class SettingsRepositoryTest {
         val dynamicTokens = controller.tokens.first { it.dynamicColor }
         assertTrue(dynamicTokens.dynamicColor)
     }
+
+    @Test
+    fun lastTabCanBeUpdatedAndPersisted() = runTest {
+        val dataStore = createTestDataStore(backgroundScope)
+        val repo = DataStoreSettingsRepository(dataStore, backgroundScope)
+
+        assertEquals("receive", repo.settings.first().lastTab)
+
+        repo.setLastTab("send")
+        assertEquals("send", repo.settings.first { it.lastTab == "send" }.lastTab)
+
+        repo.setLastTab("vault")
+        assertEquals("vault", repo.settings.first { it.lastTab == "vault" }.lastTab)
+    }
 }

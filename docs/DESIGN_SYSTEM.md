@@ -224,3 +224,34 @@ Specialized acoustic radio components and physical rendering tokens designed for
 ShoutSend provides `LocalReduceMotion` to respect system accessibility preferences:
 - Reads `Settings.Global.ANIMATOR_DURATION_SCALE == 0` with safe fallback.
 - Animated components (`BrandMark`, `StatusPill`) query `ChirpTheme.isReducedMotion` to switch instantly from infinite transitions to clean static geometry.
+
+
+---
+
+## 9. App Shell & Navigation Architecture (Step 35)
+
+The root app shell provides consistent edge-to-edge window framing, adaptive navigation layouts, and type-safe routing.
+
+### Navigation Primitives & Wrappers
+- `CdNavigationBar` & `CdNavigationBarItem`: Wraps Material 3 `NavigationBar` with `ChirpTheme.colors.surfaceContainer` container and `ChirpTheme.colors.primary` active indicators.
+- `CdNavigationRail` & `CdNavigationRailItem`: Left-anchored navigation rail active on screens with width $\ge 600$ dp.
+
+### Route Map
+```text
+[OnboardingRoute] (First run only)
+      │
+      ▼ (complete)
+[AppScaffold] ────────────────────────────────────────────────────────┐
+      │                                                               │
+  ┌───┴────────────────────────┬───────────────────────────┐          │
+  ▼                            ▼                           ▼          ▼
+[SendRoute]             [ReceiveRoute]               [VaultRoute] [Top Bar Actions]
+(Transmitter)           (Waterfall & Receiver)       (History)        ├── [SettingsRoute]
+                                                           │          └── [CalibrationRoute]
+                                                           ├─► [VaultDetailRoute(id)]
+                                                           └─► [LinkTestRoute]
+```
+
+### Transition Standards
+- **Tab Transitions**: Fade-through with 5% vertical shift using `ChirpTheme.motion.durationMedium1` (decelerate).
+- **Sub-screen Transitions**: Shared-axis horizontal slide (enter from right with fade-in, exit to left with fade-out) using `ChirpTheme.motion.durationMedium2`.
