@@ -172,7 +172,15 @@ class DevPanelViewModel(
                 "surfaceContainer", "surfaceContainerHigh", "surfaceContainerHighest"
             ),
             "Outlines" to listOf("outline", "outlineVariant", "scrim"),
-            "Extended Signal" to listOf("spectrumGlow", "signalActive", "signalIdle", "signalError")
+            "Extended Signal" to listOf("spectrumGlow", "signalActive", "signalIdle", "signalError"),
+            "Acoustic & Waterfall" to listOf(
+                "signalLow", "signalMid", "signalHigh", "signalPeak",
+                "noiseFloorLine", "syncMarker", "toneGuide"
+            ),
+            "Glow & Status" to listOf(
+                "glowPrimary", "glowSecondary", "success", "onSuccess",
+                "warning", "onWarning", "scanline"
+            )
         )
 
         fun getColorForRole(colors: ColorTokens, role: String): Color {
@@ -215,6 +223,20 @@ class DevPanelViewModel(
                 "signalActive" -> colors.signalActive
                 "signalIdle" -> colors.signalIdle
                 "signalError" -> colors.signalError
+                "signalLow" -> colors.signalLow
+                "signalMid" -> colors.signalMid
+                "signalHigh" -> colors.signalHigh
+                "signalPeak" -> colors.signalPeak
+                "noiseFloorLine" -> colors.noiseFloorLine
+                "syncMarker" -> colors.syncMarker
+                "toneGuide" -> colors.toneGuide
+                "glowPrimary" -> colors.glowPrimary
+                "glowSecondary" -> colors.glowSecondary
+                "success" -> colors.success
+                "onSuccess" -> colors.onSuccess
+                "warning" -> colors.warning
+                "onWarning" -> colors.onWarning
+                "scanline" -> colors.scanline
                 else -> colors.primary
             }
         }

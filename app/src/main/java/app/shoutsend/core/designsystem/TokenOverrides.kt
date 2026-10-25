@@ -28,7 +28,11 @@ data class TokenOverrides(
             "surfaceContainerHigh", "surfaceContainerHighest",
             "outline", "outlineVariant", "scrim",
             "inverseSurface", "inverseOnSurface", "inversePrimary",
-            "surfaceTint", "spectrumGlow", "signalActive", "signalIdle", "signalError"
+            "surfaceTint", "spectrumGlow", "signalActive", "signalIdle", "signalError",
+            "signalLow", "signalMid", "signalHigh", "signalPeak",
+            "noiseFloorLine", "syncMarker", "toneGuide",
+            "glowPrimary", "glowSecondary", "success", "onSuccess",
+            "warning", "onWarning", "scanline"
         )
 
         val ALLOWED_RADIUS_NAMES = setOf(

@@ -58,7 +58,21 @@ object DefaultTokens {
         spectrumGlow = Color(0xFF00F0FF),
         signalActive = Color(0xFF00FF66),
         signalIdle = Color(0xFF525E75),
-        signalError = Color(0xFFFF5449)
+        signalError = Color(0xFFFF5449),
+        signalLow = Color(0xFF0D1B2A),
+        signalMid = Color(0xFF0077B6),
+        signalHigh = Color(0xFF00F0FF),
+        signalPeak = Color(0xFFFFFFFF),
+        noiseFloorLine = Color(0xFFFFB300),
+        syncMarker = Color(0xFFFF007F),
+        toneGuide = Color(0xFF1E2D3D),
+        glowPrimary = Color(0xFF00F0FF),
+        glowSecondary = Color(0xFF00FF66),
+        success = Color(0xFF00FF66),
+        onSuccess = Color(0xFF003912),
+        warning = Color(0xFFFFB300),
+        onWarning = Color(0xFF412D00),
+        scanline = Color(0x0A00F0FF)
     )
 
     // --- CYBER RADIO LIGHT PALETTE ---
@@ -100,7 +114,21 @@ object DefaultTokens {
         spectrumGlow = Color(0xFF006874),
         signalActive = Color(0xFF006E26),
         signalIdle = Color(0xFF707885),
-        signalError = Color(0xFFBA1A1A)
+        signalError = Color(0xFFBA1A1A),
+        signalLow = Color(0xFFE0E8F0),
+        signalMid = Color(0xFF0288D1),
+        signalHigh = Color(0xFF006874),
+        signalPeak = Color(0xFF004D40),
+        noiseFloorLine = Color(0xFFE65100),
+        syncMarker = Color(0xFFC2185B),
+        toneGuide = Color(0xFFCFD8DC),
+        glowPrimary = Color(0xFF006874),
+        glowSecondary = Color(0xFF006E26),
+        success = Color(0xFF006E26),
+        onSuccess = Color(0xFFFFFFFF),
+        warning = Color(0xFF7A5900),
+        onWarning = Color(0xFFFFFFFF),
+        scanline = Color(0x05000000)
     )
 
     // --- BASE SHAPES ---
@@ -193,6 +221,19 @@ object DefaultTokens {
         springPress = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
         springEnter = spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessMediumLow),
         springExit = spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessMedium)
+    )
+
+    // --- RADIO VISUAL TOKENS ---
+    val RadioVisuals = RadioVisualTokens(
+        glowRadius = 12.dp,
+        glowAlpha = 0.35f,
+        ringStrokeWidths = 1.5.dp,
+        ringCount = 3,
+        ringSpawnIntervalMs = 800,
+        waterfallRowsPerSecond = 30,
+        waterfallHistorySeconds = 4,
+        colormapResolution = 256,
+        meterSegmentCount = 12
     )
 
     // --- TYPOGRAPHY TOKENS ---

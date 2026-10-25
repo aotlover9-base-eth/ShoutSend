@@ -1,6 +1,7 @@
 package app.shoutsend.core.designsystem
 
 import android.os.Build
+import android.provider.Settings
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
@@ -14,6 +15,10 @@ import androidx.compose.ui.platform.LocalContext
 
 val LocalDesignTokens = staticCompositionLocalOf {
     DesignTokens.defaultDark()
+}
+
+val LocalReduceMotion = staticCompositionLocalOf {
+    false
 }
 
 /**
@@ -30,6 +35,16 @@ fun ChirpTheme(
         ThemeMode.SYSTEM -> isSystemInDarkTheme()
         ThemeMode.DARK -> true
         ThemeMode.LIGHT -> false
+    }
+
+    val isReduceMotion = try {
+        Settings.Global.getFloat(
+            context.contentResolver,
+            Settings.Global.ANIMATOR_DURATION_SCALE,
+            1f
+        ) == 0f
+    } catch (_: Exception) {
+        false
     }
 
     val effectiveColors = if (tokens.dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -58,7 +73,20 @@ fun ChirpTheme(
             surfaceVariant = dynamicM3.surfaceVariant,
             onSurfaceVariant = dynamicM3.onSurfaceVariant,
             outline = dynamicM3.outline,
-            outlineVariant = dynamicM3.outlineVariant
+            outlineVariant = dynamicM3.outlineVariant,
+            glowPrimary = dynamicM3.primary,
+            glowSecondary = dynamicM3.secondary,
+            success = dynamicM3.secondary,
+            onSuccess = dynamicM3.onSecondary,
+            warning = dynamicM3.tertiary,
+            onWarning = dynamicM3.onTertiary,
+            signalHigh = dynamicM3.primary,
+            signalPeak = dynamicM3.secondary,
+            signalLow = dynamicM3.surfaceVariant,
+            signalMid = dynamicM3.primaryContainer,
+            noiseFloorLine = dynamicM3.tertiary,
+            syncMarker = dynamicM3.tertiary,
+            toneGuide = dynamicM3.outlineVariant
         )
     } else {
         if (isDark) DefaultTokens.CyberRadioDark else DefaultTokens.CyberRadioLight
@@ -66,7 +94,10 @@ fun ChirpTheme(
 
     val activeTokens = tokens.copy(colors = effectiveColors)
 
-    CompositionLocalProvider(LocalDesignTokens provides activeTokens) {
+    CompositionLocalProvider(
+        LocalDesignTokens provides activeTokens,
+        LocalReduceMotion provides isReduceMotion
+    ) {
         MaterialTheme(
             colorScheme = effectiveColors.toMaterialColorScheme(isDark),
             shapes = activeTokens.shapes.toMaterialShapes(),
@@ -85,6 +116,11 @@ object ChirpTheme {
         @Composable
         @ReadOnlyComposable
         get() = LocalDesignTokens.current
+
+    val isReducedMotion: Boolean
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalReduceMotion.current
 
     val colors: ColorTokens
         @Composable
@@ -130,4 +166,9 @@ object ChirpTheme {
         @Composable
         @ReadOnlyComposable
         get() = tokens.typography
+
+    val radioVisuals: RadioVisualTokens
+        @Composable
+        @ReadOnlyComposable
+        get() = tokens.radioVisuals
 }

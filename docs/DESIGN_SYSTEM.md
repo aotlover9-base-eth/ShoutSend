@@ -166,3 +166,61 @@ If an external asset (such as an Android adaptive launcher icon) requires raw co
 1. Add the file path and reason to `config/style-allowlist.txt`.
 2. Document the exception rationale in `docs/DECISIONS.md`.
 3. Never weaken or bypass the regex rules in `StyleGuard.kt`.
+
+
+---
+
+## 8. ShoutSend Cyber Radio Component Suite (Step 34)
+
+Specialized acoustic radio components and physical rendering tokens designed for high-contrast offline sonic data operations.
+
+### Extended Token Roles
+
+#### Acoustic & Colormap Color Roles
+- `signalLow`: Waterfall baseline / noise floor background.
+- `signalMid`: Mid-amplitude spectral presence.
+- `signalHigh`: High-energy spectral tone.
+- `signalPeak`: Maximum acoustic power / Goertzel lock peak.
+- `noiseFloorLine`: Dynamic noise threshold marker line on spectrograms and level meters.
+- `syncMarker`: Preamble chirp and synchronization visual indicator (magenta highlight).
+- `toneGuide`: Subdued frequency bin alignment grid lines.
+
+#### Glow, State, and Overlay Color Roles
+- `glowPrimary`: Primary neon halo translucent stroke color.
+- `glowSecondary`: Secondary neon halo translucent stroke color.
+- `success`: Transmission/reception completion status (neon green).
+- `onSuccess`: Contrast text label for success containers.
+- `warning`: Near-capacity byte frame or thermal throttling warning (amber).
+- `onWarning`: Contrast text label for warning containers.
+- `scanline`: Ultra-subtle CRT overlay line color (zero alpha bypasses rendering).
+
+#### Physical Radio Parameters (`RadioVisualTokens`)
+- `glowRadius` (12dp) & `glowAlpha` (0.24f): Non-shader halo geometry.
+- `ringStrokeWidths` (1.5dp), `ringCount` (4), `ringSpawnIntervalMs` (650ms): Acoustic wave pulses for `BrandMark`.
+- `waterfallRowsPerSecond` (30) & `waterfallHistorySeconds` (4s): Temporal spectrogram resolution.
+- `colormapResolution` (256): LUT entry count.
+- `meterSegmentCount` (12): Vertical discrete LED bars in `SignalMeter`.
+
+---
+
+### Component Catalog
+
+| Component | Purpose & Description | Token Consumption |
+| --- | --- | --- |
+| `NeonCard` | Container surface featuring a crisp primary perimeter outline with a double-pass translucent outer glow. | `ChirpTheme.colors.glowPrimary`, `ChirpTheme.radioVisuals.glowAlpha`, `ringStrokeWidths` |
+| `StatusPill` | Capsule state badge (`IDLE`, `LISTENING`, `LOCKED`, `RECEIVING`, `SUCCESS`, `ERROR`) with an animated pulsing dot. | `ChirpTheme.colors.signalActive`, `syncMarker`, `success`, `signalError` |
+| `SignalMeter` | Segmented 12-bar vertical SNR meter with monospace dB readout. | `ChirpTheme.colors.signalActive`, `signalHigh`, `signalPeak`, `radioVisuals.meterSegmentCount` |
+| `LevelMeter` | Continuous horizontal dBFS input/output audio bar with peak-hold needle and analog clip detector. | `ChirpTheme.colors.signalActive`, `signalError`, `noiseFloorLine` |
+| `ByteMeter` | Frame payload budget bar (0 to 320 bytes) with estimated air time remaining. Highlights in warning/error when near/exceeding capacity. | `ChirpTheme.colors.primary`, `warning`, `signalError` |
+| `ModeSelector` | 2-way toggle switching between Retro (1.5–3.5 kHz) and Stealth (17.6–19.8 kHz) acoustic bands. | `ChirpTheme.colors.primaryContainer`, `onPrimaryContainer`, `surfaceContainer` |
+| `SpeedSelector` | 3-way preset selector for transmission speed (`ROBUST`, `NORMAL`, `FAST`) with benchmark air time estimates. | `ChirpTheme.colors.primaryContainer`, `onSurfaceVariant` |
+| `RadioReadout` | Frequency, bandwidth, and metric display formatted strictly in monospace typography scale. | `ChirpTheme.typography.radioReadoutLarge`, `radioReadoutMedium`, `radioReadoutSmall` |
+| `BrandMark` | Concentric acoustic wave ripple emblem drawn via Compose Canvas primitives. | `ChirpTheme.colors.primary`, `radioVisuals.ringCount`, `ringStrokeWidths`, `motion` |
+| `ScanlineOverlay` | Full-screen subtle CRT scanline texture. Zero drawing overhead when disabled (`alpha == 0`). | `ChirpTheme.colors.scanline`, `ChirpTheme.strokes.hairline`, `spacing.xs` |
+
+---
+
+### Motion & Accessibility (`LocalReduceMotion`)
+ShoutSend provides `LocalReduceMotion` to respect system accessibility preferences:
+- Reads `Settings.Global.ANIMATOR_DURATION_SCALE == 0` with safe fallback.
+- Animated components (`BrandMark`, `StatusPill`) query `ChirpTheme.isReducedMotion` to switch instantly from infinite transitions to clean static geometry.

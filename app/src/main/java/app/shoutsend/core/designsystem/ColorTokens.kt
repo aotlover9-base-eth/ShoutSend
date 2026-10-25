@@ -47,7 +47,21 @@ data class ColorTokens(
     val spectrumGlow: Color,
     val signalActive: Color,
     val signalIdle: Color,
-    val signalError: Color
+    val signalError: Color,
+    val signalLow: Color,
+    val signalMid: Color,
+    val signalHigh: Color,
+    val signalPeak: Color,
+    val noiseFloorLine: Color,
+    val syncMarker: Color,
+    val toneGuide: Color,
+    val glowPrimary: Color,
+    val glowSecondary: Color,
+    val success: Color,
+    val onSuccess: Color,
+    val warning: Color,
+    val onWarning: Color,
+    val scanline: Color
 ) {
     fun toMaterialColorScheme(isDark: Boolean): ColorScheme {
         return if (isDark) {

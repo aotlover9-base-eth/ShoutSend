@@ -19,6 +19,7 @@ data class DesignTokens(
     val elevation: ElevationTokens = DefaultTokens.Elevations,
     val opacity: OpacityTokens = DefaultTokens.Opacities,
     val motion: MotionTokens = DefaultTokens.Motions,
+    val radioVisuals: RadioVisualTokens = DefaultTokens.RadioVisuals,
     val themeMode: ThemeMode = ThemeMode.DARK,
     val dynamicColor: Boolean = false
 ) {

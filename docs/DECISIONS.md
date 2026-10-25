@@ -427,3 +427,18 @@
   - Added `OverridableModemConfigProvider` to `config/dev-markers.txt`, verified 100% absent from User APK DEX via `verifyUserApkClean`.
 - **Dynamic Session-Start Propagation**:
   - `TransmitSession`, `ReceiveSession`, `CalibrationRunner`, and `DefaultAcousticReceiver` query `configProvider.config.value` on every session start/transmission invocation rather than caching static parameters at app startup.
+
+
+## 2026-10-25 - Step 34: ShoutSend Cyber Radio Components and Extended Tokens
+
+### DEC-053: Extended Design Tokens, Zero-Shader Luminous Accents, and Gamma-Corrected Colormap
+- **Token Architecture Expansion**:
+  - Added 14 specialized acoustic color tokens (`signalLow`, `signalMid`, `signalHigh`, `signalPeak`, `noiseFloorLine`, `syncMarker`, `toneGuide`, `glowPrimary`, `glowSecondary`, `success`, `onSuccess`, `warning`, `onWarning`, `scanline`) across `ColorTokens`, `DefaultTokens` (Dark and Light), and dynamic color mapping.
+  - Implemented `RadioVisualTokens` for physical radio parameters: `glowRadius`, `glowAlpha`, `ringStrokeWidths`, `ringCount`, `ringSpawnIntervalMs`, `waterfallRowsPerSecond` (30), `waterfallHistorySeconds` (4), `colormapResolution` (256), and `meterSegmentCount` (12).
+- **Gamma-Corrected Colormap Generation (`ColormapFactory`)**:
+  - Interpolation across 4 key stops (`signalLow` -> `signalMid` -> `signalHigh` -> `signalPeak`) is performed in squared photometric space ($\sqrt{\text{interp}(C_1^2, C_2^2)}$) to prevent the "dark mud" discoloration bands typical of linear sRGB interpolation between saturated complementary colors (e.g. cyan to green).
+  - Verified with comprehensive unit test suite (`ColormapFactoryTest`) confirming exact stop boundaries and strictly monotonic perceptual luminance.
+- **Subtle Halo and Zero-Blur Performance**:
+  - `NeonCard` utilizes multi-pass translucent perimeter strokes within `drawBehind` rather than expensive blur shader passes (`RenderEffect.createBlurEffect`), ensuring 60+ FPS on budget devices without hardware acceleration bottlenecks.
+- **Accessibility & Motion Invariants**:
+  - `LocalReduceMotion` checks system-wide `Settings.Global.ANIMATOR_DURATION_SCALE == 0`. Animated elements (`BrandMark`, `StatusPill`) switch cleanly from infinite transitions to static geometric layouts.

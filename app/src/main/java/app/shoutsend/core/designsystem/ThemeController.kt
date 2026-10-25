@@ -140,6 +140,20 @@ class ThemeController(
                 "signalActive" -> colors.copy(signalActive = c)
                 "signalIdle" -> colors.copy(signalIdle = c)
                 "signalError" -> colors.copy(signalError = c)
+                "signalLow" -> colors.copy(signalLow = c)
+                "signalMid" -> colors.copy(signalMid = c)
+                "signalHigh" -> colors.copy(signalHigh = c)
+                "signalPeak" -> colors.copy(signalPeak = c)
+                "noiseFloorLine" -> colors.copy(noiseFloorLine = c)
+                "syncMarker" -> colors.copy(syncMarker = c)
+                "toneGuide" -> colors.copy(toneGuide = c)
+                "glowPrimary" -> colors.copy(glowPrimary = c)
+                "glowSecondary" -> colors.copy(glowSecondary = c)
+                "success" -> colors.copy(success = c)
+                "onSuccess" -> colors.copy(onSuccess = c)
+                "warning" -> colors.copy(warning = c)
+                "onWarning" -> colors.copy(onWarning = c)
+                "scanline" -> colors.copy(scanline = c)
                 else -> colors
             }
         }
