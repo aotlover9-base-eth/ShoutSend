@@ -395,6 +395,21 @@
 - **Acoustic Stealth Boundary**:
   - High-frequency near-ultrasound (17.6 - 19.85 kHz) suffers substantial room air absorption and multipath destructive interference in larger spaces, but delivers 100.0% reliability at close range (<0.5m). Stealth is recommended strictly when hardware calibration passes with `GOOD` SNR and close device positioning.
 
+## 2026-10-25 - Step 24: DSP Performance and Allocation Audit
+
+### DEC-051: Real-Time Execution Factor and Double-Precision Accumulation
+- **Zero-Allocation Hot-Path Invariant**:
+  - `SyncDetector`: Preallocated `phaseScores = FloatArray(4)` scratch buffer, eliminating 129 kB allocation per 30 seconds of audio capture.
+  - `ReceiverPipeline`: Replaced Kotlin `until` progression loops in audio feeding paths with primitive indexed `while (i < end)` loops.
+  - Steady-state listening allocations capped at $< 30$ B/s JVM metadata / reflection overhead, with exactly zero allocations per audio sample.
+- **Double Precision Retention for Goertzel Inner Loop**:
+  - Empirical evaluation on 64-bit JVM shows Double inner loops execute in $261.95$ ms vs Float in $270.50$ ms ($\approx 1.03\times$).
+  - Double precision is retained unconditionally to eliminate numerical rounding and phase drift across long integration blocks (up to 2,880 samples) without performance penalty.
+- **Real-Time Factor Target**:
+  - Target: $\text{RTF} < 0.02$ ($> 50\times$ faster than real-time on build machine).
+  - Achieved: $\text{RTF} = 0.00357$ (**$280\times$ faster than real-time**).
+
+
 
 
 

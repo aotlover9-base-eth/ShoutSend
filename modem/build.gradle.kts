@@ -25,3 +25,9 @@ val modemBenchmark = tasks.register<JavaExec>("modemBenchmark") {
     mainClass.set("app.shoutsend.modem.channel.BatchRunner")
     workingDir = rootDir
 }
+
+val modemPerf = tasks.register<JavaExec>("modemPerf") {
+    classpath = sourceSets["main"].runtimeClasspath
+    mainClass.set("app.shoutsend.modem.perf.DspPerfRunner")
+    workingDir = rootDir
+}

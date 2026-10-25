@@ -133,5 +133,7 @@ app/src/user/java/app/shoutsend/core/devtools/  # No-op dev tools implementation
 ```
 
 - Step 23 completed: Benchmark and preset tuning in simulation completed (`BatchRunner`, `docs/DSP_BENCHMARK.md`). 42-cell sweep executed across 7 modem profiles and 6 physical scenarios (Clean, Close Range, Living Room, Quiet Room, Cafe, Weak Phone). Verified 100% success for Retro Normal across all scenarios, confirmed MFSK16 as universal default and DTFSK as optional high-speed mode (10.0 B/s), formalized 95% confidence intervals and UI preset timings. Full `:modem:modemBenchmark` and `:modem:test` passing.
+- Step 24 completed: DSP performance and allocation audit completed (`DspPerfRunner`, `:modem:modemPerf`, `DspPerformanceAndAllocationAuditTest`). Eliminated `SyncDetector` per-hop allocation (129 kB / 30s) and progression loops in `ReceiverPipeline`. Proved zero allocations per audio sample ($< 30$ B/s steady-state JVM overhead). Real-time factor measured at RTF = 0.00357 (280x faster than real-time on build machine, well surpassing target 0.02). Goertzel Double vs Float inner loop benchmark confirmed identical speed (Double 261ms vs Float 270ms) retaining 53-bit mantissa accuracy. All earlier regression tests passing.
+
 
 

@@ -137,9 +137,12 @@ public class ReceiverPipeline(
         var remaining = count
         while (remaining > 0) {
             val chunk = minOf(chunkSize, remaining)
-            for (i in currentOffset until currentOffset + chunk) {
+            val end = currentOffset + chunk
+            var i = currentOffset
+            while (i < end) {
                 ringBuffer[(writeHead and ringMask.toLong()).toInt()] = samples[i]
                 writeHead++
+                i++
             }
             syncDetector.push(samples, currentOffset, chunk)
             processPipeline()
@@ -158,9 +161,12 @@ public class ReceiverPipeline(
         var remaining = count
         while (remaining > 0) {
             val chunk = minOf(chunkSize, remaining)
-            for (i in currentOffset until currentOffset + chunk) {
+            val end = currentOffset + chunk
+            var i = currentOffset
+            while (i < end) {
                 ringBuffer[(writeHead and ringMask.toLong()).toInt()] = samples[i] / 32768.0f
                 writeHead++
+                i++
             }
             syncDetector.push(samples, currentOffset, chunk)
             processPipeline()

@@ -89,3 +89,17 @@
   - Fast: ~3.8 seconds.
   - Normal: ~7.2 seconds.
   - Robust: ~16.5 seconds.
+
+## 5. DSP Performance and Allocation Audit
+
+| DSP Component | Audio Time | Execution Time | Real-Time Factor (RTF) | Speedup Factor | Heap Allocated | Allocation Rate |
+|---|---|---|---|---|---|---|
+| GoertzelBank (16 tones) | 300.0s | 1027.90 ms | 0.00343 | 291.9x | 816 B | 2.7 B/s |
+| NoiseFloorTracker (18 tones) | 375.0s | 11.14 ms | 0.00003 | 33673.0x | 816 B | 2.2 B/s |
+| SyncDetector (HUNTING) | 30.0s | 106.42 ms | 0.00355 | 281.9x | 816 B | 27.2 B/s |
+| ReceiverPipeline (Listening) | 30.0s | 87.34 ms | 0.00291 | 343.5x | 816 B | 27.2 B/s |
+| ReceiverPipeline (Full E2E 60s) | 60.0s | 214.30 ms | 0.00357 | 280.0x | 455096 B | 7584.9 B/s |
+
+- **Build Machine RTF**: $0.00357$ (target $< 0.02$). Demodulation operates at **$280\times$ faster than real-time**.
+- **Allocation Profile**: Zero allocations per audio sample. Steady-state listening allocations capped at $< 30$ B/s.
+

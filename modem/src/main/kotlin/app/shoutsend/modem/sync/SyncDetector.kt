@@ -66,6 +66,7 @@ public class SyncDetector(
     private val blockScratch = FloatArray(headerSymbolSamples)
     private val syncEnergiesOut = FloatArray(2)
     private val dataEnergiesOut = FloatArray(16)
+    private val phaseScores = FloatArray(4)
 
     // Rolling history of evaluated hop energies: size 64 hops = 16 symbols
     private val historySize = 64
@@ -218,7 +219,7 @@ public class SyncDetector(
         val th0 = noiseTracker.threshold(0)
         val th1 = noiseTracker.threshold(1)
 
-        val phaseScores = FloatArray(4) { -1.0f }
+        phaseScores.fill(-1.0f)
         var bestScore = 0.0f
         var bestPhase = -1
         var bestAlternations = 0
