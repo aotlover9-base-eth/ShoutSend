@@ -368,6 +368,27 @@ where:
 - **Confidence Metric**: Combining winner-to-runner separation and SNR margin:
   $C = \left(\frac{E_{\text{win}} - E_{\text{run}}}{E_{\text{win}}}\right) \cdot \text{clamp}\left(\frac{\text{SNR}_{\text{dB}} - \text{margin}_{\text{dB}}}{12.0}, 0.0, 1.0\right)$ for $E_{\text{win}} \ge \text{threshold}$, and $0.0$ otherwise.
 
+### 2026-10-25 - Step 29: Acoustic Calibration Test Sequence and Link Quality Scorer
+- **Calibration Test Sequence Layout**:
+  1. Initial silence: 1000 ms (for baseline ambient noise floor measurement).
+  2. Retro band calibration block:
+     - Marker tone: 1000 Hz, 200 ms pulse + 50 ms silence.
+     - 16 data tones (1500 Hz to 3375 Hz in 125 Hz steps): 150 ms tone + 50 ms silence each.
+     - 2 sync tones (S0: 1375 Hz, S1: 3500 Hz): 150 ms tone + 50 ms silence each.
+  3. Inter-band transition silence: 500 ms.
+  4. Stealth band calibration block:
+     - Marker tone: 16500 Hz, 200 ms pulse + 50 ms silence.
+     - 16 data tones (17600 Hz to 19850 Hz in 150 Hz steps): 150 ms tone + 50 ms silence each.
+     - 2 sync tones (S0: 17450 Hz, S1: 20000 Hz): 150 ms tone + 50 ms silence each.
+  5. Tail silence: 500 ms.
+  - Total duration: ~9.7 seconds (465,600 samples at 48 kHz).
+  - Smoothing: All tone bursts employ 5 ms raised-cosine ramps at edges to eliminate switching clicks.
+- **Two-Phone Link Test**:
+  - Canonical payload: `"ShoutSend Link Quality Test v1"` (UTF-8).
+  - Scoring: $Q = \text{deliveryRatio} \cdot (0.55 \cdot \text{snrNorm} + 0.45 \cdot \text{rsNorm}) \cdot 100 \in [0, 100]$.
+  - Rating bands: EXCELLENT (80..100), GOOD (60..79), FAIR (40..59), POOR (0..39).
+
+
 
 
 

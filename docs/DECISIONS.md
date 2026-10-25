@@ -336,4 +336,27 @@
 - **Spectrum Waterfall Feed**: Emits 256-bin spectrum power vectors at 60 fps over a dedicated bounded channel (`capacity = 60`, `BufferOverflow.DROP_OLDEST`) ensuring decoupled UI rendering without back-pressuring the demodulator.
 - **Hardware-Paced Unit Testing**: Fake PCM source introduces 1 ms chunk pacing during test execution, matching real-time consumption constraints and preventing false overrun drops in synthetic tests without adding test latency.
 
+## 2026-10-25 - Step 29: Capability Probe and Calibration Engine
+
+### DEC-048: Hardware Capability Profiling, Empirical Band Qualification Thresholds, and Half-Duplex Loopback Exception
+- **Acoustic Band Qualification Thresholds**:
+  - `GOOD`: Minimum SNR $\ge 20.0$ dB, in-band variation $\le 12.0$ dB. Indicates optimal transceiver transducers suitable for full speed and near-ultrasound Stealth mode.
+  - `USABLE`: Minimum SNR $\ge 12.0$ dB, in-band variation $\le 18.0$ dB. Suitable for standard communication speed in audible Retro mode.
+  - `POOR`: Minimum SNR $\ge 6.0$ dB, in-band variation $\le 24.0$ dB. Requires error-resilient ROBUST speed preset and maximum Reed-Solomon redundancy.
+  - `UNUSABLE`: SNR $< 6.0$ dB, in-band variation $> 24.0$ dB, or marker tone not detected. Indicates severely restricted speaker/mic hardware or destructive ambient noise.
+- **Modem Recommendation Hierarchy**:
+  - Recommend `Band.STEALTH` if and only if Stealth verdict is `GOOD`. Because stealth utilizes frequencies above 17.6 kHz, any significant roll-off or low SNR causes excessive packet loss; silent operation is never enabled on substandard hardware.
+  - Otherwise recommend `Band.RETRO`:
+    - `Speed.FAST` if Retro is `GOOD`.
+    - `Speed.NORMAL` if Retro is `USABLE`.
+    - `Speed.ROBUST` if Retro is `POOR` or `UNUSABLE`.
+- **Explicit Half-Duplex Exception**:
+  - ShoutSend strictly enforces half-duplex operation for all messaging sessions to prevent acoustic feedback and self-demodulation.
+  - Transducer loopback calibration is the SOLE ARCHITECTURAL EXCEPTION where `AcousticReceiver` and `AcousticTransmitter` operate simultaneously, feeding test tones from the speaker back into the microphone.
+- **Hardware Route Warnings**:
+  - `HEADPHONES_CONNECTED`: Detected via `OutputRouteInfo` when wired headphones, Bluetooth A2DP, or USB audio is attached.
+  - `VOLUME_LOW`: Detected when media stream volume fraction is $< 0.5$, alerting users that speaker level may underreport transducer SNR.
+- **Zero-Dependency Persistence**: `CalibrationResult` serializes to JSON via `kotlinx.serialization` directly stored in `Settings.lastCalibration` String preference without database schema alterations.
+
+
 

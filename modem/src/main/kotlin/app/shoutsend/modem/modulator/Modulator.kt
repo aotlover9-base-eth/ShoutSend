@@ -1,5 +1,6 @@
 package app.shoutsend.modem.modulator
 
+import app.shoutsend.modem.AudioSpec
 import app.shoutsend.modem.synth.PcmConverter
 import app.shoutsend.modem.synth.ToneSynth
 
@@ -13,16 +14,22 @@ import app.shoutsend.modem.synth.ToneSynth
  */
 public class Modulator(
     public val plan: TransmissionPlan
-) {
+) : AudioStreamSource {
+    /**
+     * Target audio specification.
+     */
+    public override val audioSpec: AudioSpec
+        get() = plan.audioSpec
+
     /**
      * Total transmission length in samples (including lead-in and tail silence).
      */
-    public val totalSamples: Long = plan.totalSamples
+    public override val totalSamples: Long = plan.totalSamples
 
     /**
      * Total transmission duration in fractional seconds.
      */
-    public val durationSeconds: Double = plan.durationSeconds
+    public override val durationSeconds: Double = plan.durationSeconds
 
     /**
      * Renders normalized audio samples for the requested range `[startSample, startSample + count)` into [out].
@@ -30,11 +37,11 @@ public class Modulator(
      * Streaming capable, thread-safe, and zero-allocation.
      * Samples within lead-in and tail silence are guaranteed to be 0.0f.
      */
-    public fun render(
+    public override fun render(
         startSample: Long,
         out: FloatArray,
-        outOffset: Int = 0,
-        count: Int = out.size - outOffset
+        outOffset: Int,
+        count: Int
     ) {
         ToneSynth.render(
             schedule = plan.schedule,

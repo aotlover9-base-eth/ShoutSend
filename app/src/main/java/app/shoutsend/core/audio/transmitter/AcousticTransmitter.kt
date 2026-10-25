@@ -1,6 +1,7 @@
 package app.shoutsend.core.audio.transmitter
 
 import app.shoutsend.core.audio.AudioConfig
+import app.shoutsend.modem.modulator.AudioStreamSource
 import app.shoutsend.modem.modulator.Modulator
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -52,7 +53,7 @@ sealed class TransmitResult {
  */
 interface AcousticTransmitter {
     suspend fun transmit(
-        modulator: Modulator,
+        source: AudioStreamSource,
         onProgress: (progress: TransmitProgress) -> Unit = {}
     ): TransmitResult
 }
@@ -72,12 +73,12 @@ class DefaultAcousticTransmitter(
 ) : AcousticTransmitter {
 
     override suspend fun transmit(
-        modulator: Modulator,
+        source: AudioStreamSource,
         onProgress: (progress: TransmitProgress) -> Unit
     ): TransmitResult = withContext(dispatcher) {
-        val sampleRateHz = modulator.plan.audioSpec.sampleRateHz
-        val totalSamples = modulator.totalSamples
-        val totalSeconds = modulator.durationSeconds
+        val sampleRateHz = source.audioSpec.sampleRateHz
+        val totalSamples = source.totalSamples
+        val totalSeconds = source.durationSeconds
         val sink = sinkFactory(sampleRateHz)
 
         val chunkSize = AudioConfig.chunkSamples(sampleRateHz)
@@ -98,7 +99,7 @@ class DefaultAcousticTransmitter(
                 currentCoroutineContext().ensureActive()
 
                 val toRender = min(chunkSize.toLong(), totalSamples - samplesWritten).toInt()
-                modulator.render(
+                source.render(
                     startSample = samplesWritten,
                     out = floatChunk,
                     outOffset = 0,

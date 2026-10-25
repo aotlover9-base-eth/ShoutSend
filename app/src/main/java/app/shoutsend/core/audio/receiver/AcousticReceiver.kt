@@ -27,6 +27,11 @@ interface AcousticReceiver {
     val spectrumRows: ReceiveChannel<FloatArray>
 
     /**
+     * Optional raw PCM audio tap invoked for calibration recording and diagnostics.
+     */
+    var rawAudioTap: ((samples: ShortArray, offset: Int, count: Int) -> Unit)?
+
+    /**
      * Whether audio capture and processing is currently active.
      */
     val isRunning: Boolean

@@ -50,6 +50,9 @@ class DefaultAcousticReceiver(
     override val spectrumRows: ReceiveChannel<FloatArray>
         get() = _spectrumChannel
 
+    @Volatile
+    override var rawAudioTap: ((samples: ShortArray, offset: Int, count: Int) -> Unit)? = null
+
     private val active = AtomicBoolean(false)
     override val isRunning: Boolean
         get() = active.get()
@@ -220,9 +223,10 @@ class DefaultAcousticReceiver(
                     overrunCount = ringBuffer.overrunCount
                 )
 
-                // Feed Spectrum Analyzer and Demodulator
+                // Feed Spectrum Analyzer, Demodulator, and optional tap
                 spectrumAnalyzer.push(processBuf, 0, readCount)
                 pipeline.push(processBuf, 0, readCount)
+                rawAudioTap?.invoke(processBuf, 0, readCount)
             }
         }
     }
