@@ -83,3 +83,52 @@ app/src/user/java/app/shoutsend/core/devtools/  # No-op dev tools implementation
 - Step 29 completed: Capability probe and calibration engine implemented (`AudioStreamSource`, `TestSequence`, `CalibrationAnalyzer`, `CalibrationThresholds`, `BandReport`, `CalibrationRecommender`, `LinkTest`, `CapabilityProbe`, `CalibrationRunner`, `CalibrationResult`). Pure Kotlin calibration analysis in `:modem` measuring ambient noise, marker detection, and 18 tones per band; hardware capability probe; loopback calibration runner with explicit half-duplex exception and hardware warning checks; link quality scorer. 12 unit tests passed.
 - Step 31 completed: Encrypted Room vault storage implemented (`VaultEntity`, `VaultDao`, `VaultDatabase`, `AndroidKeystoreCipher`, `FakeKeystoreCipher`, `VaultRepository`). AES-256-GCM hardware keystore encryption, sensitive payload masking in `toString()`, graceful degradation on unreadable rows, starred item preservation pruning. 7 unit tests passed.
 - Step 32 completed: Settings store implemented (`Settings`, `SettingsRepository`, `DataStoreSettingsRepository`, `FakeSettingsRepository`, `DataStoreMicPermissionRequestedProvider`). Preferences DataStore with safe enum fallback decoding, strict parameter clamping, dynamic color and theme controller binding, Dev-free user model. 8 unit tests passed.
+- Step 30 completed: Send and receive sessions, audio focus, and route monitor implemented (`TransmitState`, `TransmitSession`, `DefaultTransmitSession`, `ReceiveState`, `ReceiveSession`, `DefaultReceiveSession`, `AudioCoordinator`, `DefaultAudioCoordinator`, `AudioFocusController`, `DefaultAudioFocusController`, `AudioRouteMonitor`, `DefaultAudioRouteMonitor`, `SessionLifecycleManager`). Half-duplex mutual exclusion enforced, audio focus handled with transient pause and focus-loss cancellation, route warning classifier (`SPEAKER_OK`, `HEADSET_WARNING`, `BLUETOOTH_WARNING`, `USB_WARNING`), background 5s grace period stop, end-to-end loopback with Step 22 channel simulator verified. 8 unit tests passed.
+
+### Session State Machine Diagrams
+
+#### Transmit Session State Flow
+```text
+  [Idle]
+    │
+    ▼ send(payload, profile, passphrase)
+[Preparing] ─── (validation / size / coordinator / focus error) ───► [Failed(reason)]
+    │
+    ▼ lock acquired & focus granted
+[Transmitting(progress, elapsed, remaining, frame, totalFrames)]
+    │
+    ├─── focus loss / playback error ───► [Failed(reason)]
+    ├─── cancel() by user ──────────────► [Cancelled]
+    ▼
+[Completed(durationMs)]
+```
+
+#### Receive Session State Flow
+```text
+  [Idle]
+    │
+    ▼ start(band, passphraseProvider)
+[Starting] ─── (coordinator busy / mic init error) ───► [Failed(reason)]
+    │
+    ▼ receiver started
+[Listening(ambientDbfs)] ◄──── (post-message Cooldown if no message)
+    │
+    ├─── 2s digital zeros ───► [Failed("MicrophoneSilent")]
+    ▼ Preamble detected
+[PreambleDetected]
+    │
+    ▼ sync word verified
+[Locked(snrDb)]
+    │
+    ▼ data frames ingested
+[Receiving(received, total, snrDb)] ─── (corrupted / lost) ───► [Failed(reason)]
+    │
+    ▼ message reassembled
+    ├─ Plaintext / auto-decrypted ────► [Success(payload, metadata)]
+    ├─ Encrypted & no passphrase ────► [NeedsPassphrase(message)]
+    │                                       │
+    │                                       ▼ submitPassphrase()
+    │                                  [Success] / [Failed("WrongPassphrase")]
+    └─ Corrupted body ───────────────► [Failed("PayloadCorrupt")]
+```
+

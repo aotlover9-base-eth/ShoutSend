@@ -358,5 +358,29 @@
   - `VOLUME_LOW`: Detected when media stream volume fraction is $< 0.5$, alerting users that speaker level may underreport transducer SNR.
 - **Zero-Dependency Persistence**: `CalibrationResult` serializes to JSON via `kotlinx.serialization` directly stored in `Settings.lastCalibration` String preference without database schema alterations.
 
+## 2026-10-25 - Step 30: Send and Receive Sessions, Audio Focus, Routes
+
+### DEC-049: Session State Machine Hierarchy, Mutex Audio Coordination, and Route Classification
+- **Domain Session Architecture**:
+  - `TransmitSession` and `ReceiveSession` sit strictly between ViewModels and low-level audio (`AcousticTransmitter`, `AcousticReceiver`). Zero Android UI imports.
+  - Exposes typed reactive flows (`TransmitState` and `ReceiveState`) mapping physical modem states into application state machines.
+- **AudioCoordinator Mutual Exclusion**:
+  - Guarantees half-duplex communication: starting transmission forcefully stops any active receiver before acquiring playback resources. Starting reception fails with `CoordinatorBusy` if transmission is running.
+  - Exception: Transducer loopback calibration (DEC-048) operates full-duplex through `CalibrationRunner`.
+  - Exposes `keepScreenOn: StateFlow<Boolean>` active across preparing, transmitting, starting, listening, and receiving to drive the window flag without UI polling.
+- **Audio Focus Policy**:
+  - Transmission requests `AUDIOFOCUS_GAIN_TRANSIENT` with `USAGE_MEDIA` / `CONTENT_TYPE_MUSIC` to pause external music players and alert tones.
+  - Audio focus loss during active transmission (e.g., incoming telephone call) immediately aborts playback with `Failed("AudioFocusLost")` and releases locks.
+  - Reception does not request audio focus, but exposes `isMusicActive` warning flag to advise users of potential acoustic interference.
+- **Hardware Route Classification**:
+  - `AudioRouteMonitor` registers an `AudioDeviceCallback` tracking dynamic plug/unplug events.
+  - Pure classification: `SPEAKER_OK`, `HEADSET_WARNING`, `BLUETOOTH_WARNING`, `USB_WARNING`.
+  - Transmitting with headphones attached warns that acoustic transfer requires speaker radiation. Receiving with Bluetooth warns that narrowband SCO/mSBC profiles band-limit frequencies.
+- **Terminal State Protection Against Channel Noise**:
+  - Demodulation terminal states (`Success`, `NeedsPassphrase`) and failure states are immutable against subsequent trailing channel artifacts such as `MicrophoneSilent` (from post-transmission zeros) or pipeline cooldown transitions (`Cooldown`).
+- **Background Grace Period**:
+  - Process backgrounding triggers a configurable grace timer (default 5 seconds via `Settings.backgroundGraceSeconds`) stopping microphone capture to ensure zero background eavesdropping and maintain Google Play compliance.
+
+
 
 
