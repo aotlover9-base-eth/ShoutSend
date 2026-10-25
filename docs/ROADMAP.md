@@ -23,23 +23,23 @@
 | 18 | C Modem | Goertzel detector | No | **Done** |
 | 19 | C Modem | Noise floor tracker and SNR | No | **Done** |
 | 20 | C Modem | Preamble detection and symbol sync | No | **Done** |
-| 21 | C Modem | Demodulator and receive state machine | No | Todo |
-| 22 | C Modem | Channel simulator and loopback harness | No | Todo |
-| 23 | C Modem | Benchmark and preset tuning in simulation | No | Todo |
-| 24 | C Modem | DSP performance and allocation audit | No | Todo |
+| 21 | C Modem | Demodulator and receive state machine | No | **Done** |
+| 22 | C Modem | Channel simulator and loopback harness | No | **Done** |
+| 23 | C Modem | Benchmark and preset tuning in simulation | No | **Done** |
+| 24 | C Modem | DSP performance and allocation audit | No | **Done** |
 | 25 | C Modem | Spectrum analyzer (FFT) for the waterfall | No | **Done** |
 | 26 | D Android layer | Manifest, permissions logic, audio config | No | **Done** |
 | 27 | D Android layer | AudioTrack transmitter | No | **Done** |
-| 28 | D Android layer | AudioRecord receiver | No | Todo |
-| 29 | D Android layer | Capability probe and calibration engine | No | Todo |
-| 30 | D Android layer | Send and receive sessions, audio focus, routes | No | Todo |
+| 28 | D Android layer | AudioRecord receiver | No | **Done** |
+| 29 | D Android layer | Capability probe and calibration engine | No | **Done** |
+| 30 | D Android layer | Send and receive sessions, audio focus, routes | No | **Done** |
 | 31 | D Android layer | Vault storage (Room plus Keystore) | No | **Done** |
 | 32 | D Android layer | Settings store | No | **Done** |
-| 33 | D Android layer | Modem config provider (dev override seam) | No | Todo |
-| 34 | E UI | ShoutSend components and extra tokens | Yes | Todo |
-| 35 | E UI | App shell and navigation | Yes | Todo |
-| 36 | E UI | Onboarding and permission flow | Yes | Todo |
-| 37 | E UI | Send: compose screen (text and URL) | Yes | Todo |
+| 33 | D Android layer | Modem config provider (dev override seam) | No | **Done** |
+| 34 | E UI | ShoutSend components and extra tokens | Yes | **Done** |
+| 35 | E UI | App shell and navigation | Yes | **Done** |
+| 36 | E UI | Onboarding and permission flow | Yes | **Done** |
+| 37 | E UI | Send: compose screen (text and URL) | Yes | **Done** |
 | 38 | E UI | Send: Wi-Fi and contact forms | Yes | Todo |
 | 39 | E UI | Transmit screen: soundwave rings | Yes | Todo |
 | 40 | E UI | Receive screen: spectrogram waterfall | Yes | Todo |

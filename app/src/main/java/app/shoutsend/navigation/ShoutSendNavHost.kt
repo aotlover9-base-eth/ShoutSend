@@ -25,6 +25,7 @@ import app.shoutsend.feature.receive.ReceiveScreen
 import app.shoutsend.feature.receive.ReceiveViewModel
 import app.shoutsend.feature.send.SendScreen
 import app.shoutsend.feature.send.SendViewModel
+import app.shoutsend.feature.send.TransmitScreen
 import app.shoutsend.feature.settings.SettingsScreen
 import app.shoutsend.feature.settings.SettingsViewModel
 import app.shoutsend.feature.vault.VaultDetailScreen
@@ -88,8 +89,36 @@ fun ShoutSendNavHost(
                 fadeOut(tween(durShort, easing = easeAccel)) +
                     slideOutVertically(tween(durShort, easing = easeAccel)) { -it / 20 }
             }
+        ) { backStackEntry ->
+            val route = backStackEntry.toRoute<SendRoute>()
+            androidx.compose.runtime.LaunchedEffect(route.sharedText, route.sharedType) {
+                if (!route.sharedText.isNullOrEmpty()) {
+                    sendViewModel.consumeSharedRouteArgs(route.sharedText, route.sharedType)
+                }
+            }
+            SendScreen(
+                viewModel = sendViewModel,
+                onNavigateToTransmit = {
+                    navController.navigate(TransmitRoute)
+                }
+            )
+        }
+
+        // --- Active Transmission Destination ---
+        composable<TransmitRoute>(
+            enterTransition = {
+                slideInVertically(tween(durMed, easing = easeDecel)) { it } +
+                    fadeIn(tween(durShort))
+            },
+            exitTransition = {
+                slideOutVertically(tween(durMed, easing = easeAccel)) { it } +
+                    fadeOut(tween(durShort))
+            }
         ) {
-            SendScreen(viewModel = sendViewModel)
+            TransmitScreen(
+                viewModel = sendViewModel,
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
 
         // --- Top-Level Tab: Receive ---

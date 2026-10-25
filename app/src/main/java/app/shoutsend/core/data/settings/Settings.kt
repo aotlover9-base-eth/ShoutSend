@@ -30,7 +30,8 @@ data class Settings(
     val micPermissionRequested: Boolean = DEFAULT_MIC_PERMISSION_REQUESTED,
     val stealthWarningAccepted: Boolean = DEFAULT_STEALTH_WARNING_ACCEPTED,
     val backgroundGraceSeconds: Int = DEFAULT_BACKGROUND_GRACE_SECONDS,
-    val lastTab: String = DEFAULT_LAST_TAB
+    val lastTab: String = DEFAULT_LAST_TAB,
+    val lastSendType: String = DEFAULT_LAST_SEND_TYPE
 ) {
     init {
         require(repeats in REPEATS_MIN..REPEATS_MAX) {
@@ -62,6 +63,7 @@ data class Settings(
         const val DEFAULT_STEALTH_WARNING_ACCEPTED: Boolean = false
         const val DEFAULT_BACKGROUND_GRACE_SECONDS: Int = 5
         const val DEFAULT_LAST_TAB: String = "receive"
+        const val DEFAULT_LAST_SEND_TYPE: String = "text"
 
         const val REPEATS_MIN: Int = 1
         const val REPEATS_MAX: Int = 3

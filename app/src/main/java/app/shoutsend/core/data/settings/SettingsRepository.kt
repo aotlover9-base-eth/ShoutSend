@@ -56,6 +56,7 @@ interface SettingsRepository {
     suspend fun setStealthWarningAccepted(accepted: Boolean)
     suspend fun setBackgroundGraceSeconds(seconds: Int)
     suspend fun setLastTab(tab: String)
+    suspend fun setLastSendType(type: String)
 }
 
 /**
@@ -118,6 +119,7 @@ class DataStoreSettingsRepository(
         it.copy(backgroundGraceSeconds = seconds.coerceIn(Settings.GRACE_MIN, Settings.GRACE_MAX))
     }
     override suspend fun setLastTab(tab: String) = update { it.copy(lastTab = tab) }
+    override suspend fun setLastSendType(type: String) = update { it.copy(lastSendType = type) }
 
     private fun mapPreferencesToSettings(prefs: Preferences): Settings {
         val band = try {
@@ -173,7 +175,8 @@ class DataStoreSettingsRepository(
             micPermissionRequested = micPermissionRequested,
             stealthWarningAccepted = stealthWarningAccepted,
             backgroundGraceSeconds = backgroundGraceSeconds,
-            lastTab = prefs[KEY_LAST_TAB] ?: Settings.DEFAULT_LAST_TAB
+            lastTab = prefs[KEY_LAST_TAB] ?: Settings.DEFAULT_LAST_TAB,
+            lastSendType = prefs[KEY_LAST_SEND_TYPE] ?: Settings.DEFAULT_LAST_SEND_TYPE
         )
     }
 
@@ -199,6 +202,7 @@ class DataStoreSettingsRepository(
         preferences[KEY_STEALTH_WARNING_ACCEPTED] = settings.stealthWarningAccepted
         preferences[KEY_BACKGROUND_GRACE_SECONDS] = settings.backgroundGraceSeconds
         preferences[KEY_LAST_TAB] = settings.lastTab
+        preferences[KEY_LAST_SEND_TYPE] = settings.lastSendType
     }
 
     companion object {
@@ -219,6 +223,7 @@ class DataStoreSettingsRepository(
         val KEY_STEALTH_WARNING_ACCEPTED = booleanPreferencesKey("stealth_warning_accepted")
         val KEY_BACKGROUND_GRACE_SECONDS = intPreferencesKey("background_grace_seconds")
         val KEY_LAST_TAB = stringPreferencesKey("last_tab")
+        val KEY_LAST_SEND_TYPE = stringPreferencesKey("last_send_type")
     }
 }
 
@@ -261,6 +266,7 @@ class FakeSettingsRepository(initialSettings: Settings = Settings()) : SettingsR
         it.copy(backgroundGraceSeconds = seconds.coerceIn(Settings.GRACE_MIN, Settings.GRACE_MAX))
     }
     override suspend fun setLastTab(tab: String) = update { it.copy(lastTab = tab) }
+    override suspend fun setLastSendType(type: String) = update { it.copy(lastSendType = type) }
 }
 
 /**

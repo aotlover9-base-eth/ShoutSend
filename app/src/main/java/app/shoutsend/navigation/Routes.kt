@@ -9,7 +9,13 @@ import kotlinx.serialization.Serializable
 data object OnboardingRoute
 
 @Serializable
-data object SendRoute
+data class SendRoute(
+    val sharedText: String? = null,
+    val sharedType: String? = null
+)
+
+@Serializable
+data object TransmitRoute
 
 @Serializable
 data object ReceiveRoute
@@ -38,7 +44,7 @@ enum class TopLevelDestination(
     val label: String,
     val iconGlyph: String
 ) {
-    SEND(SendRoute, "send", "Send", "▲"),
+    SEND(SendRoute(), "send", "Send", "▲"),
     RECEIVE(ReceiveRoute, "receive", "Receive", "▼"),
     VAULT(VaultRoute, "vault", "Vault", "■");
 

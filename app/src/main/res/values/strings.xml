@@ -38,4 +38,44 @@
     <string name="permission_denied_body">Microphone permission has been permanently denied. Please enable microphone access in Android application settings to receive sonic data.</string>
     <string name="permission_btn_open_settings">Open App Settings</string>
     <string name="permission_btn_grant">Grant Microphone Access</string>
+
+    <!-- Send Screen Strings (Step 37) -->
+    <string name="send_tab_title">Acoustic Transmitter</string>
+    <string name="send_tab_subtitle">Transmit arbitrary payloads offline via sound wave synthesis.</string>
+    <string name="send_type_text">Text</string>
+    <string name="send_type_url">URL</string>
+    <string name="send_type_wifi">Wi-Fi</string>
+    <string name="send_type_contact">Contact</string>
+    <string name="send_placeholder_text">Type a message to chirp...</string>
+    <string name="send_placeholder_url">https://example.com</string>
+    <string name="send_label_text">Message</string>
+    <string name="send_label_url">Web Link</string>
+    <string name="send_paste_content_desc">Paste from clipboard</string>
+    <string name="send_error_too_long">Too long for sound: shorten it</string>
+    <string name="send_notice_truncated">Text was shortened to fit acoustic limit (280 bytes)</string>
+    <string name="send_action_chirp">Chirp it</string>
+    <string name="send_duration_estimate" formatted="false">About %d s</string>
+    <string name="send_stealth_dialog_title">Near-Ultrasound Notice</string>
+    <string name="send_stealth_dialog_body">Stealth band operates in near-ultrasound (17.5–21.5 kHz). Keep devices close and check volume.</string>
+    <string name="send_stealth_dialog_confirm">Understand &amp; Enable</string>
+    <string name="send_stealth_dialog_cancel">Cancel</string>
+    <string name="send_secure_label">Secure Mode (Encrypted)</string>
+    <string name="send_secure_subtitle">AES-GCM encryption coming in Step 46</string>
+    <string name="send_options_title">Transmission Options</string>
+    <string name="send_repeats_label">Frame Repetitions</string>
+    <string name="send_volume_tip_title">Volume Tip</string>
+    <string name="send_volume_tip_body" formatted="false">Keep media speaker volume between 70% and 90% for best acoustic reception.</string>
+    <string name="send_coming_next_wifi_title">Wi-Fi Sharing Coming Next</string>
+    <string name="send_coming_next_wifi_body">Secure acoustic Wi-Fi credential transfer is arriving in Step 38.</string>
+    <string name="send_coming_next_contact_title">Contact Cards Coming Next</string>
+    <string name="send_coming_next_contact_body">VCard-lite acoustic contact exchange is arriving in Step 38.</string>
+    <string name="transmit_screen_title">Acoustic Transmission</string>
+    <string name="transmit_screen_preparing">Synthesizing acoustic tone schedule...</string>
+    <string name="transmit_screen_transmitting">Playing modulated acoustic signal</string>
+    <string name="transmit_screen_completed">Transmission Complete</string>
+    <string name="transmit_screen_cancelled">Transmission Cancelled</string>
+    <string name="transmit_screen_failed">Transmission Failed</string>
+    <string name="transmit_btn_cancel">Cancel Transmission</string>
+    <string name="transmit_btn_done">Done</string>
+    <string name="transmit_btn_back">Back</string>
 </resources>

@@ -61,6 +61,7 @@ class FixedModemConfigProviderTest {
         override suspend fun setStealthWarningAccepted(accepted: Boolean) {}
         override suspend fun setBackgroundGraceSeconds(seconds: Int) {}
         override suspend fun setLastTab(tab: String) {}
+        override suspend fun setLastSendType(type: String) {}
     }
 
     @Test

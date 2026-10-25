@@ -37,10 +37,19 @@ class NavigationStateTest {
         val decodedDetail = json.decodeFromString<VaultDetailRoute>(detailJson)
         assertEquals(12345L, decodedDetail.id)
 
-        // Test singleton routes
-        val sendJson = json.encodeToString(SendRoute)
-        val decodedSend = json.decodeFromString<SendRoute>(sendJson)
-        assertEquals(SendRoute, decodedSend)
+        // Test routes
+        val sendDefaultJson = json.encodeToString(SendRoute())
+        val decodedDefaultSend = json.decodeFromString<SendRoute>(sendDefaultJson)
+        assertEquals(SendRoute(), decodedDefaultSend)
+
+        val sendWithArgs = SendRoute(sharedText = "https://example.com", sharedType = "URL")
+        val sendWithArgsJson = json.encodeToString(sendWithArgs)
+        val decodedArgsSend = json.decodeFromString<SendRoute>(sendWithArgsJson)
+        assertEquals(sendWithArgs, decodedArgsSend)
+
+        val transmitJson = json.encodeToString(TransmitRoute)
+        val decodedTransmit = json.decodeFromString<TransmitRoute>(transmitJson)
+        assertEquals(TransmitRoute, decodedTransmit)
 
         val receiveJson = json.encodeToString(ReceiveRoute)
         val decodedReceive = json.decodeFromString<ReceiveRoute>(receiveJson)
@@ -79,7 +88,7 @@ class NavigationStateTest {
 
         assertEquals(OnboardingRoute, resolveStart(onboardingCompleted = false, lastTab = "send"))
         assertEquals(OnboardingRoute, resolveStart(onboardingCompleted = false, lastTab = "vault"))
-        assertEquals(SendRoute, resolveStart(onboardingCompleted = true, lastTab = "send"))
+        assertEquals(SendRoute(), resolveStart(onboardingCompleted = true, lastTab = "send"))
         assertEquals(ReceiveRoute, resolveStart(onboardingCompleted = true, lastTab = "receive"))
         assertEquals(VaultRoute, resolveStart(onboardingCompleted = true, lastTab = "vault"))
         assertEquals(ReceiveRoute, resolveStart(onboardingCompleted = true, lastTab = "unknown"))

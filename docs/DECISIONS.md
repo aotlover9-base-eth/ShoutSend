@@ -476,3 +476,25 @@
   - Automatically deep-links to system app settings via `createAppSettingsIntent(context)` when permanently denied.
 - **Resource String Formalization**:
   - All onboarding, permission, and guidance text externalized to `res/values/strings.xml` with zero hardcoded literals in composables.
+
+
+## 2026-10-26 - Step 37: Send Screen, Live Compaction, Air-Time Estimation, and Intent Sharing
+
+### DEC-056: Send Screen Compose, Debounced Byte & Duration Meter, Stealth Warning Gate, and Share Intent Architecture
+- **Send Screen Architecture**:
+  - Implemented `SendViewModel` with unidirectional data flow and immutable `SendUiState` holding payload category (`TEXT`, `URL`, `WIFI`, `CONTACT`), user input, validation status, on-air byte calculation, duration estimation, and transmission status.
+  - Category switching persists `lastSendType` to DataStore settings, restoring user's preferred composition mode across cold app launches.
+  - Step 38 placeholders for Wi-Fi and Contact payloads cleanly notify user of upcoming feature arrival.
+- **Live Compaction & Air-Time Estimation**:
+  - Bound real modem compaction (`PayloadCompactor.compact`) and on-air duration estimation (`AirTime.estimate(profile, onAirBytes, repeats)`).
+  - Enforced 150ms debounce on input typing so UI text fields remain latency-free while heavy compaction and air-time calculations update seamlessly.
+  - Guarded against `IllegalArgumentException` in `PayloadCodec.encode` when raw byte count exceeds 280 bytes or URL syntax is invalid: UI detects error states gracefully without crashing, switching `ByteMeter` to `signalError` or `warning` colors and disabling the "Chirp it" button.
+- **Stealth Mode Disclosure Gate**:
+  - Selecting `Band.STEALTH` checks `Settings.stealthWarningAccepted`. If unaccepted, displays a one-time `CdAlertDialog` explaining near-ultrasound characteristics (17.5–21.5 kHz). Upon acceptance, persists `stealthWarningAccepted = true` to DataStore.
+- **Transmission Execution & Placeholder Transmit Route**:
+  - Defined `@Serializable data object TransmitRoute` and implemented `TransmitScreen` placeholder displaying real-time `TransmitState` (`Preparing`, `Transmitting`, `Completed`, `Cancelled`, `Failed`), frame numbers, elapsed / remaining seconds, and progress bar.
+  - Back-pressure guard intercepts system back during active acoustic modulation with confirmation dialog to avoid abrupt transmission drops.
+- **System Share Sheet Integration (ACTION_SEND)**:
+  - Registered `ACTION_SEND` (`text/plain`) intent filter in `AndroidManifest.xml` (0 extra permissions, 100% offline).
+  - Implemented pure function `SharedTextParser.parse`: automatically categorizes incoming text into `URL` (if starting with http/https) or `TEXT`, cleanly truncating content exceeding 280 UTF-8 bytes along code point boundaries without corrupting surrogate pairs or CJK characters, and signaling a visible notice.
+  - Implemented `ClipboardSanitizer` stripping control characters (0..31 and 127) while preserving essential newlines for multiline text and removing all whitespace from URLs.
