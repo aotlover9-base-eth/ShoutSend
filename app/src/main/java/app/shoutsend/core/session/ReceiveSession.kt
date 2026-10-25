@@ -2,6 +2,7 @@ package app.shoutsend.core.session
 
 import app.shoutsend.core.audio.receiver.AcousticReceiver
 import app.shoutsend.core.audio.receiver.ReceiverDiagnostics
+import app.shoutsend.core.modem.ModemConfigProvider
 import app.shoutsend.modem.crypto.SecureBox
 import app.shoutsend.modem.crypto.SecureOpenResult
 import app.shoutsend.modem.demod.ReceiveEvent
@@ -10,6 +11,7 @@ import app.shoutsend.modem.payload.PayloadCompactor
 import app.shoutsend.modem.payload.PayloadDecodeResult
 import app.shoutsend.modem.profile.Band
 import app.shoutsend.modem.profile.ModemProfile
+import app.shoutsend.modem.tuning.ModemTuning
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -38,12 +40,12 @@ interface ReceiveSession {
     val isMusicActiveWarning: StateFlow<Boolean>
 
     /**
-     * Starts listening on [band].
+     * Starts listening on [band]. If null, defaults to the configured band from [ModemConfigProvider].
      *
      * @param passphraseProvider Optional asynchronous resolver for decrypting secure messages.
      */
     suspend fun start(
-        band: Band = Band.RETRO,
+        band: Band? = null,
         passphraseProvider: (suspend (message: ReceivedMessage) -> String?)? = null
     )
 
@@ -68,7 +70,8 @@ class DefaultReceiveSession(
     private val coordinator: AudioCoordinator,
     private val focusController: AudioFocusController,
     private val receiver: AcousticReceiver,
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + Job())
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + Job()),
+    private val configProvider: ModemConfigProvider? = null
 ) : ReceiveSession {
 
     private val _state = MutableStateFlow<ReceiveState>(ReceiveState.Idle)
@@ -86,7 +89,7 @@ class DefaultReceiveSession(
     private var receptionStartTime: Long = 0L
 
     override suspend fun start(
-        band: Band,
+        band: Band?,
         passphraseProvider: (suspend (message: ReceivedMessage) -> String?)?
     ) = withContext(Dispatchers.Default) {
         if (_state.value != ReceiveState.Idle && receiver.isRunning) {
@@ -99,9 +102,13 @@ class DefaultReceiveSession(
             return@withContext
         }
 
+        val currentConfig = configProvider?.config?.value
+        val effectiveBand = band ?: currentConfig?.band ?: Band.RETRO
+        val effectiveTuning = currentConfig?.tuning ?: ModemTuning.DEFAULT
+
         _state.value = ReceiveState.Starting
         _isMusicActiveWarning.value = focusController.isMusicActive
-        activeProfile = if (band == Band.STEALTH) ModemProfile.DEFAULT_STEALTH else ModemProfile.DEFAULT_RETRO
+        activeProfile = if (effectiveBand == Band.STEALTH) ModemProfile.DEFAULT_STEALTH else ModemProfile.DEFAULT_RETRO
 
         eventCollectionJob?.cancel()
         eventCollectionJob = scope.launch(Dispatchers.Default) {
@@ -111,7 +118,7 @@ class DefaultReceiveSession(
         }
 
         try {
-            receiver.start(band = band)
+            receiver.start(band = effectiveBand, tuning = effectiveTuning)
             _state.value = ReceiveState.Listening(diagnostics.value.ambientLevelDbfs.toDouble())
         } catch (e: Exception) {
             _state.value = ReceiveState.Failed(e.message ?: "InitFailed")

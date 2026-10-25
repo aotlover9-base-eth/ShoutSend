@@ -117,10 +117,20 @@ class SessionIntegrationTest {
 
         var startCount = 0
         var stopCount = 0
+        var lastBand: Band? = null
+        var lastPassphrase: String? = null
+        var lastTuning: app.shoutsend.modem.tuning.ModemTuning? = null
 
-        override fun start(band: Band, passphrase: String?) {
+        override fun start(
+            band: Band,
+            passphrase: String?,
+            tuning: app.shoutsend.modem.tuning.ModemTuning
+        ) {
             isRunning = true
             startCount++
+            lastBand = band
+            lastPassphrase = passphrase
+            lastTuning = tuning
         }
 
         override fun stop() {

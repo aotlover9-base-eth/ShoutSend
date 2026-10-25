@@ -8,6 +8,7 @@ import app.shoutsend.modem.profile.Band
 import app.shoutsend.modem.profile.Timing
 import app.shoutsend.modem.profile.TonePlan
 import app.shoutsend.modem.protocol.ProtocolConstants
+import app.shoutsend.modem.tuning.ModemTuning
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.roundToInt
@@ -28,8 +29,15 @@ public class SyncDetector(
     public val band: Band,
     public val audioSpec: AudioSpec,
     public val listener: SyncListener,
-    public val noiseTracker: NoiseFloorTracker = NoiseFloorTracker(2, NoiseTrackerParams(hopIntervalSec = 0.0075))
+    public val tuning: ModemTuning = ModemTuning.DEFAULT,
+    public val noiseTracker: NoiseFloorTracker = NoiseFloorTracker(2, NoiseTrackerParams.fromTuning(tuning, hopIntervalSec = 0.0075))
 ) {
+    public constructor(
+        band: Band,
+        audioSpec: AudioSpec,
+        listener: SyncListener,
+        noiseTracker: NoiseFloorTracker
+    ) : this(band, audioSpec, listener, ModemTuning.DEFAULT, noiseTracker)
     public val tonePlan: TonePlan = TonePlan(band, audioSpec)
     public val headerSymbolSamples: Int = Timing.symbolSamples(ProtocolConstants.HEADER_SPEED, audioSpec)
     public val hopSize: Int = headerSymbolSamples / 4 // Quarter symbol hop (360 samples at 48 kHz)
@@ -272,7 +280,8 @@ public class SyncDetector(
                 m++
             }
 
-            if (alternations >= 6 && s0Count >= 2 && s1Count >= 2) {
+            val minSlots = tuning.minPreambleSlots
+            if (alternations >= minSlots && s0Count >= 2 && s1Count >= 2) {
                 phaseScores[p] = scoreSum
                 if (scoreSum > bestScore) {
                     bestScore = scoreSum
@@ -285,7 +294,8 @@ public class SyncDetector(
             p++
         }
 
-        if (bestAlternations >= 6 && bestPhase != -1) {
+        val minSlots = tuning.minPreambleSlots
+        if (bestAlternations >= minSlots && bestPhase != -1) {
             candidatePhase = bestPhase
             preambleSlotsCount = bestAlternations
             lastSlotHopSample = bestLastSlotSample

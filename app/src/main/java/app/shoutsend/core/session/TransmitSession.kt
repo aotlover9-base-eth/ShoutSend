@@ -2,6 +2,7 @@ package app.shoutsend.core.session
 
 import app.shoutsend.core.audio.transmitter.AcousticTransmitter
 import app.shoutsend.core.audio.transmitter.TransmitResult
+import app.shoutsend.core.modem.ModemConfigProvider
 import app.shoutsend.modem.AudioSpec
 import app.shoutsend.modem.crypto.SecureBox
 import app.shoutsend.modem.modulator.Modulator
@@ -13,7 +14,9 @@ import app.shoutsend.modem.payload.PayloadCodec
 import app.shoutsend.modem.payload.PayloadCompactor
 import app.shoutsend.modem.payload.PayloadValidationResult
 import app.shoutsend.modem.profile.ModemProfile
+import app.shoutsend.modem.profile.Scheme
 import app.shoutsend.modem.protocol.ProtocolConstants
+import app.shoutsend.modem.tuning.ModemTuning
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -35,7 +38,7 @@ interface TransmitSession {
      */
     suspend fun send(
         payload: Payload,
-        profile: ModemProfile = ModemProfile.DEFAULT_RETRO,
+        profile: ModemProfile? = null,
         securePassphrase: String? = null
     ): TransmitState
 
@@ -52,7 +55,8 @@ class DefaultTransmitSession(
     private val coordinator: AudioCoordinator,
     private val focusController: AudioFocusController,
     private val transmitter: AcousticTransmitter,
-    private val audioSpec: AudioSpec = AudioSpec.RATE_48K
+    private val audioSpec: AudioSpec = AudioSpec.RATE_48K,
+    private val configProvider: ModemConfigProvider? = null
 ) : TransmitSession {
 
     private val _state = MutableStateFlow<TransmitState>(TransmitState.Idle)
@@ -65,7 +69,7 @@ class DefaultTransmitSession(
 
     override suspend fun send(
         payload: Payload,
-        profile: ModemProfile,
+        profile: ModemProfile?,
         securePassphrase: String?
     ): TransmitState = withContext(Dispatchers.Default) {
         _state.value = TransmitState.Preparing
@@ -144,6 +148,10 @@ class DefaultTransmitSession(
 
         try {
             // 8. Assemble transmission plan and modulator
+            val currentConfig = configProvider?.config?.value
+            val effectiveProfile = profile ?: currentConfig?.profile ?: ModemProfile.DEFAULT_RETRO
+            val effectiveTuning = currentConfig?.tuning ?: ModemTuning.DEFAULT
+
             val message = OutgoingMessage(
                 type = payload.messageType,
                 flags = flags,
@@ -151,8 +159,9 @@ class DefaultTransmitSession(
             )
             val plan = TransmissionBuilder.build(
                 message = message,
-                profile = profile,
-                audioSpec = audioSpec
+                profile = effectiveProfile,
+                audioSpec = audioSpec,
+                tuning = effectiveTuning
             )
             val modulator = Modulator(plan)
             val totalFrames = plan.frames.size

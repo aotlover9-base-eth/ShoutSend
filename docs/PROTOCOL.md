@@ -409,3 +409,28 @@ where:
 
 
 
+
+### 2026-10-25 - Step 33: Physical Parameter Tunability Matrix
+
+| Parameter | Type | Default | Tunable at Runtime? | Scope / Justification |
+| :--- | :--- | :--- | :--- | :--- |
+| **Tuning / Physical Layer** | | | | |
+| Tone Frequencies | Fixed | Table 1 / Table 2 | **NO (Fixed)** | Receiver Goertzel bin banks must match transmitter frequencies. |
+| Frame Header Format | Fixed | 12 bytes | **NO (Fixed)** | Frame synchronization and decoding require structural consensus. |
+| Reed-Solomon Codecs | Fixed | RS(60, 48), RS(60, 40), etc. | **NO (Fixed)** | Interoperable syndrome decoding requires matching Galois field parameters. |
+| Output Level | Tunable | 0.85 (-1.4 dBFS) | **YES (Dev Panel)** | Transmit audio attenuation to prevent speaker clipping. |
+| Lead-in Silence | Tunable | 250 ms | **YES (Dev Panel)** | Speaker warm-up settling time. |
+| Tail Silence | Tunable | 150 ms | **YES (Dev Panel)** | Audio sink drain delay. |
+| Symbol Durations | Tunable | 20 ms / 30 ms / 60 ms | **YES (Dev Panel)** | Baud rate tuning (requires both endpoints to agree). |
+| Overlap Ramp Times | Tunable | 3 ms / 4 ms / 6 ms | **YES (Dev Panel)** | Raised-cosine window transition duration. |
+| Erasure Confidence Threshold | Tunable | 0.20 | **YES (Dev Panel)** | Reed-Solomon soft erasure thresholding. |
+| Tone Detection Margin | Tunable | 6.0 dB | **YES (Dev Panel)** | SNR margin above local ambient noise. |
+| Absolute Detection Floor | Tunable | -70.0 dBFS | **YES (Dev Panel)** | Minimum tone energy threshold. |
+| Sync Minimum Slots | Tunable | 6 | **YES (Dev Panel)** | Preamble alternate alternation requirement. |
+| Preamble SNR Threshold | Tunable | 6.0 dB | **YES (Dev Panel)** | Sync tone detection confidence margin. |
+| Marker Miss Limit | Tunable | 2 | **YES (Dev Panel)** | Inter-frame marker loss tolerance. |
+| Noise Floor Attack Time | Tunable | 1.5 s | **YES (Dev Panel)** | Ambient noise tracking response time. |
+| Noise Floor Decay Time | Tunable | 0.25 s | **YES (Dev Panel)** | Ambient noise tracking release time. |
+| Waterfall FFT Size | Tunable | 1024 | **YES (Dev Panel)** | Spectrum visual frequency resolution. |
+| Spectrum Dynamic Range | Tunable | -90 dBFS .. 0 dBFS | **YES (Dev Panel)** | Waterfall colormap color mapping span. |
+| Hardware Audio Source | Override | `UNPROCESSED` (or default) | **YES (Dev Panel)** | `MediaRecorder.AudioSource` override in developer builds. |

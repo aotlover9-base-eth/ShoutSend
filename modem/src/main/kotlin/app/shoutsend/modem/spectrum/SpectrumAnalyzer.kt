@@ -1,6 +1,7 @@
 package app.shoutsend.modem.spectrum
 
 import app.shoutsend.modem.AudioSpec
+import app.shoutsend.modem.tuning.ModemTuning
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.log10
@@ -58,6 +59,20 @@ public class SpectrumAnalyzer(
     public val maxDbfs: Double = DEFAULT_MAX_DBFS,
     private val listener: SpectrumListener? = null
 ) {
+    public constructor(
+        spec: AudioSpec,
+        band: AnalysisBand,
+        tuning: ModemTuning,
+        listener: SpectrumListener? = null
+    ) : this(
+        spec = spec,
+        band = band,
+        fftSize = tuning.fftSize,
+        minDbfs = tuning.spectrumMinDbfs.toDouble(),
+        maxDbfs = tuning.spectrumMaxDbfs.toDouble(),
+        listener = listener
+    )
+
     init {
         require(fftSize > 0 && (fftSize and (fftSize - 1)) == 0) {
             "fftSize must be a power of 2, got: $fftSize"

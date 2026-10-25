@@ -4,10 +4,12 @@ import android.content.Context
 import app.shoutsend.core.audio.receiver.AcousticReceiver
 import app.shoutsend.core.audio.transmitter.AcousticTransmitter
 import app.shoutsend.core.audio.transmitter.getOutputRouteInfo
+import app.shoutsend.core.modem.ModemConfigProvider
 import app.shoutsend.modem.AudioSpec
 import app.shoutsend.modem.calibration.CalibrationAnalyzer
 import app.shoutsend.modem.calibration.TestSequence
 import app.shoutsend.modem.profile.Band
+import app.shoutsend.modem.tuning.ModemTuning
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.CancellationException
@@ -30,18 +32,21 @@ class CalibrationRunner(
     private val receiver: AcousticReceiver,
     private val transmitter: AcousticTransmitter,
     private val audioSpec: AudioSpec = AudioSpec.RATE_48K,
-    private val routeInfoProvider: () -> app.shoutsend.core.audio.transmitter.OutputRouteInfo
+    private val routeInfoProvider: () -> app.shoutsend.core.audio.transmitter.OutputRouteInfo,
+    private val configProvider: ModemConfigProvider? = null
 ) {
     constructor(
         context: Context,
         receiver: AcousticReceiver,
         transmitter: AcousticTransmitter,
-        audioSpec: AudioSpec = AudioSpec.RATE_48K
+        audioSpec: AudioSpec = AudioSpec.RATE_48K,
+        configProvider: ModemConfigProvider? = null
     ) : this(
         receiver = receiver,
         transmitter = transmitter,
         audioSpec = audioSpec,
-        routeInfoProvider = { getOutputRouteInfo(context) }
+        routeInfoProvider = { getOutputRouteInfo(context) },
+        configProvider = configProvider
     )
 
     /**
@@ -81,8 +86,9 @@ class CalibrationRunner(
         try {
             onProgress(0.05f)
 
-            // 1. Start acoustic receiver
-            receiver.start(band = Band.RETRO)
+            // 1. Start acoustic receiver with configured tuning
+            val tuning = configProvider?.config?.value?.tuning ?: ModemTuning.DEFAULT
+            receiver.start(band = Band.RETRO, tuning = tuning)
 
             // 2. Wait 1 second for ambient noise profiling
             delay(1000)

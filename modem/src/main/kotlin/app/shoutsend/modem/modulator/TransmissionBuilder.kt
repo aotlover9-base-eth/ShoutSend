@@ -17,6 +17,7 @@ import app.shoutsend.modem.protocol.ProtocolConstants
 import app.shoutsend.modem.synth.SymbolEvent
 import app.shoutsend.modem.synth.SymbolSchedule
 import app.shoutsend.modem.synth.ToneSynth
+import app.shoutsend.modem.tuning.ModemTuning
 
 /**
  * Builds physical transmission plans from outgoing application messages and modem configurations.
@@ -46,9 +47,10 @@ public object TransmissionBuilder {
         message: OutgoingMessage,
         profile: ModemProfile,
         audioSpec: AudioSpec,
-        leadInSilenceMs: Int = DEFAULT_LEAD_IN_SILENCE_MS,
-        tailSilenceMs: Int = DEFAULT_TAIL_SILENCE_MS,
-        outputLevel: Float = ToneSynth.DEFAULT_OUTPUT_LEVEL,
+        tuning: ModemTuning = ModemTuning.DEFAULT,
+        leadInSilenceMs: Int = tuning.leadInSilenceMs,
+        tailSilenceMs: Int = tuning.tailSilenceMs,
+        outputLevel: Float = tuning.outputLevel,
         repeats: Int = profile.repeats
     ): TransmissionPlan {
         require(leadInSilenceMs >= 0) { "leadInSilenceMs cannot be negative: $leadInSilenceMs" }
@@ -128,8 +130,10 @@ public object TransmissionBuilder {
         }
 
         // 2. Active Frame Timing (profile.speed and profile.scheme)
-        val payloadDurSamples = Timing.symbolSamples(profile.speed, audioSpec)
-        val payloadRampSamples = Timing.rampSamples(profile.speed, audioSpec)
+        val payloadDurMs = tuning.durationMs(profile.speed)
+        val payloadRampMs = tuning.rampMs(profile.speed)
+        val payloadDurSamples = Timing.symbolSamples(payloadDurMs, audioSpec)
+        val payloadRampSamples = Timing.rampSamples(payloadRampMs, audioSpec)
         val payloadSymLength = payloadDurSamples + payloadRampSamples
         val isDtfsk = profile.scheme == Scheme.DTFSK
         val payloadLevelPerTone = if (isDtfsk) outputLevel / 2.0f else outputLevel

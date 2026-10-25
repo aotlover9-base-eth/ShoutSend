@@ -1,5 +1,8 @@
 package app.shoutsend.modem.detector
 
+import app.shoutsend.modem.tuning.ModemTuning
+import kotlin.math.pow
+
 /**
  * Configuration parameters governing dynamic noise floor tracking, adaptation rates, and detection thresholds.
  *
@@ -24,5 +27,16 @@ public data class NoiseTrackerParams(
         require(decayTimeSec > 0.0) { "decayTimeSec must be positive: $decayTimeSec" }
         require(marginDb > 0.0f) { "marginDb must be positive: $marginDb" }
         require(minFloorPower > 0.0f) { "minFloorPower must be positive: $minFloorPower" }
+    }
+
+    public companion object {
+        public fun fromTuning(tuning: ModemTuning, hopIntervalSec: Double): NoiseTrackerParams =
+            NoiseTrackerParams(
+                hopIntervalSec = hopIntervalSec,
+                attackTimeSec = tuning.noiseAttackSec,
+                decayTimeSec = tuning.noiseDecaySec,
+                marginDb = tuning.detectionMarginDb.toFloat(),
+                minFloorPower = 10.0.pow(tuning.absoluteDetectionFloorDbfs / 10.0).toFloat()
+            )
     }
 }

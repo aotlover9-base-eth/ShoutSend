@@ -2,12 +2,14 @@ package app.shoutsend.core.audio.receiver
 
 import android.os.Process
 import app.shoutsend.core.audio.AudioConfig
+import app.shoutsend.core.modem.ModemConfigProvider
 import app.shoutsend.modem.AudioSpec
 import app.shoutsend.modem.demod.ReceiveEvent
 import app.shoutsend.modem.demod.ReceiverPipeline
 import app.shoutsend.modem.profile.Band
 import app.shoutsend.modem.spectrum.AnalysisBand
 import app.shoutsend.modem.spectrum.SpectrumAnalyzer
+import app.shoutsend.modem.tuning.ModemTuning
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -37,7 +39,8 @@ import kotlin.math.max
  */
 class DefaultAcousticReceiver(
     private val pcmSourceFactory: () -> PcmSource,
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + Job())
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + Job()),
+    private val configProvider: ModemConfigProvider? = null
 ) : AcousticReceiver {
 
     private val _events = MutableSharedFlow<ReceiveEvent>(replay = 32, extraBufferCapacity = 64)
@@ -59,6 +62,7 @@ class DefaultAcousticReceiver(
 
     private var currentBand: Band = Band.RETRO
     private var currentPassphrase: String? = null
+    private var currentTuning: ModemTuning = ModemTuning.DEFAULT
 
     private var readerThread: Thread? = null
     private var processingJob: Job? = null
@@ -67,9 +71,15 @@ class DefaultAcousticReceiver(
     private val ringBuffer = SpscRingBuffer(capacity = 262144)
 
     @Synchronized
-    override fun start(band: Band, passphrase: String?) {
+    override fun start(band: Band, passphrase: String?, tuning: ModemTuning) {
+        val effectiveTuning = if (tuning == ModemTuning.DEFAULT && configProvider != null) {
+            configProvider.config.value.tuning
+        } else {
+            tuning
+        }
+
         if (active.get()) {
-            if (currentBand == band && currentPassphrase == passphrase) {
+            if (currentBand == band && currentPassphrase == passphrase && currentTuning == effectiveTuning) {
                 return // Already running with identical config
             }
             stop()
@@ -77,6 +87,7 @@ class DefaultAcousticReceiver(
 
         currentBand = band
         currentPassphrase = passphrase
+        currentTuning = effectiveTuning
         ringBuffer.clear()
 
         val source = pcmSourceFactory()
@@ -106,6 +117,7 @@ class DefaultAcousticReceiver(
         val spectrumAnalyzer = SpectrumAnalyzer(
             spec = audioSpec,
             band = analysisBand,
+            tuning = tuning,
             listener = { _, row ->
                 _spectrumChannel.trySend(row.copyOf())
             }
@@ -118,7 +130,8 @@ class DefaultAcousticReceiver(
             listener = { event ->
                 _events.tryEmit(event)
             },
-            passphrase = passphrase
+            passphrase = passphrase,
+            tuning = tuning
         )
 
         active.set(true)

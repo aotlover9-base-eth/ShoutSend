@@ -3,6 +3,7 @@ package app.shoutsend.modem.demod
 import app.shoutsend.modem.AudioSpec
 import app.shoutsend.modem.detector.GoertzelBank
 import app.shoutsend.modem.detector.NoiseFloorTracker
+import app.shoutsend.modem.detector.NoiseTrackerParams
 import app.shoutsend.modem.fec.RsDecodeResult
 import app.shoutsend.modem.fec.RsDecoder
 import app.shoutsend.modem.packet.AssemblerResult
@@ -21,6 +22,7 @@ import app.shoutsend.modem.protocol.CodewordSymbolizer
 import app.shoutsend.modem.protocol.ProtocolConstants
 import app.shoutsend.modem.sync.SyncDetector
 import app.shoutsend.modem.sync.SyncListener
+import app.shoutsend.modem.tuning.ModemTuning
 import kotlin.math.min
 
 /**
@@ -51,8 +53,16 @@ public class ReceiverPipeline(
     public val band: Band,
     public val audioSpec: AudioSpec,
     private val listener: ReceiveEventListener,
-    public var passphrase: String? = null
+    public var passphrase: String? = null,
+    public val tuning: ModemTuning = ModemTuning.DEFAULT
 ) {
+    public constructor(
+        band: Band,
+        audioSpec: AudioSpec,
+        listener: ReceiveEventListener,
+        passphrase: String?
+    ) : this(band, audioSpec, listener, passphrase, ModemTuning.DEFAULT)
+
     public val tonePlan: TonePlan = TonePlan(band, audioSpec)
     public val headerSymbolSamples: Int = Timing.symbolSamples(ProtocolConstants.HEADER_SPEED, audioSpec)
 
@@ -63,7 +73,7 @@ public class ReceiverPipeline(
     private var writeHead: Long = 0L
 
     // Noise floor tracker & sync detector
-    public val noiseTracker: NoiseFloorTracker = NoiseFloorTracker(2)
+    public val noiseTracker: NoiseFloorTracker = NoiseFloorTracker(2, NoiseTrackerParams.fromTuning(tuning, hopIntervalSec = 0.0075))
     private var syncLockedStartSample: Long = 0L
     private var syncLockedSnrDb: Float = 0f
 
@@ -94,6 +104,7 @@ public class ReceiverPipeline(
         band = band,
         audioSpec = audioSpec,
         listener = syncListener,
+        tuning = tuning,
         noiseTracker = noiseTracker
     )
 
@@ -234,7 +245,7 @@ public class ReceiverPipeline(
         listener.onReceiveEvent(ReceiveEvent.ModeDecoded(profile))
 
         // Configure active timing and resonators for data payload frames
-        activeSymbolSamples = Timing.symbolSamples(profile.speed, audioSpec)
+        activeSymbolSamples = Timing.symbolSamples(tuning.durationMs(profile.speed), audioSpec)
         activeBank = if (activeSymbolSamples == headerSymbolSamples) {
             headerDataBank
         } else {
@@ -333,7 +344,7 @@ public class ReceiverPipeline(
             scheme = profile.scheme,
             frameSeed = ProtocolConstants.WHITEN_SEED_V1,
             byteCount = nBytes,
-            confidenceThreshold = 0.20f
+            confidenceThreshold = tuning.erasureThreshold
         )
 
         // 4. Reed-Solomon Decode

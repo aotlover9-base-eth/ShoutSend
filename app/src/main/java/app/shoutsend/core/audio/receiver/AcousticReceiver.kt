@@ -2,6 +2,7 @@ package app.shoutsend.core.audio.receiver
 
 import app.shoutsend.modem.demod.ReceiveEvent
 import app.shoutsend.modem.profile.Band
+import app.shoutsend.modem.tuning.ModemTuning
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -37,10 +38,14 @@ interface AcousticReceiver {
     val isRunning: Boolean
 
     /**
-     * Starts acoustic listening on [band] with optional [passphrase] for encrypted transmissions.
+     * Starts acoustic listening on [band] with optional [passphrase] and [tuning].
      * Idempotent: if already active with identical configuration, does not restart.
      */
-    fun start(band: Band = Band.RETRO, passphrase: String? = null)
+    fun start(
+        band: Band = Band.RETRO,
+        passphrase: String? = null,
+        tuning: ModemTuning = ModemTuning.DEFAULT
+    )
 
     /**
      * Stops audio capture and processing cleanly, releasing all hardware resources.

@@ -414,3 +414,16 @@
 
 
 
+
+## 2026-10-25 - Step 33: Modem Config Provider (Dev Override Seam)
+
+### DEC-052: Pure JVM Modem Tuning Hierarchy and Dev Override Seam
+- **ModemTuning Isolation (`:modem`)**:
+  - Encapsulates every physical acoustic parameter (output level, silence margins, symbol/ramp durations, detection margins, noise tracking attack/decay constants, Goertzel thresholds, and waterfall FFT/dBFS limits) into an immutable, self-validating data class `ModemTuning`.
+  - Bit-identical transmission waveform output verified via SHA-256 (`7db9cf6fb7d4022dbf37b98fecaa1c17290ebce2fe8d8442ec9103c800a73d32`).
+- **Flavor Separation (Rule 15)**:
+  - `FixedModemConfigProvider` in `src/user` strictly binds `SettingsRepository.settings` to `ModemTuning.DEFAULT` and enforces `audioSourceOverride = null`.
+  - `OverridableModemConfigProvider` in `src/dev` provides live mutable hooks for the Step 50 DSP Lab (`customTuning`, `customAudioSourceOverride`).
+  - Added `OverridableModemConfigProvider` to `config/dev-markers.txt`, verified 100% absent from User APK DEX via `verifyUserApkClean`.
+- **Dynamic Session-Start Propagation**:
+  - `TransmitSession`, `ReceiveSession`, `CalibrationRunner`, and `DefaultAcousticReceiver` query `configProvider.config.value` on every session start/transmission invocation rather than caching static parameters at app startup.

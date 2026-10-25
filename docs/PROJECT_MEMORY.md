@@ -137,3 +137,4 @@ app/src/user/java/app/shoutsend/core/devtools/  # No-op dev tools implementation
 
 
 
+- Step 33 completed: Modem config provider and dev override seam completed. Implemented `ModemTuning` data class and validation logic in `:modem` with bit-identical SHA-256 transmission waveform generation. Implemented `ModemConfig` and `ModemConfigProvider` in `:app`, with `FixedModemConfigProvider` in `src/user` and `OverridableModemConfigProvider` in `src/dev`. Updated `TransmitSession`, `ReceiveSession`, `CalibrationRunner`, and `DefaultAcousticReceiver` to query active configuration and tuning dynamically at each session start. Verified 100% clean User APK via `verifyUserApkClean` and dev markers. Full test suite passing across dev and user flavors.
