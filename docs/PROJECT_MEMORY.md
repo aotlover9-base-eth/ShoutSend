@@ -132,3 +132,6 @@ app/src/user/java/app/shoutsend/core/devtools/  # No-op dev tools implementation
     └─ Corrupted body ───────────────► [Failed("PayloadCorrupt")]
 ```
 
+- Step 23 completed: Benchmark and preset tuning in simulation completed (`BatchRunner`, `docs/DSP_BENCHMARK.md`). 42-cell sweep executed across 7 modem profiles and 6 physical scenarios (Clean, Close Range, Living Room, Quiet Room, Cafe, Weak Phone). Verified 100% success for Retro Normal across all scenarios, confirmed MFSK16 as universal default and DTFSK as optional high-speed mode (10.0 B/s), formalized 95% confidence intervals and UI preset timings. Full `:modem:modemBenchmark` and `:modem:test` passing.
+
+

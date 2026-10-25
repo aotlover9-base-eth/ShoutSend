@@ -381,6 +381,21 @@
 - **Background Grace Period**:
   - Process backgrounding triggers a configurable grace timer (default 5 seconds via `Settings.backgroundGraceSeconds`) stopping microphone capture to ensure zero background eavesdropping and maintain Google Play compliance.
 
+## 2026-10-25 - Step 23: Benchmark and Preset Tuning in Simulation
+
+### DEC-050: Empirical Acoustic Preset Selection and Scheme Viability
+- **MFSK16 Retained as Default Across All Bands**:
+  - Full-sweep simulation across 42 cells (7 profiles $\times$ 6 channel scenarios) confirms MFSK16 Normal (30ms symbols, 4ms raised cosine ramp, RS1, 2 frame repeats) achieves 100.0% delivery reliability across all tested acoustic environments, including reverberant living rooms and noisy cafes (target SNR 12 dB).
+- **DTFSK Retained as High-Throughput Mode**:
+  - DTFSK delivers up to 10.0 B/s net throughput at close range (<0.5m) and clean channels. It is retained as a specialized high-speed option for users transferring larger texts or contacts in quiet conditions.
+- **Physical Timing Invariants**:
+  - `ROBUST`: 60 ms symbol duration, 6 ms raised-cosine ramp, RS(60, 40) STRONG profile, 2 repeats. Maximum error correction under severe acoustic disruption.
+  - `NORMAL`: 30 ms symbol duration, 4 ms raised-cosine ramp, RS(60, 48) STANDARD profile, 2 repeats. Optimal trade-off between multipath delay spread (~5-10 ms) and throughput.
+  - `FAST`: 20 ms symbol duration, 3 ms raised-cosine ramp, RS(60, 54) LIGHT profile, 1 repeat. High speed for low-distance transfers (up to 12.5 B/s).
+- **Acoustic Stealth Boundary**:
+  - High-frequency near-ultrasound (17.6 - 19.85 kHz) suffers substantial room air absorption and multipath destructive interference in larger spaces, but delivers 100.0% reliability at close range (<0.5m). Stealth is recommended strictly when hardware calibration passes with `GOOD` SNR and close device positioning.
+
+
 
 
 

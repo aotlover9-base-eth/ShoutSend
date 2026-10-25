@@ -388,6 +388,19 @@ where:
   - Scoring: $Q = \text{deliveryRatio} \cdot (0.55 \cdot \text{snrNorm} + 0.45 \cdot \text{rsNorm}) \cdot 100 \in [0, 100]$.
   - Rating bands: EXCELLENT (80..100), GOOD (60..79), FAIR (40..59), POOR (0..39).
 
+### 2026-10-25 - Step 23: Acoustic Benchmark Tuning and Net Throughput Characterization
+- **Simulation-Tuned Net Data Rates**:
+  - `RETRO / MFSK16 / NORMAL / RS1 / x2` (Default): Net throughput 2.8 B/s (100.0% success rate across all clean, living room, quiet room, and cafe scenarios).
+  - `RETRO / MFSK16 / FAST / RS0 / x1`: Net throughput 12.3 to 12.5 B/s (100.0% close range/living room, 80.0% in noisy cafe).
+  - `RETRO / DTFSK / FAST / RS1 / x1`: Net throughput 9.9 to 10.0 B/s (100.0% close range/living room, 90.0% in noisy cafe).
+  - `RETRO / MFSK16 / ROBUST / RS2 / x2`: Net throughput 1.4 B/s (high-noise survival).
+- **Physical Layer Confirmations**:
+  - Scheme: MFSK16 retained as universal default across both bands; DTFSK retained as optional high-speed preset for clean/close-range channels.
+  - Symbol durations: 30 ms (Normal), 20 ms (Fast), 60 ms (Robust).
+  - Edge transitions: Raised-cosine windows of 4 ms (Normal), 3 ms (Fast), 6 ms (Robust).
+  - Channel constraints: Ultrasonic Stealth band provides reliable transfer at close range (<0.5m), but suffers room reverberation and wall absorption in large rooms; Retro band serves as the all-environment reliable workhorse.
+
+
 
 
 
