@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,6 +56,13 @@ fun SendScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val clipboardManager = LocalClipboardManager.current
     val scrollState = rememberScrollState()
+
+    // Clear credentials and sensitive contact details when leaving the screen (Rule 25)
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.clearSensitiveData()
+        }
+    }
 
     // Stealth Band First-Use Warning Dialog
     if (uiState.showStealthWarningDialog) {
@@ -252,43 +260,18 @@ fun SendScreen(
             }
 
             SendPayloadType.WIFI -> {
-                NeonCard(modifier = Modifier.fillMaxWidth()) {
-                    Column(
-                        modifier = Modifier.padding(ChirpTheme.spacing.md),
-                        verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.send_coming_next_wifi_title),
-                            style = ChirpTheme.typography.titleMedium,
-                            color = ChirpTheme.colors.secondary
-                        )
-                        Text(
-                            text = stringResource(R.string.send_coming_next_wifi_body),
-                            style = ChirpTheme.typography.bodyMedium,
-                            color = ChirpTheme.colors.onSurfaceVariant
-                        )
-                    }
-                }
+                WifiComposer(
+                    uiState = uiState,
+                    viewModel = viewModel,
+                    clipboardManager = clipboardManager
+                )
             }
 
             SendPayloadType.CONTACT -> {
-                NeonCard(modifier = Modifier.fillMaxWidth()) {
-                    Column(
-                        modifier = Modifier.padding(ChirpTheme.spacing.md),
-                        verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.send_coming_next_contact_title),
-                            style = ChirpTheme.typography.titleMedium,
-                            color = ChirpTheme.colors.secondary
-                        )
-                        Text(
-                            text = stringResource(R.string.send_coming_next_contact_body),
-                            style = ChirpTheme.typography.bodyMedium,
-                            color = ChirpTheme.colors.onSurfaceVariant
-                        )
-                    }
-                }
+                ContactComposer(
+                    uiState = uiState,
+                    viewModel = viewModel
+                )
             }
         }
 

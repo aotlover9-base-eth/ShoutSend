@@ -5,6 +5,7 @@ import app.shoutsend.core.data.settings.Settings
 import app.shoutsend.core.session.TransmitSession
 import app.shoutsend.core.session.TransmitState
 import app.shoutsend.modem.payload.Payload
+import app.shoutsend.modem.payload.WifiSecurity
 import app.shoutsend.modem.profile.Band
 import app.shoutsend.modem.profile.ModemProfile
 import app.shoutsend.modem.profile.Speed
@@ -380,5 +381,228 @@ class SendViewModelTest {
 
         viewModel.cancelTransmission()
         assertEquals("CancelledByUser", session.cancelReasonReceived)
+    }
+
+    @Test
+    fun wifiValidationSuccessWithWpa2() = runTest {
+        val settingsRepo = FakeSettingsRepository()
+        val session = TestTransmitSession()
+        val viewModel = SendViewModel(settingsRepo, session)
+        advanceUntilIdle()
+
+        viewModel.selectPayloadType(SendPayloadType.WIFI)
+        viewModel.onWifiSsidChanged("Office_Guest", debounceMs = 0L)
+        viewModel.onWifiPasswordChanged("SuperSecret88", debounceMs = 0L)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state.isValid)
+        assertNull(state.validationError)
+        assertTrue(state.onAirBytes > 0)
+        assertTrue(state.estimatedDurationSeconds > 0.0)
+    }
+
+    @Test
+    fun wifiValidationSuccessWithOpenSecurity() = runTest {
+        val settingsRepo = FakeSettingsRepository()
+        val session = TestTransmitSession()
+        val viewModel = SendViewModel(settingsRepo, session)
+        advanceUntilIdle()
+
+        viewModel.selectPayloadType(SendPayloadType.WIFI)
+        viewModel.onWifiSsidChanged("FreeCoffeeWifi", debounceMs = 0L)
+        viewModel.onWifiSecurityChanged(WifiSecurity.OPEN)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state.isValid)
+        assertNull(state.validationError)
+        assertTrue(state.onAirBytes > 0)
+    }
+
+    @Test
+    fun wifiValidationFailsWhenPasswordTooShort() = runTest {
+        val settingsRepo = FakeSettingsRepository()
+        val session = TestTransmitSession()
+        val viewModel = SendViewModel(settingsRepo, session)
+        advanceUntilIdle()
+
+        viewModel.selectPayloadType(SendPayloadType.WIFI)
+        viewModel.onWifiSsidChanged("Office_Guest", debounceMs = 0L)
+        viewModel.onWifiPasswordChanged("short", debounceMs = 0L)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.isValid)
+        assertNotNull(state.validationError)
+    }
+
+    @Test
+    fun wifiValidationFailsWhenSsidTooLong() = runTest {
+        val settingsRepo = FakeSettingsRepository()
+        val session = TestTransmitSession()
+        val viewModel = SendViewModel(settingsRepo, session)
+        advanceUntilIdle()
+
+        viewModel.selectPayloadType(SendPayloadType.WIFI)
+        val longSsid = "A".repeat(33)
+        viewModel.onWifiSsidChanged(longSsid, debounceMs = 0L)
+        viewModel.onWifiPasswordChanged("ValidPassword123", debounceMs = 0L)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.isValid)
+        assertNotNull(state.validationError)
+    }
+
+    @Test
+    fun contactValidationSuccessAndFieldExclusion() = runTest {
+        val settingsRepo = FakeSettingsRepository()
+        val session = TestTransmitSession()
+        val viewModel = SendViewModel(settingsRepo, session)
+        advanceUntilIdle()
+
+        viewModel.selectPayloadType(SendPayloadType.CONTACT)
+        viewModel.applyPickedContact(
+            PickedContactData(
+                displayName = "Faraday Researcher",
+                phones = listOf("+1-555-0199", "555-0144"),
+                email = "faraday@shoutsend.app"
+            )
+        )
+        advanceUntilIdle()
+
+        var state = viewModel.uiState.value
+        assertTrue(state.isValid)
+        assertNull(state.validationError)
+        val initialBytes = state.onAirBytes
+
+        // Uncheck secondary phone
+        viewModel.toggleContactIncludePhone2()
+        advanceUntilIdle()
+        state = viewModel.uiState.value
+        assertTrue(state.isValid)
+        assertTrue(state.onAirBytes < initialBytes)
+
+        // Transmit and verify transmitted payload contains only selected phone
+        var navigated = false
+        viewModel.startTransmission { navigated = true }
+        advanceUntilIdle()
+
+        assertTrue(navigated)
+        val sent = session.lastPayloadSent as? Payload.Contact
+        assertNotNull(sent)
+        assertEquals("Faraday Researcher", sent!!.displayName)
+        assertEquals(listOf("+1-555-0199"), sent.phones)
+        assertEquals("faraday@shoutsend.app", sent.email)
+    }
+
+    @Test
+    fun contactManualModeValidation() = runTest {
+        val settingsRepo = FakeSettingsRepository()
+        val session = TestTransmitSession()
+        val viewModel = SendViewModel(settingsRepo, session)
+        advanceUntilIdle()
+
+        viewModel.selectPayloadType(SendPayloadType.CONTACT)
+        viewModel.setContactManualMode(true)
+        viewModel.onContactNameChanged("Alice Hacker", debounceMs = 0L)
+        viewModel.onContactPhone1Changed("+1234567890", debounceMs = 0L)
+        viewModel.onContactEmailChanged("alice@example.com", debounceMs = 0L)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertTrue(state.isContactManualMode)
+        assertTrue(state.isValid)
+        assertNull(state.validationError)
+        assertTrue(state.onAirBytes > 0)
+    }
+
+    @Test
+    fun contactValidationFailsWhenEmailInvalid() = runTest {
+        val settingsRepo = FakeSettingsRepository()
+        val session = TestTransmitSession()
+        val viewModel = SendViewModel(settingsRepo, session)
+        advanceUntilIdle()
+
+        viewModel.selectPayloadType(SendPayloadType.CONTACT)
+        viewModel.onContactNameChanged("Bob", debounceMs = 0L)
+        viewModel.onContactEmailChanged("invalid-email-without-at", debounceMs = 0L)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertFalse(state.isValid)
+        assertNotNull(state.validationError)
+    }
+
+    @Test
+    fun clearSensitiveDataWipesCredentialsAndContacts() = runTest {
+        val settingsRepo = FakeSettingsRepository()
+        val session = TestTransmitSession()
+        val viewModel = SendViewModel(settingsRepo, session)
+        advanceUntilIdle()
+
+        viewModel.onWifiPasswordChanged("SensitivePassword123", debounceMs = 0L)
+        viewModel.toggleWifiPasswordVisibility()
+        viewModel.onContactNameChanged("Secret Agent", debounceMs = 0L)
+        viewModel.onContactPhone1Changed("12345", debounceMs = 0L)
+        viewModel.onContactEmailChanged("agent@secret.com", debounceMs = 0L)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.wifiPasswordVisible)
+        assertEquals("SensitivePassword123", viewModel.uiState.value.wifiPassword)
+        assertEquals("Secret Agent", viewModel.uiState.value.contactName)
+
+        viewModel.clearSensitiveData()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals("", state.wifiPassword)
+        assertFalse(state.wifiPasswordVisible)
+        assertEquals("", state.contactName)
+        assertEquals("", state.contactPhone1)
+        assertEquals("", state.contactPhone2)
+        assertEquals("", state.contactEmail)
+    }
+
+    @Test
+    fun startTransmissionClearsSensitiveDataUponDispatch() = runTest {
+        val settingsRepo = FakeSettingsRepository()
+        val session = TestTransmitSession()
+        val viewModel = SendViewModel(settingsRepo, session)
+        advanceUntilIdle()
+
+        viewModel.selectPayloadType(SendPayloadType.WIFI)
+        viewModel.onWifiSsidChanged("SecuredNet", debounceMs = 0L)
+        viewModel.onWifiPasswordChanged("Password123!", debounceMs = 0L)
+        advanceUntilIdle()
+
+        viewModel.startTransmission {}
+        advanceUntilIdle()
+
+        assertNotNull(session.lastPayloadSent)
+        assertTrue(session.lastPayloadSent is Payload.WiFi)
+        val wifiSent = session.lastPayloadSent as Payload.WiFi
+        assertEquals("SecuredNet", wifiSent.ssid)
+        assertEquals("Password123!", wifiSent.password)
+
+        // Sensitive password in state must be wiped clean immediately
+        assertEquals("", viewModel.uiState.value.wifiPassword)
+    }
+
+    @Test
+    fun enableSecureModeUpdatesFlagAndSnackbar() = runTest {
+        val settingsRepo = FakeSettingsRepository()
+        val session = TestTransmitSession()
+        val viewModel = SendViewModel(settingsRepo, session)
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isSecureEnabled)
+        assertNull(viewModel.uiState.value.snackbarMessage)
+
+        viewModel.enableSecureMode()
+
+        assertTrue(viewModel.uiState.value.isSecureEnabled)
+        assertNotNull(viewModel.uiState.value.snackbarMessage)
     }
 }

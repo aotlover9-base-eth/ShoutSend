@@ -498,3 +498,25 @@
   - Registered `ACTION_SEND` (`text/plain`) intent filter in `AndroidManifest.xml` (0 extra permissions, 100% offline).
   - Implemented pure function `SharedTextParser.parse`: automatically categorizes incoming text into `URL` (if starting with http/https) or `TEXT`, cleanly truncating content exceeding 280 UTF-8 bytes along code point boundaries without corrupting surrogate pairs or CJK characters, and signaling a visible notice.
   - Implemented `ClipboardSanitizer` stripping control characters (0..31 and 127) while preserving essential newlines for multiline text and removing all whitespace from URLs.
+
+
+## 2026-10-26 - Step 38: Send Screen, Wi-Fi and Contact Forms with Privacy Safeguards
+
+### DEC-057: Wi-Fi Credential and Contact Card Composers with Zero-Permission Queries and Memory Sanitization
+- **Wi-Fi Composer Architecture**:
+  - Implemented `WifiComposer` supporting SSID (1..32 UTF-8 bytes), security mode (`WPA2` default, `WPA3`, `OPEN`), masked password input with show/hide toggle and clipboard paste button, and hidden network switch.
+  - Password input field completely disappears when security mode is set to `OPEN`, ensuring zero confusion for unencrypted access points.
+  - Autofill and keyboard suggestions are strictly disabled on password field (`KeyboardOptions(keyboardType = KeyboardType.Password, autoCorrectEnabled = false)`), and the field is explicitly marked sensitive for accessibility services (`Modifier.semantics { password() }`).
+  - Prominent acoustic privacy cue card displayed on secured networks: "Anyone near you with a recorder could capture this password." with an action "Use Secure mode" toggling `isSecureEnabled` and displaying an informative notification until Step 46 passphrase UI.
+- **Zero-Permission Contact Picker & Privacy Card**:
+  - Implemented `ContactPickerReader` using `ActivityResultContracts.PickContact` and reading via `Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Data.CONTENT_DIRECTORY)`. Operates strictly under temporary picker URI read grants without requiring `READ_CONTACTS` or `ACCESS_FINE_LOCATION` permissions.
+  - Implemented manual entry fallback mode for environments without a contacts provider or where users prefer direct data entry.
+  - In both picker and manual modes, presents a "This is exactly what will be sent" review card featuring contact name, up to 2 phone numbers, and 1 email, each paired with a `CdCheckbox` allowing granular exclusion of individual fields before transmission.
+  - Contact photos are strictly never queried, processed, or transmitted.
+- **Sensitive Memory Sanitization (Rule 25)**:
+  - Implemented `clearSensitiveData()` wiping Wi-Fi password and contact details (name, phone numbers, email) and resetting password masking.
+  - Invoked automatically whenever the user navigates away from the screen via `DisposableEffect` and immediately upon dispatching acoustic transmission in `startTransmission()`, preventing plaintext credentials from lingering in memory.
+- **Pure Tokenized Design System Compliance**:
+  - Built `CdCheckbox` wrapping Material 3 Checkbox with ChirpTheme tokenized colors and opacities.
+  - 100% compliant with `:app:checkNoHardcodedStyle` and `:app:verifyPermissions`.
+

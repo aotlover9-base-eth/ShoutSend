@@ -78,4 +78,35 @@
     <string name="transmit_btn_cancel">Cancel Transmission</string>
     <string name="transmit_btn_done">Done</string>
     <string name="transmit_btn_back">Back</string>
+
+    <!-- Wi-Fi & Contact Form Strings (Step 38) -->
+    <string name="send_label_wifi_ssid">Network Name (SSID)</string>
+    <string name="send_placeholder_wifi_ssid">e.g. Office_Guest</string>
+    <string name="send_label_wifi_security">Security</string>
+    <string name="send_label_wifi_password">Wi-Fi Password</string>
+    <string name="send_placeholder_wifi_password">Enter network password</string>
+    <string name="send_label_wifi_hidden">Hidden Network</string>
+    <string name="send_wifi_warning_title">Acoustic Exposure Notice</string>
+    <string name="send_wifi_warning_body">Anyone near you with a recorder could capture this password.</string>
+    <string name="send_wifi_warning_action">Use Secure mode</string>
+    <string name="send_contact_btn_pick">Pick from Contacts</string>
+    <string name="send_contact_btn_manual">Enter Manually</string>
+    <string name="send_contact_btn_repick">Pick Different Contact</string>
+    <string name="send_contact_review_title">This is exactly what will be sent</string>
+    <string name="send_contact_label_name">Contact Name</string>
+    <string name="send_contact_placeholder_name">Full Name</string>
+    <string name="send_contact_label_phone1">Primary Phone</string>
+    <string name="send_contact_label_phone2">Secondary Phone</string>
+    <string name="send_contact_label_email">Email Address</string>
+    <string name="send_contact_no_photo_notice">Contact photo is never transmitted.</string>
+    <string name="send_secure_note_step46">Secure mode enabled. Passphrase entry arrives in Step 46.</string>
+    <string name="send_wifi_show_password">Show password</string>
+    <string name="send_wifi_hide_password">Hide password</string>
+    <string name="send_wifi_paste_password">Paste password</string>
+    <string name="send_wifi_sec_wpa2">WPA2</string>
+    <string name="send_wifi_sec_wpa3">WPA3</string>
+    <string name="send_wifi_sec_open">Open</string>
+    <string name="send_contact_switch_to_manual">Switch to manual entry</string>
+    <string name="send_contact_switch_to_picker">Switch to contact picker</string>
+    <string name="send_contact_clear">Clear</string>
 </resources>

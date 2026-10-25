@@ -12,6 +12,7 @@ import app.shoutsend.core.designsystem.DesignTokens
 import app.shoutsend.core.session.TransmitSession
 import app.shoutsend.core.session.TransmitState
 import app.shoutsend.modem.payload.Payload
+import app.shoutsend.modem.payload.WifiSecurity
 import app.shoutsend.modem.profile.ModemProfile
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -81,6 +82,53 @@ fun SendScreenOverLimitPreview() {
     val viewModel = SendViewModel(settingsRepo, session)
     val hugeText = "A".repeat(350)
     viewModel.onTextChanged(hugeText, debounceMs = 0L)
+
+    ChirpTheme(tokens = DesignTokens.defaultDark()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(ChirpTheme.colors.background)
+        ) {
+            SendScreen(viewModel = viewModel, onNavigateToTransmit = {})
+        }
+    }
+}
+
+@Preview(name = "Send Screen - Wi-Fi Composer (Dark)", showBackground = true)
+@Composable
+fun SendScreenWifiPreview() {
+    val settingsRepo = FakeSettingsRepository()
+    val session = PreviewTransmitSession()
+    val viewModel = SendViewModel(settingsRepo, session)
+    viewModel.selectPayloadType(SendPayloadType.WIFI)
+    viewModel.onWifiSsidChanged("Office_Guest", debounceMs = 0L)
+    viewModel.onWifiPasswordChanged("SuperSecretPass123", debounceMs = 0L)
+
+    ChirpTheme(tokens = DesignTokens.defaultDark()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(ChirpTheme.colors.background)
+        ) {
+            SendScreen(viewModel = viewModel, onNavigateToTransmit = {})
+        }
+    }
+}
+
+@Preview(name = "Send Screen - Contact Composer (Dark)", showBackground = true)
+@Composable
+fun SendScreenContactPreview() {
+    val settingsRepo = FakeSettingsRepository()
+    val session = PreviewTransmitSession()
+    val viewModel = SendViewModel(settingsRepo, session)
+    viewModel.selectPayloadType(SendPayloadType.CONTACT)
+    viewModel.applyPickedContact(
+        PickedContactData(
+            displayName = "Faraday Researcher",
+            phones = listOf("+1-555-0199", "555-0144"),
+            email = "faraday@shoutsend.app"
+        )
+    )
 
     ChirpTheme(tokens = DesignTokens.defaultDark()) {
         Box(
