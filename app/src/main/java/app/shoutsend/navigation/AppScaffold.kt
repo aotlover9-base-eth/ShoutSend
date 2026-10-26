@@ -1,6 +1,16 @@
 package app.shoutsend.navigation
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -171,7 +181,21 @@ fun AppScaffold(
     }
 
     val bottomBar: @Composable () -> Unit = {
-        if (!isWideScreen && isTopLevelRoute) {
+        AnimatedVisibility(
+            visible = !isWideScreen && isTopLevelRoute,
+            enter = if (ChirpTheme.isReducedMotion) EnterTransition.None else slideInVertically(
+                animationSpec = tween(
+                    durationMillis = ChirpTheme.motion.durationMedium1,
+                    easing = ChirpTheme.motion.easingStandardDecelerate
+                )
+            ) { it } + fadeIn(tween(ChirpTheme.motion.durationShort2)),
+            exit = if (ChirpTheme.isReducedMotion) ExitTransition.None else slideOutVertically(
+                animationSpec = tween(
+                    durationMillis = ChirpTheme.motion.durationShort2,
+                    easing = ChirpTheme.motion.easingStandardAccelerate
+                )
+            ) { it } + fadeOut(tween(ChirpTheme.motion.durationShort2))
+        ) {
             CdNavigationBar {
                 TopLevelDestination.entries.forEach { destination ->
                     val selected = currentDestination?.route?.contains(
@@ -212,7 +236,21 @@ fun AppScaffold(
 
     if (isWideScreen) {
         Row(modifier = Modifier.fillMaxSize()) {
-            if (isTopLevelRoute) {
+            AnimatedVisibility(
+                visible = isTopLevelRoute,
+                enter = if (ChirpTheme.isReducedMotion) EnterTransition.None else slideInHorizontally(
+                    animationSpec = tween(
+                        durationMillis = ChirpTheme.motion.durationMedium1,
+                        easing = ChirpTheme.motion.easingStandardDecelerate
+                    )
+                ) { -it } + fadeIn(tween(ChirpTheme.motion.durationShort2)),
+                exit = if (ChirpTheme.isReducedMotion) ExitTransition.None else slideOutHorizontally(
+                    animationSpec = tween(
+                        durationMillis = ChirpTheme.motion.durationShort2,
+                        easing = ChirpTheme.motion.easingStandardAccelerate
+                    )
+                ) { -it } + fadeOut(tween(ChirpTheme.motion.durationShort2))
+            ) {
                 CdNavigationRail(
                     modifier = Modifier.fillMaxHeight(),
                     header = {
