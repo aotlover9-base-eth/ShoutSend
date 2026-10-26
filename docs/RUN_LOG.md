@@ -41,3 +41,4 @@
 | 37 | DONE | 2026-10-26 03:15 | SendScreen text & URL compose, live byte estimation, ACTION_SEND passed |
 | 38 | DONE | 2026-10-26 03:37 | SendScreen Wi-Fi & contact forms, ContactPickerReader, memory sanitization passed |
 | 39 | DONE | 2026-10-26 04:04 | TransmitScreen soundwave rings, envelope sync, vault archiving passed |
+| 40 | DONE | 2026-10-26 13:25 | ReceiveScreen spectrogram waterfall, lock glow, 11 tests passed |

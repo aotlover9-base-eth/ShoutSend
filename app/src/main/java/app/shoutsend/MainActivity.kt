@@ -50,6 +50,8 @@ class MainActivity : ComponentActivity() {
         val settingsRepository = app.appContainer.settingsRepository
         val permissionRepository = app.appContainer.permissionRepository
         val transmitSession = app.appContainer.transmitSession
+        val acousticReceiver = app.appContainer.acousticReceiver
+        val audioCoordinator = app.appContainer.audioCoordinator
         val vaultRepository = app.appContainer.vaultRepository
         val audioRouteMonitor = app.appContainer.audioRouteMonitor
         val devTools = app.appContainer.devTools
@@ -91,7 +93,13 @@ class MainActivity : ComponentActivity() {
                             context = this@MainActivity
                         )
                     }
-                    val receiveViewModel = remember { ReceiveViewModel() }
+                    val receiveViewModel = remember {
+                        ReceiveViewModel(
+                            acousticReceiver = acousticReceiver,
+                            audioCoordinator = audioCoordinator,
+                            settingsRepository = settingsRepository
+                        )
+                    }
                     val vaultViewModel = remember { VaultViewModel() }
                     val settingsViewModel = remember { SettingsViewModel(settingsRepository) }
                     val calibrationViewModel = remember { CalibrationViewModel() }

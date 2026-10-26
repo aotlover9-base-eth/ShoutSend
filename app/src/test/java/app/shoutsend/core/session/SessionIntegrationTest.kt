@@ -30,7 +30,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
@@ -239,16 +241,13 @@ class SessionIntegrationTest {
 
         // Emit demodulation events
         receiver.emitEvent(ReceiveEvent.PreambleDetected)
-        delay(5)
-        assertTrue(rxSession.state.value is ReceiveState.PreambleDetected)
+        withTimeout(500) { rxSession.state.first { it is ReceiveState.PreambleDetected } }
 
         receiver.emitEvent(ReceiveEvent.Locked(18.5))
-        delay(5)
-        assertEquals(ReceiveState.Locked(18.5), rxSession.state.value)
+        withTimeout(500) { rxSession.state.first { it == ReceiveState.Locked(18.5) } }
 
         receiver.emitEvent(ReceiveEvent.FrameDecoded(fragmentIndex = 0, fragmentCount = 1, correctedBytes = 0))
-        delay(5)
-        assertEquals(ReceiveState.Receiving(1, 1, 18.5), rxSession.state.value)
+        withTimeout(500) { rxSession.state.first { it == ReceiveState.Receiving(1, 1, 18.5) } }
 
         val payload = Payload.Text("Demodulated Text")
         val msg = ReceivedMessage(
@@ -258,9 +257,8 @@ class SessionIntegrationTest {
             payload = PayloadCodec.encode(payload)
         )
         receiver.emitEvent(ReceiveEvent.MessageComplete(message = msg, payload = payload))
-        delay(5)
+        val state = withTimeout(500) { rxSession.state.first { it is ReceiveState.Success } }
 
-        val state = rxSession.state.value
         assertTrue("State must be Success", state is ReceiveState.Success)
         assertEquals("Demodulated Text", ((state as ReceiveState.Success).payload as Payload.Text).value)
 

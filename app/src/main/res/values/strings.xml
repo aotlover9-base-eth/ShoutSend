@@ -125,4 +125,21 @@
     <string name="transmit_stop_confirm_body">Stopping will interrupt the active acoustic sound wave. The receiver will not get the payload.</string>
     <string name="transmit_stop_confirm_action">Stop Transmission</string>
     <string name="transmit_stop_keep_playing">Keep Playing</string>
+
+    <!-- Receive Screen Strings (Step 40) -->
+    <string name="receive_screen_title">Acoustic Receiver</string>
+    <string name="receive_hero_listening">Listening for acoustic chirps on %s band</string>
+    <string name="receive_hero_acquiring">Preamble detected, acquiring carrier sync…</string>
+    <string name="receive_hero_locked">Carrier locked · SNR %s dB</string>
+    <string name="receive_hero_receiving" formatted="false">Receiving frame %d of %d…</string>
+    <string name="receive_hero_success">Transmission received successfully</string>
+    <string name="receive_meter_carrier_signal">Carrier Signal Strength</string>
+    <string name="receive_meter_mic_input">Microphone Input Level</string>
+    <string name="receive_guidance_tip">Keep phones within 1–2 meters with direct line-of-sight.</string>
+    <string name="receive_clipping_alert">Input clipping: Move phones further apart or lower sender volume.</string>
+    <string name="receive_silence_alert">Microphone silence detected. Check microphone permissions or mute switch.</string>
+    <string name="receive_band_retro">Audible (Retro)</string>
+    <string name="receive_band_stealth">Ultrasonic (Stealth)</string>
+    <string name="receive_btn_start_listening">Start Listening</string>
+    <string name="receive_btn_stop_listening">Stop Listening</string>
 </resources>
