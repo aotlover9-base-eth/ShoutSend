@@ -1,5 +1,8 @@
 package app.shoutsend.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -9,6 +12,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -53,6 +57,8 @@ fun ShoutSendNavHost(
     onOpenSettings: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    val isReducedMotion = ChirpTheme.isReducedMotion
+
     // Capture motion tokens in composable scope for non-composable transition lambdas
     val durShort = ChirpTheme.motion.durationShort2
     val durMed = ChirpTheme.motion.durationMedium1
@@ -60,15 +66,147 @@ fun ShoutSendNavHost(
     val easeDecel = ChirpTheme.motion.easingStandardDecelerate
     val easeAccel = ChirpTheme.motion.easingStandardAccelerate
 
+    // Top-level tab transition lambdas with reduced-motion support
+    val tabEnterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
+        if (isReducedMotion) {
+            EnterTransition.None
+        } else {
+            fadeIn(tween(durMed, easing = easeDecel)) +
+                slideInVertically(tween(durMed, easing = easeDecel)) { it / 20 }
+        }
+    }
+
+    val tabExitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
+        if (isReducedMotion) {
+            ExitTransition.None
+        } else {
+            fadeOut(tween(durShort, easing = easeAccel)) +
+                slideOutVertically(tween(durShort, easing = easeAccel)) { -it / 20 }
+        }
+    }
+
+    val tabPopEnterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
+        if (isReducedMotion) {
+            EnterTransition.None
+        } else {
+            fadeIn(tween(durMed, easing = easeDecel)) +
+                slideInVertically(tween(durMed, easing = easeDecel)) { it / 20 }
+        }
+    }
+
+    val tabPopExitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
+        if (isReducedMotion) {
+            ExitTransition.None
+        } else {
+            fadeOut(tween(durShort, easing = easeAccel)) +
+                slideOutVertically(tween(durShort, easing = easeAccel)) { it / 20 }
+        }
+    }
+
+    // Modal/Active transmission transition lambdas
+    val transmitEnterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
+        if (isReducedMotion) {
+            EnterTransition.None
+        } else {
+            slideInVertically(tween(durMed, easing = easeDecel)) { it } +
+                fadeIn(tween(durShort, easing = easeDecel))
+        }
+    }
+
+    val transmitExitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
+        if (isReducedMotion) {
+            ExitTransition.None
+        } else {
+            slideOutVertically(tween(durMed, easing = easeAccel)) { it } +
+                fadeOut(tween(durShort, easing = easeAccel))
+        }
+    }
+
+    val transmitPopEnterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
+        if (isReducedMotion) {
+            EnterTransition.None
+        } else {
+            fadeIn(tween(durShort, easing = easeDecel))
+        }
+    }
+
+    val transmitPopExitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
+        if (isReducedMotion) {
+            ExitTransition.None
+        } else {
+            slideOutVertically(tween(durMed, easing = easeAccel)) { it } +
+                fadeOut(tween(durShort, easing = easeAccel))
+        }
+    }
+
+    // Deep destination slide-horizontal transition lambdas (Predictive Back compatible)
+    val deepEnterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
+        if (isReducedMotion) {
+            EnterTransition.None
+        } else {
+            slideInHorizontally(tween(durLong, easing = easeDecel)) { it } +
+                fadeIn(tween(durShort, easing = easeDecel))
+        }
+    }
+
+    val deepExitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
+        if (isReducedMotion) {
+            ExitTransition.None
+        } else {
+            slideOutHorizontally(tween(durLong, easing = easeAccel)) { -it / 3 } +
+                fadeOut(tween(durShort, easing = easeAccel))
+        }
+    }
+
+    val deepPopEnterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
+        if (isReducedMotion) {
+            EnterTransition.None
+        } else {
+            slideInHorizontally(tween(durLong, easing = easeDecel)) { -it / 3 } +
+                fadeIn(tween(durShort, easing = easeDecel))
+        }
+    }
+
+    val deepPopExitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
+        if (isReducedMotion) {
+            ExitTransition.None
+        } else {
+            slideOutHorizontally(tween(durLong, easing = easeAccel)) { it } +
+                fadeOut(tween(durShort, easing = easeAccel))
+        }
+    }
+
+    val onboardingEnterTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition = {
+        if (isReducedMotion) {
+            EnterTransition.None
+        } else {
+            fadeIn(tween(durLong, easing = easeDecel))
+        }
+    }
+
+    val onboardingExitTransition: AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition = {
+        if (isReducedMotion) {
+            ExitTransition.None
+        } else {
+            fadeOut(tween(durMed, easing = easeAccel))
+        }
+    }
+
     NavHost(
         navController = navController,
         startDestination = startDestination,
-        modifier = modifier
+        modifier = modifier,
+        enterTransition = tabEnterTransition,
+        exitTransition = tabExitTransition,
+        popEnterTransition = tabPopEnterTransition,
+        popExitTransition = tabPopExitTransition
     ) {
         // --- Onboarding Destination ---
         composable<OnboardingRoute>(
-            enterTransition = { fadeIn(tween(durLong, easing = easeDecel)) },
-            exitTransition = { fadeOut(tween(durMed, easing = easeAccel)) }
+            enterTransition = onboardingEnterTransition,
+            exitTransition = onboardingExitTransition,
+            popEnterTransition = onboardingEnterTransition,
+            popExitTransition = onboardingExitTransition
         ) {
             OnboardingScreen(
                 viewModel = onboardingViewModel,
@@ -83,14 +221,10 @@ fun ShoutSendNavHost(
 
         // --- Top-Level Tab: Send ---
         composable<SendRoute>(
-            enterTransition = {
-                fadeIn(tween(durMed, easing = easeDecel)) +
-                    slideInVertically(tween(durMed, easing = easeDecel)) { it / 20 }
-            },
-            exitTransition = {
-                fadeOut(tween(durShort, easing = easeAccel)) +
-                    slideOutVertically(tween(durShort, easing = easeAccel)) { -it / 20 }
-            }
+            enterTransition = tabEnterTransition,
+            exitTransition = tabExitTransition,
+            popEnterTransition = tabPopEnterTransition,
+            popExitTransition = tabPopExitTransition
         ) { backStackEntry ->
             val route = backStackEntry.toRoute<SendRoute>()
             androidx.compose.runtime.LaunchedEffect(route.sharedText, route.sharedType) {
@@ -108,14 +242,10 @@ fun ShoutSendNavHost(
 
         // --- Active Transmission Destination ---
         composable<TransmitRoute>(
-            enterTransition = {
-                slideInVertically(tween(durMed, easing = easeDecel)) { it } +
-                    fadeIn(tween(durShort))
-            },
-            exitTransition = {
-                slideOutVertically(tween(durMed, easing = easeAccel)) { it } +
-                    fadeOut(tween(durShort))
-            }
+            enterTransition = transmitEnterTransition,
+            exitTransition = transmitExitTransition,
+            popEnterTransition = transmitPopEnterTransition,
+            popExitTransition = transmitPopExitTransition
         ) {
             TransmitScreen(
                 viewModel = transmitViewModel,
@@ -125,14 +255,10 @@ fun ShoutSendNavHost(
 
         // --- Top-Level Tab: Receive ---
         composable<ReceiveRoute>(
-            enterTransition = {
-                fadeIn(tween(durMed, easing = easeDecel)) +
-                    slideInVertically(tween(durMed, easing = easeDecel)) { it / 20 }
-            },
-            exitTransition = {
-                fadeOut(tween(durShort, easing = easeAccel)) +
-                    slideOutVertically(tween(durShort, easing = easeAccel)) { -it / 20 }
-            }
+            enterTransition = tabEnterTransition,
+            exitTransition = tabExitTransition,
+            popEnterTransition = tabPopEnterTransition,
+            popExitTransition = tabPopExitTransition
         ) {
             ReceiveScreen(
                 viewModel = receiveViewModel,
@@ -144,14 +270,10 @@ fun ShoutSendNavHost(
 
         // --- Top-Level Tab: Vault ---
         composable<VaultRoute>(
-            enterTransition = {
-                fadeIn(tween(durMed, easing = easeDecel)) +
-                    slideInVertically(tween(durMed, easing = easeDecel)) { it / 20 }
-            },
-            exitTransition = {
-                fadeOut(tween(durShort, easing = easeAccel)) +
-                    slideOutVertically(tween(durShort, easing = easeAccel)) { -it / 20 }
-            }
+            enterTransition = tabEnterTransition,
+            exitTransition = tabExitTransition,
+            popEnterTransition = tabPopEnterTransition,
+            popExitTransition = tabPopExitTransition
         ) {
             VaultScreen(
                 viewModel = vaultViewModel,
@@ -166,22 +288,10 @@ fun ShoutSendNavHost(
 
         // --- Deeper Screen: Vault Detail ---
         composable<VaultDetailRoute>(
-            enterTransition = {
-                slideInHorizontally(tween(durLong, easing = easeDecel)) { it } +
-                    fadeIn(tween(durShort))
-            },
-            exitTransition = {
-                slideOutHorizontally(tween(durLong, easing = easeAccel)) { -it / 3 } +
-                    fadeOut(tween(durShort))
-            },
-            popEnterTransition = {
-                slideInHorizontally(tween(durLong, easing = easeDecel)) { -it / 3 } +
-                    fadeIn(tween(durShort))
-            },
-            popExitTransition = {
-                slideOutHorizontally(tween(durLong, easing = easeAccel)) { it } +
-                    fadeOut(tween(durShort))
-            }
+            enterTransition = deepEnterTransition,
+            exitTransition = deepExitTransition,
+            popEnterTransition = deepPopEnterTransition,
+            popExitTransition = deepPopExitTransition
         ) { backStackEntry ->
             val route = backStackEntry.toRoute<VaultDetailRoute>()
             VaultDetailScreen(
@@ -199,22 +309,10 @@ fun ShoutSendNavHost(
 
         // --- Deeper Screen: Settings ---
         composable<SettingsRoute>(
-            enterTransition = {
-                slideInHorizontally(tween(durLong, easing = easeDecel)) { it } +
-                    fadeIn(tween(durShort))
-            },
-            exitTransition = {
-                slideOutHorizontally(tween(durLong, easing = easeAccel)) { -it / 3 } +
-                    fadeOut(tween(durShort))
-            },
-            popEnterTransition = {
-                slideInHorizontally(tween(durLong, easing = easeDecel)) { -it / 3 } +
-                    fadeIn(tween(durShort))
-            },
-            popExitTransition = {
-                slideOutHorizontally(tween(durLong, easing = easeAccel)) { it } +
-                    fadeOut(tween(durShort))
-            }
+            enterTransition = deepEnterTransition,
+            exitTransition = deepExitTransition,
+            popEnterTransition = deepPopEnterTransition,
+            popExitTransition = deepPopExitTransition
         ) {
             SettingsScreen(
                 viewModel = settingsViewModel,
@@ -226,22 +324,10 @@ fun ShoutSendNavHost(
 
         // --- Deeper Screen: Calibration ---
         composable<CalibrationRoute>(
-            enterTransition = {
-                slideInHorizontally(tween(durLong, easing = easeDecel)) { it } +
-                    fadeIn(tween(durShort))
-            },
-            exitTransition = {
-                slideOutHorizontally(tween(durLong, easing = easeAccel)) { -it / 3 } +
-                    fadeOut(tween(durShort))
-            },
-            popEnterTransition = {
-                slideInHorizontally(tween(durLong, easing = easeDecel)) { -it / 3 } +
-                    fadeIn(tween(durShort))
-            },
-            popExitTransition = {
-                slideOutHorizontally(tween(durLong, easing = easeAccel)) { it } +
-                    fadeOut(tween(durShort))
-            }
+            enterTransition = deepEnterTransition,
+            exitTransition = deepExitTransition,
+            popEnterTransition = deepPopEnterTransition,
+            popExitTransition = deepPopExitTransition
         ) {
             CalibrationScreen(
                 viewModel = calibrationViewModel,
@@ -254,26 +340,23 @@ fun ShoutSendNavHost(
 
         // --- Deeper Screen: Link Test ---
         composable<LinkTestRoute>(
-            enterTransition = {
-                slideInHorizontally(tween(durLong, easing = easeDecel)) { it } +
-                    fadeIn(tween(durShort))
-            },
-            exitTransition = {
-                slideOutHorizontally(tween(durLong, easing = easeAccel)) { -it / 3 } +
-                    fadeOut(tween(durShort))
-            },
-            popEnterTransition = {
-                slideInHorizontally(tween(durLong, easing = easeDecel)) { -it / 3 } +
-                    fadeIn(tween(durShort))
-            },
-            popExitTransition = {
-                slideOutHorizontally(tween(durLong, easing = easeAccel)) { it } +
-                    fadeOut(tween(durShort))
-            }
+            enterTransition = deepEnterTransition,
+            exitTransition = deepExitTransition,
+            popEnterTransition = deepPopEnterTransition,
+            popExitTransition = deepPopExitTransition
         ) {
             LinkTestScreen(
                 onNavigateBack = { navController.popBackStack() }
             )
         }
     }
+}
+
+/**
+ * Encapsulates motion policies and reduced-motion bypass logic for route navigation.
+ */
+object NavMotionPolicy {
+    fun shouldBypassAnimations(isReducedMotion: Boolean): Boolean = isReducedMotion
+    fun resolveTransitionDuration(isReducedMotion: Boolean, durationMs: Int): Int =
+        if (isReducedMotion) 0 else durationMs
 }

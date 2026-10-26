@@ -7,6 +7,8 @@ import app.shoutsend.core.data.settings.SettingsRepository
 import app.shoutsend.core.data.vault.model.Direction
 import app.shoutsend.core.data.vault.repository.VaultRepository
 import app.shoutsend.core.designsystem.components.AcousticStatus
+import app.shoutsend.core.feedback.AudioFeedbackPlayer
+import app.shoutsend.core.feedback.TactileFeedbackController
 import app.shoutsend.core.session.AudioCoordinator
 import app.shoutsend.modem.demod.ReceiveEvent
 import app.shoutsend.modem.payload.Payload
@@ -58,7 +60,9 @@ class ReceiveViewModel(
     private val acousticReceiver: AcousticReceiver,
     private val audioCoordinator: AudioCoordinator,
     private val settingsRepository: SettingsRepository,
-    private val vaultRepository: VaultRepository
+    private val vaultRepository: VaultRepository,
+    private val audioFeedbackPlayer: AudioFeedbackPlayer? = null,
+    private val tactileFeedback: TactileFeedbackController? = null
 ) : ViewModel() {
 
     val waterfallBuffer: WaterfallBuffer = WaterfallBuffer()
@@ -71,6 +75,7 @@ class ReceiveViewModel(
 
     private var activeProfile: ModemProfile? = null
     private var receptionStartTimeMs: Long = 0L
+    private var hasLockedPreamble = false
 
     private var spectrumJob: Job? = null
     private var diagnosticsJob: Job? = null
@@ -159,6 +164,7 @@ class ReceiveViewModel(
     private fun handleReceiveEvent(event: ReceiveEvent) {
         when (event) {
             is ReceiveEvent.Listening -> {
+                hasLockedPreamble = false
                 if (_uiState.value.status != AcousticStatus.SUCCESS) {
                     _uiState.update {
                         it.copy(
@@ -171,6 +177,11 @@ class ReceiveViewModel(
                 }
             }
             is ReceiveEvent.PreambleDetected -> {
+                if (!hasLockedPreamble) {
+                    hasLockedPreamble = true
+                    audioFeedbackPlayer?.playReceiveLocked()
+                    tactileFeedback?.click()
+                }
                 receptionStartTimeMs = System.currentTimeMillis()
                 _uiState.update {
                     it.copy(
@@ -184,6 +195,11 @@ class ReceiveViewModel(
                 }
             }
             is ReceiveEvent.Locked -> {
+                if (!hasLockedPreamble) {
+                    hasLockedPreamble = true
+                    audioFeedbackPlayer?.playReceiveLocked()
+                    tactileFeedback?.click()
+                }
                 _uiState.update {
                     it.copy(
                         status = AcousticStatus.LOCKED,
@@ -237,6 +253,9 @@ class ReceiveViewModel(
                 }
             }
             is ReceiveEvent.MessageComplete -> {
+                hasLockedPreamble = false
+                audioFeedbackPlayer?.playSuccess()
+                tactileFeedback?.success()
                 val durationMs = (System.currentTimeMillis() - receptionStartTimeMs).coerceAtLeast(100L)
                 val payload = event.payload
 
@@ -282,6 +301,11 @@ class ReceiveViewModel(
             }
             is ReceiveEvent.Lost -> {
                 val hadLock = _uiState.value.isPreambleLocked || _uiState.value.currentFragment > 0
+                if (hadLock) {
+                    audioFeedbackPlayer?.playError()
+                    tactileFeedback?.error()
+                }
+                hasLockedPreamble = false
                 _uiState.update {
                     it.copy(
                         status = if (hadLock) AcousticStatus.ERROR else AcousticStatus.LISTENING,
@@ -293,6 +317,7 @@ class ReceiveViewModel(
                 }
             }
             is ReceiveEvent.Cooldown -> {
+                hasLockedPreamble = false
                 if (_uiState.value.status != AcousticStatus.SUCCESS) {
                     _uiState.update {
                         it.copy(
@@ -305,6 +330,8 @@ class ReceiveViewModel(
                 }
             }
             is ReceiveEvent.FrameFailed -> {
+                audioFeedbackPlayer?.playError()
+                tactileFeedback?.error()
                 val hadLock = _uiState.value.isPreambleLocked || _uiState.value.currentFragment > 0
                 if (hadLock) {
                     _uiState.update {
@@ -337,6 +364,7 @@ class ReceiveViewModel(
      * Resets received state and prepares receiver to listen for a new transmission.
      */
     fun resetReception() {
+        hasLockedPreamble = false
         _uiState.update {
             it.copy(
                 status = if (it.isListening) AcousticStatus.LISTENING else AcousticStatus.IDLE,
@@ -373,6 +401,7 @@ class ReceiveViewModel(
      * Halts acoustic listening and releases the audio coordinator lock.
      */
     fun stopListening() {
+        hasLockedPreamble = false
         spectrumJob?.cancel()
         diagnosticsJob?.cancel()
         eventsJob?.cancel()

@@ -163,6 +163,9 @@ app/src/user/java/app/shoutsend/core/devtools/  # No-op dev tools implementation
 
 - Step 45 completed: Acoustic calibration and link test screen implemented and verified. Implemented `CalibrationViewModel` managing loopback calibration lifecycle (noise baseline sampling, chirp playback, spectral response evaluation, result persistence). Built `CalibrationScreen` with cyber radio meters (`SignalMeter`, `LevelMeter`, `StatusPill`, `RadioReadout`), volume/headphone warning badges, band quality verdict cards, and one-tap "Apply Recommendations" updating user settings. Updated `LinkTestScreen` to match design tokens. Injected `CalibrationRunner` in `AppContainer` and `MainActivity`. Added dev previews in `CalibrationScreenPreview.kt` and 5 unit tests in `CalibrationViewModelTest.kt`. Full verification suite passing (`check`, `assembleDevDebug`, `assembleUserDebug`, `lintDevDebug`, `lintUserDebug`).
 
+- Step 46 completed: Secure mode UI implemented and verified. Implemented passphrase dialog and strength evaluation (`PassphraseEvaluator`) in `SendViewModel` with volatile memory zeroing upon completion or screen exit (`clearSensitiveData()`). Updated `ByteMeter` budget with `SecureBox` overhead (28 bytes). Built `SendScreen` passphrase modal with show/hide password toggle, strength rating text, and sealed cyber lock badge (`🔒 AES-GCM 256-BIT SEALED`). Wired `TransmitScreen` sealed status indicator throughout active transmission and vault persistence. Created 16 unit tests in `SendViewModelSecureModeTest.kt` and updated `TransmitViewModelTest.kt`. Full verification suite passing (`check`, `assembleDevDebug`, `assembleUserDebug`, `lintDevDebug`, `lintUserDebug`).
+
+
 
 
 

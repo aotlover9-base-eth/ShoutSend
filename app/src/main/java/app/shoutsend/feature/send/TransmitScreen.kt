@@ -243,6 +243,12 @@ fun TransmitScreen(
                                     style = ChirpTheme.typography.titleLarge,
                                     color = ChirpTheme.colors.onSurface
                                 )
+                                if (uiState.isSecure) {
+                                    StatusPill(
+                                        status = AcousticStatus.LOCKED,
+                                        customLabel = stringResource(R.string.transmit_sealed_badge)
+                                    )
+                                }
                                 if (uiState.isSavedToVault) {
                                     Text(
                                         text = stringResource(R.string.transmit_status_saved_to_vault),
@@ -315,6 +321,13 @@ fun TransmitScreen(
                                     status = AcousticStatus.LOCKED,
                                     customLabel = "${uiState.band.name} · ${uiState.speed.name}"
                                 )
+
+                                if (uiState.isSecure) {
+                                    StatusPill(
+                                        status = AcousticStatus.LOCKED,
+                                        customLabel = stringResource(R.string.transmit_sealed_badge)
+                                    )
+                                }
                             }
                         }
                     }

@@ -294,4 +294,28 @@ class TransmitViewModelTest {
 
         assertEquals("Bluetooth connected: sound may not emit from speaker", viewModel.uiState.value.routeWarning)
     }
+
+    @Test
+    fun secureTransmissionUpdatesIsSecureFlagInUiState() = runTest {
+        val session = TestTransmitSession()
+        val settingsRepo = FakeSettingsRepository()
+        val vaultRepo = TestVaultRepository()
+        val routeMonitor = TestAudioRouteMonitor()
+
+        val viewModel = TransmitViewModel(session, settingsRepo, vaultRepo, routeMonitor)
+        advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isSecure)
+
+        session._activePassphrase.value = "ActiveEncryptedPassphrase123"
+        session._state.value = TransmitState.Transmitting(0.5f, 1.0, 1.0, 1, 2)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.isSecure)
+
+        session._state.value = TransmitState.Completed(durationMs = 3000L)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.uiState.value.isSecure)
+    }
 }

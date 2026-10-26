@@ -48,7 +48,7 @@
 | 43 | E UI | Transmission Vault screen | Yes | **Done** |
 | 44 | E UI | Settings screen | Yes | **Done** |
 | 45 | E UI | Calibration and link test screen | Yes | **Done** |
-| 46 | E UI | Secure mode UI | Yes | Todo |
+| 46 | E UI | Secure mode UI | Yes | **Done** |
 | 47 | E UI | Haptics and audio feedback | Light | Todo |
 | 48 | E UI | Motion, transitions, predictive back | Yes | Todo |
 | 49 | E UI | Accessibility pass | Light | Todo |

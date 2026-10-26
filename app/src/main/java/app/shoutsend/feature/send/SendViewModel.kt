@@ -5,6 +5,9 @@ import androidx.lifecycle.viewModelScope
 import app.shoutsend.core.data.settings.SettingsRepository
 import app.shoutsend.core.session.TransmitSession
 import app.shoutsend.core.session.TransmitState
+import app.shoutsend.modem.crypto.PassphraseEvaluator
+import app.shoutsend.modem.crypto.PassphraseStrengthClass
+import app.shoutsend.modem.crypto.SecureBox
 import app.shoutsend.modem.packet.AirTime
 import app.shoutsend.modem.payload.Payload
 import app.shoutsend.modem.payload.PayloadCompactor
@@ -51,6 +54,12 @@ data class SendUiState(
     val selectedSpeed: Speed = Speed.NORMAL,
     val repeats: Int = 1,
     val isSecureEnabled: Boolean = false,
+    val showPassphraseDialog: Boolean = false,
+    val passphraseInput: String = "",
+    val isPassphraseVisible: Boolean = false,
+    val passphraseError: String? = null,
+    val passphraseStrength: PassphraseStrengthClass? = null,
+    val passphraseStrengthMessage: String? = null,
     val stealthWarningAccepted: Boolean = false,
     val showStealthWarningDialog: Boolean = false,
     val showSettingsBottomSheet: Boolean = false,
@@ -78,6 +87,7 @@ class SendViewModel(
     val uiState: StateFlow<SendUiState> = _uiState.asStateFlow()
 
     private var calculationJob: Job? = null
+    private var activePassphrase: CharArray? = null
 
     init {
         // Load initial settings and observe changes
@@ -262,15 +272,151 @@ class SendViewModel(
     }
 
     /**
-     * Enables Secure Mode with notification banner (Step 38 privacy cue).
+     * Enables Secure Mode with optional passphrase or prompts the passphrase dialog.
      */
-    fun enableSecureMode() {
-        _uiState.update { current ->
-            current.copy(
-                isSecureEnabled = true,
-                snackbarMessage = "Secure mode enabled. Passphrase entry arrives in Step 46."
+    fun enableSecureMode(passphrase: String? = null) {
+        if (passphrase != null && passphrase.length >= PassphraseEvaluator.MIN_LENGTH) {
+            setPassphrase(passphrase)
+        } else {
+            _uiState.update { current ->
+                current.copy(
+                    isSecureEnabled = true,
+                    showPassphraseDialog = true,
+                    snackbarMessage = "Secure mode enabled. Enter passphrase."
+                )
+            }
+        }
+    }
+
+    /**
+     * User toggled the Secure Mode switch in the UI.
+     */
+    fun onSecureModeToggled(enabled: Boolean) {
+        if (enabled) {
+            _uiState.update { it.copy(showPassphraseDialog = true, passphraseError = null) }
+        } else {
+            disableSecureMode()
+        }
+    }
+
+    /**
+     * Opens the passphrase configuration dialog.
+     */
+    fun openPassphraseDialog() {
+        _uiState.update { it.copy(showPassphraseDialog = true, passphraseError = null) }
+    }
+
+    /**
+     * Dismisses the passphrase dialog. If no valid passphrase was configured previously,
+     * resets secure mode toggle back to false.
+     */
+    fun dismissPassphraseDialog() {
+        val isAlreadyConfigured = activePassphrase != null
+        _uiState.update {
+            it.copy(
+                showPassphraseDialog = false,
+                isSecureEnabled = isAlreadyConfigured,
+                passphraseInput = "",
+                passphraseError = null,
+                passphraseStrength = null,
+                passphraseStrengthMessage = null
             )
         }
+    }
+
+    /**
+     * Live passphrase input changed. Evaluates passphrase strength.
+     */
+    fun onPassphraseInputChanged(newPassphrase: String) {
+        if (newPassphrase.isEmpty()) {
+            _uiState.update {
+                it.copy(
+                    passphraseInput = newPassphrase,
+                    passphraseError = null,
+                    passphraseStrength = null,
+                    passphraseStrengthMessage = null
+                )
+            }
+            return
+        }
+
+        val eval = PassphraseEvaluator.evaluate(newPassphrase.toCharArray())
+        val error = if (!eval.isValid) eval.message else null
+        _uiState.update {
+            it.copy(
+                passphraseInput = newPassphrase,
+                passphraseError = error,
+                passphraseStrength = eval.strength,
+                passphraseStrengthMessage = eval.message
+            )
+        }
+    }
+
+    /**
+     * Toggles passphrase character masking.
+     */
+    fun togglePassphraseVisibility() {
+        _uiState.update { it.copy(isPassphraseVisible = !it.isPassphraseVisible) }
+    }
+
+    /**
+     * Confirms the entered passphrase in the dialog.
+     */
+    fun confirmPassphrase() {
+        val input = _uiState.value.passphraseInput
+        if (input.length < PassphraseEvaluator.MIN_LENGTH) {
+            _uiState.update {
+                it.copy(
+                    passphraseError = "Passphrase must be at least ${PassphraseEvaluator.MIN_LENGTH} characters"
+                )
+            }
+            return
+        }
+        setPassphrase(input)
+    }
+
+    /**
+     * Sets the active encryption passphrase and activates Secure Mode.
+     * Ephemeral string input is immediately converted to CharArray, wiped from UI state,
+     * and never logged or persisted.
+     */
+    fun setPassphrase(passphrase: String) {
+        require(passphrase.length >= PassphraseEvaluator.MIN_LENGTH) {
+            "Passphrase must be at least ${PassphraseEvaluator.MIN_LENGTH} characters"
+        }
+        activePassphrase?.fill('\u0000')
+        activePassphrase = passphrase.toCharArray()
+        _uiState.update {
+            it.copy(
+                isSecureEnabled = true,
+                showPassphraseDialog = false,
+                passphraseInput = "",
+                passphraseError = null,
+                passphraseStrength = null,
+                passphraseStrengthMessage = null,
+                snackbarMessage = "Secure mode enabled with AES-GCM 256-bit encryption."
+            )
+        }
+        recalculate(state = _uiState.value)
+    }
+
+    /**
+     * Disables Secure Mode and zeroes active passphrase in volatile memory.
+     */
+    fun disableSecureMode() {
+        activePassphrase?.fill('\u0000')
+        activePassphrase = null
+        _uiState.update {
+            it.copy(
+                isSecureEnabled = false,
+                showPassphraseDialog = false,
+                passphraseInput = "",
+                passphraseError = null,
+                passphraseStrength = null,
+                passphraseStrengthMessage = null
+            )
+        }
+        recalculate(state = _uiState.value)
     }
 
     /**
@@ -329,12 +475,20 @@ class SendViewModel(
     }
 
     /**
-     * Wipes credentials and contact data from memory (Rule 25).
+     * Wipes credentials, passphrases, and contact data from memory (Rule 25).
      * Invoked on screen departure or upon successful transmission.
      */
     fun clearSensitiveData() {
+        activePassphrase?.fill('\u0000')
+        activePassphrase = null
         _uiState.update { current ->
             current.copy(
+                isSecureEnabled = false,
+                showPassphraseDialog = false,
+                passphraseInput = "",
+                passphraseError = null,
+                passphraseStrength = null,
+                passphraseStrengthMessage = null,
                 wifiPassword = "",
                 wifiPasswordVisible = false,
                 contactName = "",
@@ -345,6 +499,11 @@ class SendViewModel(
         }
         recalculate(state = _uiState.value)
     }
+
+    /**
+     * Test-only accessor to verify volatile memory sanitization and zero-fill.
+     */
+    internal fun getActivePassphraseForTesting(): CharArray? = activePassphrase
 
     /**
      * Band selection requested by user.
@@ -498,6 +657,7 @@ class SendViewModel(
             repeats = state.repeats
         )
 
+        val passString = if (state.isSecureEnabled) activePassphrase?.let { String(it) } else null
         onNavigateToTransmit()
 
         viewModelScope.launch {
@@ -505,7 +665,7 @@ class SendViewModel(
                 transmitSession.send(
                     payload = payload,
                     profile = profile,
-                    securePassphrase = null // Step 46 wires Secure Mode passphrase
+                    securePassphrase = passString
                 )
             } finally {
                 clearSensitiveData()
@@ -542,6 +702,7 @@ class SendViewModel(
             speed = state.selectedSpeed,
             repeats = state.repeats
         )
+        val cryptoOverhead = if (state.isSecureEnabled) SecureBox.OVERHEAD_BYTES else 0
 
         when (state.selectedType) {
             SendPayloadType.TEXT -> {
@@ -564,7 +725,7 @@ class SendViewModel(
                 val validation = payload.validate()
 
                 if (isByteLimitExceeded || validation is PayloadValidationResult.Invalid) {
-                    val onAirBytes = rawBytes
+                    val onAirBytes = rawBytes + cryptoOverhead
                     val isTooLong = isByteLimitExceeded || onAirBytes > ProtocolConstants.MAX_AIR_PAYLOAD_BYTES
                     val duration = AirTime.estimate(
                         profile = profile,
@@ -584,7 +745,7 @@ class SendViewModel(
                     }
                 } else {
                     val compactResult = PayloadCompactor.compact(payload)
-                    val onAirBytes = compactResult.bytes.size
+                    val onAirBytes = compactResult.bytes.size + cryptoOverhead
                     val isTooLong = onAirBytes > ProtocolConstants.MAX_AIR_PAYLOAD_BYTES
 
                     val duration = AirTime.estimate(
@@ -625,7 +786,7 @@ class SendViewModel(
                 val validation = payload.validate()
 
                 if (isByteLimitExceeded || validation is PayloadValidationResult.Invalid) {
-                    val onAirBytes = rawBytes
+                    val onAirBytes = rawBytes + cryptoOverhead
                     val isTooLong = isByteLimitExceeded || onAirBytes > ProtocolConstants.MAX_AIR_PAYLOAD_BYTES
                     val duration = AirTime.estimate(
                         profile = profile,
@@ -645,7 +806,7 @@ class SendViewModel(
                     }
                 } else {
                     val compactResult = PayloadCompactor.compact(payload)
-                    val onAirBytes = compactResult.bytes.size
+                    val onAirBytes = compactResult.bytes.size + cryptoOverhead
                     val isTooLong = onAirBytes > ProtocolConstants.MAX_AIR_PAYLOAD_BYTES
 
                     val duration = AirTime.estimate(
@@ -691,17 +852,18 @@ class SendViewModel(
                 if (validation is PayloadValidationResult.Invalid) {
                     val rawBytes = state.wifiSsid.toByteArray(Charsets.UTF_8).size +
                         (pass?.toByteArray(Charsets.UTF_8)?.size ?: 0) + 4
-                    val isTooLong = rawBytes > ProtocolConstants.MAX_AIR_PAYLOAD_BYTES
+                    val onAirBytes = rawBytes + cryptoOverhead
+                    val isTooLong = onAirBytes > ProtocolConstants.MAX_AIR_PAYLOAD_BYTES
                     val duration = AirTime.estimate(
                         profile = profile,
-                        onAirBytes = rawBytes,
+                        onAirBytes = onAirBytes,
                         repeats = state.repeats
                     )
                     val error = validation.error.reason
 
                     _uiState.update {
                         it.copy(
-                            onAirBytes = rawBytes,
+                            onAirBytes = onAirBytes,
                             estimatedDurationSeconds = duration,
                             isTooLong = isTooLong,
                             validationError = error,
@@ -710,7 +872,7 @@ class SendViewModel(
                     }
                 } else {
                     val compactResult = PayloadCompactor.compact(payload)
-                    val onAirBytes = compactResult.bytes.size
+                    val onAirBytes = compactResult.bytes.size + cryptoOverhead
                     val isTooLong = onAirBytes > ProtocolConstants.MAX_AIR_PAYLOAD_BYTES
 
                     val duration = AirTime.estimate(
@@ -768,17 +930,18 @@ class SendViewModel(
                     val rawBytes = state.contactName.toByteArray(Charsets.UTF_8).size +
                         phones.sumOf { it.toByteArray(Charsets.UTF_8).size } +
                         (email?.toByteArray(Charsets.UTF_8)?.size ?: 0) + 4
-                    val isTooLong = rawBytes > ProtocolConstants.MAX_AIR_PAYLOAD_BYTES
+                    val onAirBytes = rawBytes + cryptoOverhead
+                    val isTooLong = onAirBytes > ProtocolConstants.MAX_AIR_PAYLOAD_BYTES
                     val duration = AirTime.estimate(
                         profile = profile,
-                        onAirBytes = rawBytes,
+                        onAirBytes = onAirBytes,
                         repeats = state.repeats
                     )
                     val error = validation.error.reason
 
                     _uiState.update {
                         it.copy(
-                            onAirBytes = rawBytes,
+                            onAirBytes = onAirBytes,
                             estimatedDurationSeconds = duration,
                             isTooLong = isTooLong,
                             validationError = error,
@@ -787,7 +950,7 @@ class SendViewModel(
                     }
                 } else {
                     val compactResult = PayloadCompactor.compact(payload)
-                    val onAirBytes = compactResult.bytes.size
+                    val onAirBytes = compactResult.bytes.size + cryptoOverhead
                     val isTooLong = onAirBytes > ProtocolConstants.MAX_AIR_PAYLOAD_BYTES
 
                     val duration = AirTime.estimate(

@@ -29,6 +29,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.core.designsystem.colormap.ColormapFactory
@@ -120,7 +122,11 @@ fun WaterfallCanvas(
         }
     }
 
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier.semantics {
+            contentDescription = WaterfallSemantics.formatDescription(band)
+        }
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -361,3 +367,16 @@ private data class Quad(
     val bandStartHz: Double,
     val bandEndHz: Double
 )
+
+/**
+ * Formatter for WaterfallCanvas accessibility announcements.
+ */
+object WaterfallSemantics {
+    fun formatDescription(band: Band): String {
+        val bandName = when (band) {
+            Band.RETRO -> "Retro"
+            Band.STEALTH -> "Stealth"
+        }
+        return "Acoustic waterfall spectrogram, listening on $bandName"
+    }
+}

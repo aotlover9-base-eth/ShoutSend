@@ -1,5 +1,6 @@
 package app.shoutsend.feature.send
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,9 +27,12 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.shoutsend.R
 import app.shoutsend.core.designsystem.ChirpTheme
+import app.shoutsend.core.designsystem.components.AcousticStatus
 import app.shoutsend.core.designsystem.components.ByteMeter
 import app.shoutsend.core.designsystem.components.CdAlertDialog
 import app.shoutsend.core.designsystem.components.CdButton
@@ -40,6 +45,9 @@ import app.shoutsend.core.designsystem.components.CdSwitch
 import app.shoutsend.core.designsystem.components.ModeSelector
 import app.shoutsend.core.designsystem.components.NeonCard
 import app.shoutsend.core.designsystem.components.SpeedSelector
+import app.shoutsend.core.designsystem.components.StatusPill
+import app.shoutsend.modem.crypto.PassphraseEvaluator
+import app.shoutsend.modem.crypto.PassphraseStrengthClass
 import kotlin.math.ceil
 
 /**
@@ -161,6 +169,125 @@ fun SendScreen(
         }
     }
 
+    // Secure Mode Passphrase Dialog (Step 46)
+    if (uiState.showPassphraseDialog) {
+        CdAlertDialog(
+            onDismissRequest = { viewModel.dismissPassphraseDialog() },
+            title = {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "🔒",
+                        style = ChirpTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = stringResource(R.string.send_secure_dialog_title),
+                        style = ChirpTheme.typography.titleMedium,
+                        color = ChirpTheme.colors.onSurface
+                    )
+                }
+            },
+            text = {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = stringResource(R.string.send_secure_dialog_description),
+                        style = ChirpTheme.typography.bodyMedium,
+                        color = ChirpTheme.colors.onSurfaceVariant
+                    )
+
+                    CdOutlinedTextField(
+                        value = uiState.passphraseInput,
+                        onValueChange = { viewModel.onPassphraseInputChanged(it) },
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text(stringResource(R.string.send_secure_dialog_passphrase_label)) },
+                        placeholder = { Text(stringResource(R.string.send_secure_dialog_passphrase_placeholder)) },
+                        singleLine = true,
+                        visualTransformation = if (uiState.isPassphraseVisible) {
+                            VisualTransformation.None
+                        } else {
+                            PasswordVisualTransformation()
+                        },
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Password,
+                            autoCorrectEnabled = false,
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = {
+                                if (uiState.passphraseInput.length >= PassphraseEvaluator.MIN_LENGTH) {
+                                    viewModel.confirmPassphrase()
+                                }
+                            }
+                        ),
+                        isError = uiState.passphraseError != null,
+                        trailingIcon = {
+                            CdIconButton(
+                                onClick = { viewModel.togglePassphraseVisibility() }
+                            ) {
+                                Text(
+                                    text = if (uiState.isPassphraseVisible) "👁" else "🙈",
+                                    style = ChirpTheme.typography.titleMedium,
+                                    color = ChirpTheme.colors.onSurfaceVariant
+                                )
+                            }
+                        }
+                    )
+
+                    if (uiState.passphraseError != null) {
+                        Text(
+                            text = uiState.passphraseError!!,
+                            style = ChirpTheme.typography.bodySmall,
+                            color = ChirpTheme.colors.error
+                        )
+                    } else if (uiState.passphraseStrength != null && uiState.passphraseStrengthMessage != null) {
+                        val strengthColor = when (uiState.passphraseStrength) {
+                            PassphraseStrengthClass.STRONG -> ChirpTheme.colors.success
+                            PassphraseStrengthClass.OK -> ChirpTheme.colors.primary
+                            PassphraseStrengthClass.WEAK -> ChirpTheme.colors.warning
+                            null -> ChirpTheme.colors.onSurfaceVariant
+                        }
+                        val strengthLabel = when (uiState.passphraseStrength) {
+                            PassphraseStrengthClass.STRONG -> stringResource(R.string.send_secure_strength_strong)
+                            PassphraseStrengthClass.OK -> stringResource(R.string.send_secure_strength_ok)
+                            PassphraseStrengthClass.WEAK -> stringResource(R.string.send_secure_strength_weak)
+                            null -> ""
+                        }
+                        Column(verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xxs)) {
+                            Text(
+                                text = "Strength: $strengthLabel",
+                                style = ChirpTheme.typography.labelSmall,
+                                color = strengthColor
+                            )
+                            Text(
+                                text = uiState.passphraseStrengthMessage!!,
+                                style = ChirpTheme.typography.bodySmall,
+                                color = ChirpTheme.colors.onSurfaceVariant
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                CdButton(
+                    onClick = { viewModel.confirmPassphrase() },
+                    enabled = uiState.passphraseInput.length >= PassphraseEvaluator.MIN_LENGTH
+                ) {
+                    Text(stringResource(R.string.send_secure_dialog_confirm))
+                }
+            },
+            dismissButton = {
+                CdOutlinedButton(onClick = { viewModel.dismissPassphraseDialog() }) {
+                    Text(stringResource(R.string.send_secure_dialog_cancel))
+                }
+            }
+        )
+    }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -199,6 +326,48 @@ fun SendScreen(
         }
 
         // --- 2. Dynamic Input Composers ---
+        if (uiState.isSecureEnabled) {
+            NeonCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { viewModel.openPassphraseDialog() }
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = ChirpTheme.spacing.md, vertical = ChirpTheme.spacing.sm),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "🔒",
+                            style = ChirpTheme.typography.titleMedium
+                        )
+                        Column {
+                            Text(
+                                text = stringResource(R.string.send_secure_sealed_badge),
+                                style = ChirpTheme.typography.labelMedium,
+                                color = ChirpTheme.colors.primary
+                            )
+                            Text(
+                                text = stringResource(R.string.send_secure_tap_to_edit),
+                                style = ChirpTheme.typography.labelSmall,
+                                color = ChirpTheme.colors.onSurfaceVariant
+                            )
+                        }
+                    }
+                    StatusPill(
+                        status = AcousticStatus.LOCKED,
+                        customLabel = "AES-256"
+                    )
+                }
+            }
+        }
+
         when (uiState.selectedType) {
             SendPayloadType.TEXT -> {
                 CdOutlinedTextField(
@@ -321,7 +490,7 @@ fun SendScreen(
                     onSpeedSelected = { viewModel.onSpeedSelected(it) }
                 )
 
-                // Secure Mode Switch Row (greyed out until Step 46)
+                // Secure Mode Switch Row (Step 46)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -331,18 +500,21 @@ fun SendScreen(
                         Text(
                             text = stringResource(R.string.send_secure_label),
                             style = ChirpTheme.typography.bodyMedium,
-                            color = ChirpTheme.colors.onSurfaceVariant
+                            color = ChirpTheme.colors.onSurface
                         )
                         Text(
-                            text = stringResource(R.string.send_secure_subtitle),
+                            text = stringResource(
+                                if (uiState.isSecureEnabled) R.string.send_secure_active_subtitle
+                                else R.string.send_secure_subtitle
+                            ),
                             style = ChirpTheme.typography.bodySmall,
-                            color = ChirpTheme.colors.onSurfaceVariant.copy(alpha = ChirpTheme.opacity.muted)
+                            color = if (uiState.isSecureEnabled) ChirpTheme.colors.primary else ChirpTheme.colors.onSurfaceVariant.copy(alpha = ChirpTheme.opacity.muted)
                         )
                     }
                     CdSwitch(
-                        checked = false,
-                        onCheckedChange = null,
-                        enabled = false
+                        checked = uiState.isSecureEnabled,
+                        onCheckedChange = { viewModel.onSecureModeToggled(it) },
+                        enabled = true
                     )
                 }
 

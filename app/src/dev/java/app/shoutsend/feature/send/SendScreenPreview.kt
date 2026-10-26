@@ -91,6 +91,26 @@ fun SendScreenTextPreview() {
     }
 }
 
+@Preview(name = "Send Screen - Secure Mode Active (Dark)", showBackground = true)
+@Composable
+fun SendScreenSecureModePreview() {
+    val settingsRepo = FakeSettingsRepository()
+    val session = PreviewTransmitSession()
+    val viewModel = SendViewModel(settingsRepo, session)
+    viewModel.onTextChanged("Top secret acoustic payload", debounceMs = 0L)
+    viewModel.setPassphrase("SuperSecretPass123!")
+
+    ChirpTheme(tokens = DesignTokens.defaultDark()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(ChirpTheme.colors.background)
+        ) {
+            SendScreen(viewModel = viewModel, onNavigateToTransmit = {})
+        }
+    }
+}
+
 @Preview(name = "Send Screen - URL Composer (Dark)", showBackground = true)
 @Composable
 fun SendScreenUrlPreview() {

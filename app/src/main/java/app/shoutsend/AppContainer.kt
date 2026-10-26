@@ -23,6 +23,10 @@ import app.shoutsend.core.designsystem.ThemeController
 import app.shoutsend.core.designsystem.createTokenOverridesRepository
 import app.shoutsend.core.devtools.DevTools
 import app.shoutsend.core.devtools.createDevTools
+import app.shoutsend.core.feedback.AudioFeedbackPlayer
+import app.shoutsend.core.feedback.DefaultAudioFeedbackPlayer
+import app.shoutsend.core.feedback.DefaultTactileFeedbackController
+import app.shoutsend.core.feedback.TactileFeedbackController
 import app.shoutsend.core.modem.ModemConfigProvider
 import app.shoutsend.core.modem.createModemConfigProvider
 import app.shoutsend.core.session.AudioCoordinator
@@ -106,6 +110,20 @@ class AppContainer(val context: Context) {
         DefaultVaultRepository(
             dao = vaultDatabase.vaultDao(),
             cipher = keystoreCipher
+        )
+    }
+
+    val audioFeedbackPlayer: AudioFeedbackPlayer by lazy {
+        DefaultAudioFeedbackPlayer(
+            context = context,
+            settingsRepository = settingsRepository
+        )
+    }
+
+    val tactileFeedbackController: TactileFeedbackController by lazy {
+        DefaultTactileFeedbackController(
+            context = context,
+            settingsRepository = settingsRepository
         )
     }
 

@@ -7,6 +7,8 @@ import androidx.lifecycle.viewModelScope
 import app.shoutsend.core.data.settings.SettingsRepository
 import app.shoutsend.core.data.vault.model.Direction
 import app.shoutsend.core.data.vault.repository.VaultRepository
+import app.shoutsend.core.feedback.AudioFeedbackPlayer
+import app.shoutsend.core.feedback.TactileFeedbackController
 import app.shoutsend.core.session.AudioRouteMonitor
 import app.shoutsend.core.session.TransmitSession
 import app.shoutsend.core.session.TransmitState
@@ -39,6 +41,7 @@ data class TransmitUiState(
     val isLowVolume: Boolean = false,
     val routeWarning: String? = null,
     val isSavedToVault: Boolean = false,
+    val isSecure: Boolean = false,
     val errorMessage: String? = null
 ) {
     val isTransmitting: Boolean
@@ -64,7 +67,9 @@ class TransmitViewModel(
     private val vaultRepository: VaultRepository,
     private val audioRouteMonitor: AudioRouteMonitor,
     context: Context? = null,
-    private val audioManager: AudioManager? = context?.getSystemService(Context.AUDIO_SERVICE) as? AudioManager
+    private val audioManager: AudioManager? = context?.getSystemService(Context.AUDIO_SERVICE) as? AudioManager,
+    private val audioFeedbackPlayer: AudioFeedbackPlayer? = null,
+    private val tactileFeedback: TactileFeedbackController? = null
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TransmitUiState())
@@ -72,6 +77,8 @@ class TransmitViewModel(
 
     private var activeEnvelope: TransmissionEnvelope? = null
     private var lastSavedDurationMs: Long? = null
+    private var isCurrentlyTransmitting = false
+    private var lastObservedRepeat = 1
 
     init {
         // 1. Observe transmission state from modem session
@@ -106,6 +113,13 @@ class TransmitViewModel(
             }
         }
 
+        // 5. Observe active encryption passphrase for secure mode badge
+        viewModelScope.launch {
+            transmitSession.activePassphrase.collectLatest { passphrase ->
+                _uiState.update { it.copy(isSecure = !passphrase.isNullOrBlank()) }
+            }
+        }
+
         checkVolume()
     }
 
@@ -114,9 +128,12 @@ class TransmitViewModel(
         val effectiveBand = profile?.band ?: _uiState.value.band
         val effectiveSpeed = profile?.speed ?: _uiState.value.speed
         val effectiveRepeats = profile?.repeats ?: _uiState.value.repeats
+        val effectiveIsSecure = !transmitSession.activePassphrase.value.isNullOrBlank()
 
         when (state) {
             is TransmitState.Idle -> {
+                isCurrentlyTransmitting = false
+                lastObservedRepeat = 1
                 _uiState.update {
                     it.copy(
                         transmitState = state,
@@ -128,6 +145,8 @@ class TransmitViewModel(
                 }
             }
             is TransmitState.Preparing -> {
+                isCurrentlyTransmitting = false
+                lastObservedRepeat = 1
                 _uiState.update {
                     it.copy(
                         transmitState = state,
@@ -138,12 +157,20 @@ class TransmitViewModel(
                         isSavedToVault = false,
                         band = effectiveBand,
                         speed = effectiveSpeed,
-                        repeats = effectiveRepeats
+                        repeats = effectiveRepeats,
+                        isSecure = effectiveIsSecure
                     )
                 }
                 checkVolume()
             }
             is TransmitState.Transmitting -> {
+                if (!isCurrentlyTransmitting) {
+                    isCurrentlyTransmitting = true
+                    lastObservedRepeat = 1
+                    audioFeedbackPlayer?.playTransmitStart()
+                    tactileFeedback?.click()
+                }
+
                 val envelope = activeEnvelope ?: transmitSession.activeEnvelope.value
                 val point = envelope?.getAtTime(state.elapsedSeconds)
                 val rms = point?.rms ?: 0.5f
@@ -154,6 +181,11 @@ class TransmitViewModel(
                     (frameInAll / state.totalFrames).coerceIn(0, effectiveRepeats - 1) + 1
                 } else {
                     1
+                }
+
+                if (currentRepeat > lastObservedRepeat) {
+                    tactileFeedback?.tick()
+                    lastObservedRepeat = currentRepeat
                 }
 
                 _uiState.update {
@@ -168,6 +200,7 @@ class TransmitViewModel(
                         repeats = effectiveRepeats,
                         band = effectiveBand,
                         speed = effectiveSpeed,
+                        isSecure = effectiveIsSecure,
                         activeRms = rms,
                         activeToneIndex = tone,
                         errorMessage = null
@@ -175,6 +208,10 @@ class TransmitViewModel(
                 }
             }
             is TransmitState.Completed -> {
+                isCurrentlyTransmitting = false
+                lastObservedRepeat = 1
+                audioFeedbackPlayer?.playSuccess()
+                tactileFeedback?.success()
                 _uiState.update {
                     it.copy(
                         transmitState = state,
@@ -182,12 +219,15 @@ class TransmitViewModel(
                         remainingSeconds = 0.0,
                         activeRms = 0.0f,
                         activeToneIndex = -1,
+                        isSecure = effectiveIsSecure,
                         errorMessage = null
                     )
                 }
                 autoSaveToVaultIfEnabled(state.durationMs)
             }
             is TransmitState.Cancelled -> {
+                isCurrentlyTransmitting = false
+                lastObservedRepeat = 1
                 _uiState.update {
                     it.copy(
                         transmitState = state,
@@ -197,6 +237,10 @@ class TransmitViewModel(
                 }
             }
             is TransmitState.Failed -> {
+                isCurrentlyTransmitting = false
+                lastObservedRepeat = 1
+                audioFeedbackPlayer?.playError()
+                tactileFeedback?.error()
                 val humanError = mapErrorMessage(state.reason)
                 _uiState.update {
                     it.copy(
