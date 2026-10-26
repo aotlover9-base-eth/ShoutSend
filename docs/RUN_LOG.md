@@ -48,3 +48,4 @@
 | 44 | DONE | 2026-10-26 21:15 | Settings screen with 6 grouped sections, stealth disclosure, vault prune confirmation, data reset |
 | 45 | DONE | 2026-10-26 22:15 | Acoustic calibration & link test screen, loopback analysis, SNR meter, recommended preset auto-apply |
 | 46 | DONE | 2026-10-27 00:35 | Secure mode UI, passphrase modal with strength check, sealed cyber lock badge, volatile memory zeroing |
+| 47 | DONE | 2026-10-27 01:05 | Haptics & audio feedback, pure Kotlin earcon synthesis, ringer/settings gating, 7 tests passed |

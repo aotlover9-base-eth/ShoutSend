@@ -10,6 +10,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -22,6 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import app.shoutsend.core.audio.permissions.createAppSettingsIntent
 import app.shoutsend.core.capability.CapabilityProbe
 import app.shoutsend.core.designsystem.ChirpTheme
+import app.shoutsend.core.feedback.LocalTactileFeedback
 import app.shoutsend.feature.calibration.CalibrationViewModel
 import app.shoutsend.feature.onboarding.OnboardingViewModel
 import app.shoutsend.feature.receive.ReceiveViewModel
@@ -56,6 +58,8 @@ class MainActivity : ComponentActivity() {
         val vaultRepository = app.appContainer.vaultRepository
         val audioRouteMonitor = app.appContainer.audioRouteMonitor
         val devTools = app.appContainer.devTools
+        val audioFeedbackPlayer = app.appContainer.audioFeedbackPlayer
+        val tactileFeedbackController = app.appContainer.tactileFeedbackController
 
         setContent {
             val tokens by themeController.tokens.collectAsStateWithLifecycle()
@@ -78,30 +82,35 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
-            ChirpTheme(tokens = tokens) {
-                Box(modifier = Modifier.fillMaxSize()) {
-                    val navController = rememberNavController()
+            CompositionLocalProvider(LocalTactileFeedback provides tactileFeedbackController) {
+                ChirpTheme(tokens = tokens) {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        val navController = rememberNavController()
 
-                    val sendViewModel = remember {
-                        SendViewModel(settingsRepository, transmitSession)
-                    }
-                    val transmitViewModel = remember {
-                        TransmitViewModel(
-                            transmitSession = transmitSession,
-                            settingsRepository = settingsRepository,
-                            vaultRepository = vaultRepository,
-                            audioRouteMonitor = audioRouteMonitor,
-                            context = this@MainActivity
-                        )
-                    }
-                    val receiveViewModel = remember {
-                        ReceiveViewModel(
-                            acousticReceiver = acousticReceiver,
-                            audioCoordinator = audioCoordinator,
-                            settingsRepository = settingsRepository,
-                            vaultRepository = vaultRepository
-                        )
-                    }
+                        val sendViewModel = remember {
+                            SendViewModel(settingsRepository, transmitSession)
+                        }
+                        val transmitViewModel = remember {
+                            TransmitViewModel(
+                                transmitSession = transmitSession,
+                                settingsRepository = settingsRepository,
+                                vaultRepository = vaultRepository,
+                                audioRouteMonitor = audioRouteMonitor,
+                                context = this@MainActivity,
+                                audioFeedbackPlayer = audioFeedbackPlayer,
+                                tactileFeedback = tactileFeedbackController
+                            )
+                        }
+                        val receiveViewModel = remember {
+                            ReceiveViewModel(
+                                acousticReceiver = acousticReceiver,
+                                audioCoordinator = audioCoordinator,
+                                settingsRepository = settingsRepository,
+                                vaultRepository = vaultRepository,
+                                audioFeedbackPlayer = audioFeedbackPlayer,
+                                tactileFeedback = tactileFeedbackController
+                            )
+                        }
                     val vaultViewModel = remember { VaultViewModel(vaultRepository) }
                     val settingsViewModel = remember {
                         SettingsViewModel(
@@ -177,6 +186,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
     }
 
     override fun onNewIntent(intent: Intent) {
