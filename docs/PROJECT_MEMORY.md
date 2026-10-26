@@ -181,6 +181,9 @@ app/src/user/java/app/shoutsend/core/devtools/  # No-op dev tools implementation
 
 - Step 54 completed: Performance and battery profile implemented and verified. Real-Time Factor (RTF) across all modem profiles measured < 0.05 (up to 300x faster than real-time audio). Verified immediate hardware release of `AudioTrack` and `AudioRecord` upon completion, cancellation, and errors to prevent battery drain. Validated `WaterfallBuffer` zero heap allocation hot path and 60-second streaming stability. 6 unit tests passed in `PerformanceAndBatteryProfileTest.kt`.
 
+- Step 55 completed: Field test plan and tooling implemented and verified. Authored comprehensive physical acoustic field test plan (`docs/FIELD_TEST_PLAN.md`) with 4 environment matrices, distance/orientation setups, and step-by-step OWNER RUNS execution instructions. Built dev-only `FieldTestLogger.kt` providing privacy-safe JSON/CSV export for clipboard analysis. 4 unit tests passed in `FieldTestLoggerTest.kt`.
+
+
 
 
 
