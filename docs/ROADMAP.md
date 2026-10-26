@@ -58,7 +58,7 @@
 | 53 | F Hardening | Test consolidation | No | **Done** |
 | 54 | F Hardening | Performance and battery profile | No | **Done** |
 | 55 | F Hardening | Field test plan and tooling (OWNER RUNS) | No | **Done** |
-| 56 | F Hardening | Preset tuning from field data | No | Todo |
+| 56 | F Hardening | Preset tuning from field data | No | **Done** |
 | 57 | F Hardening | Lint, R8, size cleanup | No | Todo |
 | 58 | F Hardening | Release build and docs | No | Todo |
 | 59 | F Hardening | Final audit and handoff | No | Todo |

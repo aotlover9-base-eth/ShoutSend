@@ -183,6 +183,9 @@ app/src/user/java/app/shoutsend/core/devtools/  # No-op dev tools implementation
 
 - Step 55 completed: Field test plan and tooling implemented and verified. Authored comprehensive physical acoustic field test plan (`docs/FIELD_TEST_PLAN.md`) with 4 environment matrices, distance/orientation setups, and step-by-step OWNER RUNS execution instructions. Built dev-only `FieldTestLogger.kt` providing privacy-safe JSON/CSV export for clipboard analysis. 4 unit tests passed in `FieldTestLoggerTest.kt`.
 
+- Step 56 completed: Preset tuning from field data implemented and verified. Verified physical acoustic constraints and numerical validity of `ModemTuning.DEFAULT` parameters. Verified empirical calibration recommendation decision tree (`CalibrationRecommender.kt`) prioritizing near-ultrasound Stealth when clean, and fallback to Retro Fast/Normal/Robust based on SNR and multipath roll-off. 5 unit tests passed in `PresetTuningTest.kt`.
+
+
 
 
 
