@@ -101,7 +101,7 @@ class MainActivity : ComponentActivity() {
                             vaultRepository = vaultRepository
                         )
                     }
-                    val vaultViewModel = remember { VaultViewModel() }
+                    val vaultViewModel = remember { VaultViewModel(vaultRepository) }
                     val settingsViewModel = remember { SettingsViewModel(settingsRepository) }
                     val calibrationViewModel = remember { CalibrationViewModel() }
                     val onboardingViewModel = remember {

@@ -274,6 +274,61 @@ class SendViewModel(
     }
 
     /**
+     * Loads a payload from the Vault for re-transmission.
+     */
+    fun loadPayloadForRetransmit(payload: Payload, isSecure: Boolean = false) {
+        when (payload) {
+            is Payload.Text -> {
+                _uiState.update {
+                    it.copy(
+                        selectedType = SendPayloadType.TEXT,
+                        textValue = payload.value,
+                        isSecureEnabled = isSecure
+                    )
+                }
+            }
+            is Payload.Url -> {
+                _uiState.update {
+                    it.copy(
+                        selectedType = SendPayloadType.URL,
+                        urlValue = payload.value,
+                        isSecureEnabled = isSecure
+                    )
+                }
+            }
+            is Payload.WiFi -> {
+                _uiState.update {
+                    it.copy(
+                        selectedType = SendPayloadType.WIFI,
+                        wifiSsid = payload.ssid,
+                        wifiSecurity = payload.security,
+                        wifiPassword = payload.password.orEmpty(),
+                        wifiIsHidden = payload.isHidden,
+                        isSecureEnabled = isSecure
+                    )
+                }
+            }
+            is Payload.Contact -> {
+                _uiState.update {
+                    it.copy(
+                        selectedType = SendPayloadType.CONTACT,
+                        isContactManualMode = true,
+                        contactName = payload.displayName,
+                        contactPhone1 = payload.phones.getOrNull(0).orEmpty(),
+                        contactPhone2 = payload.phones.getOrNull(1).orEmpty(),
+                        contactEmail = payload.email.orEmpty(),
+                        contactIncludePhone1 = payload.phones.isNotEmpty(),
+                        contactIncludePhone2 = payload.phones.size > 1,
+                        contactIncludeEmail = !payload.email.isNullOrBlank(),
+                        isSecureEnabled = isSecure
+                    )
+                }
+            }
+        }
+        recalculate(state = _uiState.value)
+    }
+
+    /**
      * Wipes credentials and contact data from memory (Rule 25).
      * Invoked on screen departure or upon successful transmission.
      */

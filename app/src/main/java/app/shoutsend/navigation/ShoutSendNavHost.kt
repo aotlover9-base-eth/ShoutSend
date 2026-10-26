@@ -186,7 +186,14 @@ fun ShoutSendNavHost(
             val route = backStackEntry.toRoute<VaultDetailRoute>()
             VaultDetailScreen(
                 id = route.id,
-                onNavigateBack = { navController.popBackStack() }
+                viewModel = vaultViewModel,
+                onNavigateBack = { navController.popBackStack() },
+                onRetransmit = { payload, isSecure ->
+                    sendViewModel.loadPayloadForRetransmit(payload, isSecure)
+                    sendViewModel.startTransmission {
+                        navController.navigate(TransmitRoute)
+                    }
+                }
             )
         }
 
