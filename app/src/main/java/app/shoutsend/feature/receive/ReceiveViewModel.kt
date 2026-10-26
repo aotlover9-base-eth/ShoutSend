@@ -4,11 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.shoutsend.core.audio.receiver.AcousticReceiver
 import app.shoutsend.core.data.settings.SettingsRepository
+import app.shoutsend.core.data.vault.model.Direction
+import app.shoutsend.core.data.vault.repository.VaultRepository
 import app.shoutsend.core.designsystem.components.AcousticStatus
 import app.shoutsend.core.session.AudioCoordinator
 import app.shoutsend.modem.demod.ReceiveEvent
 import app.shoutsend.modem.payload.Payload
 import app.shoutsend.modem.profile.Band
+import app.shoutsend.modem.profile.ModemProfile
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,24 +31,34 @@ data class ReceiveUiState(
     val isClipping: Boolean = false,
     val isSilent: Boolean = false,
     val isPreambleLocked: Boolean = false,
+    val isReadingHeader: Boolean = false,
     val currentFragment: Int = 0,
     val totalFragments: Int = 0,
+    val estimatedRemainingSeconds: Double? = null,
     val activeToneIndex: Int = -1,
     val audioSource: String = "MIC",
     val sampleRateHz: Int = 48000,
     val isListening: Boolean = false,
+    val hasAutoRepairedNoise: Boolean = false,
+    val autoRepairedBytes: Int = 0,
     val lastReceivedPayload: Payload? = null,
+    val savedVaultId: Long? = null,
+    val isSavedToVault: Boolean = false,
+    val isStarred: Boolean = false,
+    val activeProfileSummary: String = "RETRO · NORMAL",
+    val retryHint: String? = null,
     val lastError: String? = null
 )
 
 /**
  * ViewModel managing acoustic listening, demodulator event processing,
- * and high-frame-rate waterfall streaming.
+ * segmented reassembly progress, and automatic encrypted vault archiving.
  */
 class ReceiveViewModel(
     private val acousticReceiver: AcousticReceiver,
     private val audioCoordinator: AudioCoordinator,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val vaultRepository: VaultRepository
 ) : ViewModel() {
 
     val waterfallBuffer: WaterfallBuffer = WaterfallBuffer()
@@ -55,6 +68,9 @@ class ReceiveViewModel(
 
     private val _frameClock = MutableStateFlow(0L)
     val frameClock: StateFlow<Long> = _frameClock.asStateFlow()
+
+    private var activeProfile: ModemProfile? = null
+    private var receptionStartTimeMs: Long = 0L
 
     private var spectrumJob: Job? = null
     private var diagnosticsJob: Job? = null
@@ -94,7 +110,8 @@ class ReceiveViewModel(
                 it.copy(
                     isListening = true,
                     status = AcousticStatus.LISTENING,
-                    lastError = null
+                    lastError = null,
+                    retryHint = null
                 )
             }
 
@@ -142,19 +159,27 @@ class ReceiveViewModel(
     private fun handleReceiveEvent(event: ReceiveEvent) {
         when (event) {
             is ReceiveEvent.Listening -> {
-                _uiState.update {
-                    it.copy(
-                        status = AcousticStatus.LISTENING,
-                        isPreambleLocked = false,
-                        activeToneIndex = -1
-                    )
+                if (_uiState.value.status != AcousticStatus.SUCCESS) {
+                    _uiState.update {
+                        it.copy(
+                            status = AcousticStatus.LISTENING,
+                            isPreambleLocked = false,
+                            isReadingHeader = false,
+                            activeToneIndex = -1
+                        )
+                    }
                 }
             }
             is ReceiveEvent.PreambleDetected -> {
+                receptionStartTimeMs = System.currentTimeMillis()
                 _uiState.update {
                     it.copy(
                         status = AcousticStatus.LOCKED,
-                        isPreambleLocked = true
+                        isPreambleLocked = true,
+                        isReadingHeader = true,
+                        retryHint = null,
+                        hasAutoRepairedNoise = false,
+                        autoRepairedBytes = 0
                     )
                 }
             }
@@ -163,25 +188,41 @@ class ReceiveViewModel(
                     it.copy(
                         status = AcousticStatus.LOCKED,
                         isPreambleLocked = true,
+                        isReadingHeader = true,
                         snrDb = event.snrDb
                     )
                 }
             }
             is ReceiveEvent.ModeDecoded -> {
-                _uiState.update {
-                    it.copy(
-                        status = AcousticStatus.RECEIVING,
-                        isPreambleLocked = true
-                    )
-                }
-            }
-            is ReceiveEvent.FrameDecoded -> {
+                activeProfile = event.profile
+                val summary = "${event.profile.band.name} · ${event.profile.speed.name}"
                 _uiState.update {
                     it.copy(
                         status = AcousticStatus.RECEIVING,
                         isPreambleLocked = true,
-                        currentFragment = event.fragmentIndex + 1,
-                        totalFragments = event.fragmentCount
+                        activeProfileSummary = summary
+                    )
+                }
+            }
+            is ReceiveEvent.FrameDecoded -> {
+                val fragmentCount = event.fragmentCount
+                val fragmentIdx = event.fragmentIndex
+                val profile = activeProfile
+                val speedDurationMs = profile?.speed?.durationMs ?: 30
+                val frameDurationSec = (124 * speedDurationMs) / 1000.0
+                val remainingBlocks = maxOf(0, fragmentCount - (fragmentIdx + 1))
+                val remainingSec = remainingBlocks * frameDurationSec
+
+                _uiState.update { current ->
+                    current.copy(
+                        status = AcousticStatus.RECEIVING,
+                        isPreambleLocked = true,
+                        isReadingHeader = false,
+                        currentFragment = fragmentIdx + 1,
+                        totalFragments = fragmentCount,
+                        estimatedRemainingSeconds = remainingSec,
+                        hasAutoRepairedNoise = current.hasAutoRepairedNoise || (event.correctedBytes > 0),
+                        autoRepairedBytes = current.autoRepairedBytes + event.correctedBytes
                     )
                 }
             }
@@ -189,41 +230,129 @@ class ReceiveViewModel(
                 _uiState.update {
                     it.copy(
                         status = AcousticStatus.RECEIVING,
+                        isReadingHeader = false,
                         currentFragment = event.receivedFragments,
                         totalFragments = event.totalFragments
                     )
                 }
             }
             is ReceiveEvent.MessageComplete -> {
+                val durationMs = (System.currentTimeMillis() - receptionStartTimeMs).coerceAtLeast(100L)
+                val payload = event.payload
+
                 _uiState.update {
                     it.copy(
                         status = AcousticStatus.SUCCESS,
                         isPreambleLocked = false,
-                        lastReceivedPayload = event.payload
+                        isReadingHeader = false,
+                        estimatedRemainingSeconds = 0.0,
+                        lastReceivedPayload = payload
                     )
+                }
+
+                // Auto-save to encrypted Vault if enabled in Settings (A4)
+                if (payload != null) {
+                    val settings = settingsRepository.settings.value
+                    if (settings.historyEnabled) {
+                        viewModelScope.launch {
+                            try {
+                                val isSecure = event.message.flags.isEncrypted
+                                val summary = _uiState.value.activeProfileSummary
+                                val savedId = vaultRepository.save(
+                                    direction = Direction.RECEIVED,
+                                    payload = payload,
+                                    profileSummary = summary,
+                                    durationMs = durationMs,
+                                    snrDb = _uiState.value.snrDb.toFloat(),
+                                    isSecure = isSecure
+                                )
+                                _uiState.update {
+                                    it.copy(
+                                        savedVaultId = savedId,
+                                        isSavedToVault = true,
+                                        isStarred = false
+                                    )
+                                }
+                            } catch (_: Exception) {
+                                // Non-fatal
+                            }
+                        }
+                    }
                 }
             }
             is ReceiveEvent.Lost -> {
+                val hadLock = _uiState.value.isPreambleLocked || _uiState.value.currentFragment > 0
                 _uiState.update {
                     it.copy(
-                        status = AcousticStatus.LISTENING,
+                        status = if (hadLock) AcousticStatus.ERROR else AcousticStatus.LISTENING,
                         isPreambleLocked = false,
+                        isReadingHeader = false,
+                        retryHint = if (hadLock) "Move closer, raise the volume, try again" else null,
                         activeToneIndex = -1
                     )
                 }
             }
             is ReceiveEvent.Cooldown -> {
-                _uiState.update {
-                    it.copy(
-                        status = AcousticStatus.LISTENING,
-                        isPreambleLocked = false,
-                        activeToneIndex = -1
-                    )
+                if (_uiState.value.status != AcousticStatus.SUCCESS) {
+                    _uiState.update {
+                        it.copy(
+                            status = AcousticStatus.LISTENING,
+                            isPreambleLocked = false,
+                            isReadingHeader = false,
+                            activeToneIndex = -1
+                        )
+                    }
                 }
             }
             is ReceiveEvent.FrameFailed -> {
-                // Keep receiving, RS parity or repeat will correct
+                val hadLock = _uiState.value.isPreambleLocked || _uiState.value.currentFragment > 0
+                if (hadLock) {
+                    _uiState.update {
+                        it.copy(retryHint = "Move closer, raise the volume, try again")
+                    }
+                }
             }
+        }
+    }
+
+    /**
+     * Toggles one-tap star status for the newly received vault message.
+     */
+    fun toggleStar() {
+        val vaultId = _uiState.value.savedVaultId ?: return
+        val newStarred = !_uiState.value.isStarred
+        _uiState.update { it.copy(isStarred = newStarred) }
+
+        viewModelScope.launch {
+            try {
+                vaultRepository.setStarred(vaultId, newStarred)
+            } catch (_: Exception) {
+                // Revert on failure
+                _uiState.update { it.copy(isStarred = !newStarred) }
+            }
+        }
+    }
+
+    /**
+     * Resets received state and prepares receiver to listen for a new transmission.
+     */
+    fun resetReception() {
+        _uiState.update {
+            it.copy(
+                status = if (it.isListening) AcousticStatus.LISTENING else AcousticStatus.IDLE,
+                isPreambleLocked = false,
+                isReadingHeader = false,
+                currentFragment = 0,
+                totalFragments = 0,
+                estimatedRemainingSeconds = null,
+                lastReceivedPayload = null,
+                savedVaultId = null,
+                isSavedToVault = false,
+                isStarred = false,
+                hasAutoRepairedNoise = false,
+                autoRepairedBytes = 0,
+                retryHint = null
+            )
         }
     }
 
@@ -259,6 +388,7 @@ class ReceiveViewModel(
                 isListening = false,
                 status = AcousticStatus.IDLE,
                 isPreambleLocked = false,
+                isReadingHeader = false,
                 activeToneIndex = -1
             )
         }

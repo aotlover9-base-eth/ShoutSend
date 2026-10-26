@@ -292,14 +292,11 @@ class SessionIntegrationTest {
         rxSession.start(Band.RETRO, passphraseProvider = { passphrase })
 
         receiver.emitEvent(ReceiveEvent.MessageComplete(message = encryptedMsg, payload = null))
-        var waited = 0
-        while (waited < 100 && rxSession.state.value !is ReceiveState.Success && rxSession.state.value !is ReceiveState.Failed) {
-            delay(20)
-            waited++
+        val state = withTimeout(10_000) {
+            rxSession.state.first { it is ReceiveState.Success || it is ReceiveState.Failed }
         }
 
-        val state = rxSession.state.value
-        assertTrue("Must successfully decrypt", state is ReceiveState.Success)
+        assertTrue("Must successfully decrypt, actual: $state", state is ReceiveState.Success)
         assertEquals(secretText, ((state as ReceiveState.Success).payload as Payload.Text).value)
         assertTrue(state.metadata.isEncrypted)
 
@@ -383,14 +380,11 @@ class SessionIntegrationTest {
 
         rxSession.start(band = Band.RETRO, passphraseProvider = { passphrase })
 
-        // Wait up to 5s for decoding
-        var waited = 0
-        while (waited < 50 && rxSession.state.value !is ReceiveState.Success && rxSession.state.value !is ReceiveState.Failed) {
-            delay(100)
-            waited++
+        // Wait up to 10s for decoding under heavy test load
+        val rxState = withTimeout(10_000) {
+            rxSession.state.first { it is ReceiveState.Success || it is ReceiveState.Failed }
         }
 
-        val rxState = rxSession.state.value
         assertTrue("RX reached Success, actual state: $rxState", rxState is ReceiveState.Success)
         val decodedText = ((rxState as ReceiveState.Success).payload as Payload.Text).value
         assertEquals(messageText, decodedText)

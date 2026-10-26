@@ -43,7 +43,7 @@
 | 38 | E UI | Send: Wi-Fi and contact forms | Yes | **Done** |
 | 39 | E UI | Transmit screen: soundwave rings | Yes | **Done** |
 | 40 | E UI | Receive screen: spectrogram waterfall | Yes | **Done** |
-| 41 | E UI | Receive progress and success states | Yes | Todo |
+| 41 | E UI | Receive progress and success states | Yes | **Done** |
 | 42 | E UI | Instant action cards | Yes | Todo |
 | 43 | E UI | Transmission Vault screen | Yes | Todo |
 | 44 | E UI | Settings screen | Yes | Todo |

@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -31,6 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.shoutsend.R
 import app.shoutsend.core.audio.permissions.MicPermissionState
 import app.shoutsend.core.designsystem.ChirpTheme
+import app.shoutsend.core.designsystem.components.AcousticStatus
 import app.shoutsend.core.designsystem.components.CdFilterChip
 import app.shoutsend.core.designsystem.components.LevelMeter
 import app.shoutsend.core.designsystem.components.MicPermissionCard
@@ -44,12 +44,15 @@ import java.util.Locale
 
 /**
  * Cyber-radio acoustic reception screen featuring a live 256-bin spectrogram waterfall,
- * carrier lock highlight, signal and volume meters, and hardware diagnostics.
+ * segmented reassembly progress, error-correction indicator, inline received payload card,
+ * and automatic encrypted vault archiving.
  *
- * Conforms to:
- * - Rule 6 & 7: 100% tokenized design system (zero raw hex or measurement literals).
- * - Rule 22: Zero-allocation audio and waterfall rendering pipeline.
- * - Rule 24: Permission gates gracefully handle microphone state without crash.
+ * Conforms to UI Gate specifications:
+ * - Inline animated card right below the waterfall keeping the live spectrogram in view.
+ * - Segmented progress bar showing "Locked, reading header…" before block count is known,
+ *   and block segments + remaining seconds once header is decoded.
+ * - Honest error correction reporting ("Noise detected · Auto-repaired") only when RS corrected bytes.
+ * - Auto-saves to encrypted vault with a one-tap star button.
  */
 @Composable
 fun ReceiveScreen(
@@ -148,16 +151,11 @@ fun ReceiveScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val statusText = when {
+                        uiState.status == AcousticStatus.SUCCESS -> stringResource(R.string.receive_hero_success)
                         uiState.isPreambleLocked -> String.format(
                             Locale.US,
                             stringResource(R.string.receive_hero_locked),
                             String.format(Locale.US, "%.1f", uiState.snrDb)
-                        )
-                        uiState.currentFragment > 0 -> String.format(
-                            Locale.US,
-                            stringResource(R.string.receive_hero_receiving),
-                            uiState.currentFragment,
-                            uiState.totalFragments
                         )
                         uiState.isListening -> String.format(
                             Locale.US,
@@ -182,7 +180,80 @@ fun ReceiveScreen(
             }
         }
 
-        // --- 4. Signal Meters Card ---
+        // --- 4. In-Flight Progress or Success Card (UI Gate Option 1: Inline Card) ---
+        if (uiState.status == AcousticStatus.SUCCESS && uiState.lastReceivedPayload != null) {
+            ReceivedPayloadCard(
+                payload = uiState.lastReceivedPayload!!,
+                snrDb = uiState.snrDb,
+                profileSummary = uiState.activeProfileSummary,
+                isStarred = uiState.isStarred,
+                isSavedToVault = uiState.isSavedToVault,
+                hasAutoRepairedNoise = uiState.hasAutoRepairedNoise,
+                onToggleStar = { viewModel.toggleStar() },
+                onReceiveAnother = { viewModel.resetReception() },
+                modifier = Modifier.fillMaxWidth()
+            )
+        } else if (uiState.isPreambleLocked || uiState.status == AcousticStatus.RECEIVING || uiState.isReadingHeader) {
+            NeonCard(
+                modifier = Modifier.fillMaxWidth(),
+                borderColor = ChirpTheme.colors.syncMarker,
+                glowColor = ChirpTheme.colors.syncMarker
+            ) {
+                Column(
+                    modifier = Modifier.padding(ChirpTheme.spacing.md),
+                    verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs)
+                ) {
+                    SegmentedProgressBar(
+                        receivedBlocks = uiState.currentFragment,
+                        totalBlocks = uiState.totalFragments,
+                        estimatedRemainingSeconds = uiState.estimatedRemainingSeconds,
+                        hasAutoRepairedNoise = uiState.hasAutoRepairedNoise,
+                        isReadingHeader = uiState.isReadingHeader,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        }
+
+        // --- 5. Retry Hint Banner on Failed Reception (UI Gate A3) ---
+        AnimatedVisibility(
+            visible = uiState.retryHint != null,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        color = ChirpTheme.colors.surfaceContainerHigh,
+                        shape = ChirpTheme.shapes.medium
+                    )
+                    .border(
+                        width = ChirpTheme.strokes.thin,
+                        color = ChirpTheme.colors.warning,
+                        shape = ChirpTheme.shapes.medium
+                    )
+                    .padding(ChirpTheme.spacing.md)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs)
+                ) {
+                    Text(
+                        text = "ℹ",
+                        style = ChirpTheme.typography.titleMedium,
+                        color = ChirpTheme.colors.warning
+                    )
+                    Text(
+                        text = uiState.retryHint ?: stringResource(R.string.receive_retry_hint),
+                        style = ChirpTheme.typography.bodyMedium,
+                        color = ChirpTheme.colors.onSurface
+                    )
+                }
+            }
+        }
+
+        // --- 6. Signal & Volume Input Meters ---
         NeonCard(
             modifier = Modifier.fillMaxWidth()
         ) {
@@ -215,7 +286,7 @@ fun ReceiveScreen(
             }
         }
 
-        // --- 5. Diagnostic Warnings (Clipping or Digital Silence) ---
+        // --- 7. Hardware Alerts (Clipping or Silence) ---
         AnimatedVisibility(
             visible = uiState.isClipping,
             enter = fadeIn(),
@@ -270,7 +341,7 @@ fun ReceiveScreen(
             }
         }
 
-        // --- 6. Hardware Info Strip ---
+        // --- 8. Hardware Source Info Strip ---
         Row(
             modifier = Modifier
                 .fillMaxWidth()

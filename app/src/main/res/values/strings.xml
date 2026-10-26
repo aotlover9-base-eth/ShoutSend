@@ -142,4 +142,18 @@
     <string name="receive_band_stealth">Ultrasonic (Stealth)</string>
     <string name="receive_btn_start_listening">Start Listening</string>
     <string name="receive_btn_stop_listening">Stop Listening</string>
+
+    <!-- Receive Progress & Success Strings (Step 41) -->
+    <string name="receive_status_reading_header">Locked, reading header…</string>
+    <string name="receive_progress_block" formatted="false">Block %d of %d</string>
+    <string name="receive_progress_time_remaining" formatted="false"> · ~%.1fs remaining</string>
+    <string name="receive_noise_repaired">Noise detected · Auto-repaired</string>
+    <string name="receive_retry_hint">Move closer, raise the volume, try again</string>
+    <string name="receive_success_title">Transmission Received</string>
+    <string name="receive_btn_star">Star</string>
+    <string name="receive_btn_copy">Copy</string>
+    <string name="receive_btn_copied">Copied to clipboard</string>
+    <string name="receive_btn_open_link">Open Link</string>
+    <string name="receive_btn_receive_another">Receive Another</string>
+    <string name="receive_saved_to_vault">Saved to Vault history</string>
 </resources>

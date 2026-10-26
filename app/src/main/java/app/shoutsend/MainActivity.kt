@@ -97,7 +97,8 @@ class MainActivity : ComponentActivity() {
                         ReceiveViewModel(
                             acousticReceiver = acousticReceiver,
                             audioCoordinator = audioCoordinator,
-                            settingsRepository = settingsRepository
+                            settingsRepository = settingsRepository,
+                            vaultRepository = vaultRepository
                         )
                     }
                     val vaultViewModel = remember { VaultViewModel() }
