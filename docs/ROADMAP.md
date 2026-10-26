@@ -52,7 +52,7 @@
 | 47 | E UI | Haptics and audio feedback | Light | **Done** |
 | 48 | E UI | Motion, transitions, predictive back | Yes | **Done** |
 | 49 | E UI | Accessibility pass | Light | **Done** |
-| 50 | E UI | Developer panel: DSP Lab | Light | Todo |
+| 50 | E UI | Developer panel: DSP Lab | Light | **Done** |
 | 51 | F Hardening | Robustness and edge cases | No | Todo |
 | 52 | F Hardening | Security and privacy review | No | Todo |
 | 53 | F Hardening | Test consolidation | No | Todo |

@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 enum class DevPanelTab {
-    COLORS, SHAPES
+    COLORS, SHAPES, DSP_LAB
 }
 
 data class ColorRoleItem(
@@ -44,6 +44,8 @@ class DevPanelViewModel(
     val themeController: ThemeController,
     private val scope: CoroutineScope
 ) {
+    val dspLabViewModel = DspLabViewModel()
+
     private val _activeTab = MutableStateFlow(DevPanelTab.COLORS)
     private val _statusMessage = MutableStateFlow<String?>(null)
 

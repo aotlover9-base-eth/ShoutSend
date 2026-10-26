@@ -129,6 +129,11 @@ fun DeveloperPanel(
                     onClick = { viewModel.selectTab(DevPanelTab.SHAPES) },
                     label = { Text("Shapes & Radii") }
                 )
+                CdFilterChip(
+                    selected = uiState.activeTab == DevPanelTab.DSP_LAB,
+                    onClick = { viewModel.selectTab(DevPanelTab.DSP_LAB) },
+                    label = { Text("DSP Lab") }
+                )
             }
 
             CdHorizontalDivider()
@@ -146,6 +151,9 @@ fun DeveloperPanel(
                         radiusItems = uiState.radiusItems,
                         onRadiusChanged = viewModel::onRadiusChanged,
                         onResetRadius = viewModel::resetRadius
+                    )
+                    DevPanelTab.DSP_LAB -> DspLabContent(
+                        viewModel = viewModel.dspLabViewModel
                     )
                 }
             }
