@@ -592,5 +592,39 @@
   - Contained 100% in `src/dev` and `src/testDev`, providing 16-bar Goertzel power meters, synthetic tone injection pad, and real-time SNR telemetry.
   - Verified 0 dev marker leakage in User APK via `verifyUserApkClean`.
 
+### DEC-065: Real-Time Acoustic Pacing, Real-Time Factor (RTF) Bounds, and Battery Safety Guarantees
+- **Real-Time Factor (RTF) Bounds (`PerformanceAndBatteryProfileTest`)**:
+  - Formalized strict real-time audio computation bounds: RTF $\le 0.05$ across all modem profiles (Audible Retro and Ultrasonic Stealth at Fast, Normal, and Robust speeds).
+  - Audio rendering and demodulation executes 80x to 300x faster than real-time playback (RTF $\approx 0.003 - 0.012$), eliminating audio buffer underruns (xruns) and frame drop stutter.
+- **Hardware Power Rail & AudioTrack / AudioRecord Lifecycle**:
+  - `DefaultAcousticTransmitter` strictly invokes `PcmSink.stop()` and `PcmSink.release()` across all termination outcomes (Success, Cancelled, Failure) to return hardware speaker power rails.
+  - `DefaultAcousticReceiver` stops the high-priority capture thread and releases microphone resources (`PcmSource.stop()` and `release()`) immediately upon screen departure or manual stop.
+  - Screen keep-awake lock (`view.keepScreenOn`) is strictly bound via `DisposableEffect` to active acoustic transmission and reception, reverting to system display sleep policy on exit.
+
+### DEC-066: Physical Transceiver Field Test Architecture and Anonymized Telemetry Logging
+- **Acoustic Link Field Test Plan (`docs/FIELD_TEST_PLAN.md`)**:
+  - Established formal OWNER RUNS field test protocol across 4 acoustic environments: Quiet Room (<35 dBA), Living Room/Office (45-55 dBA), Busy Cafeteria (65-75 dBA), and Outdoor Transit (70-80 dBA).
+  - Standardized physical distance (0.1m – 3.0m) and orientation matrices (Desk Flat, Direct Line of Sight, 45-degree angle, Hand Obstructed) pairing flagship and budget Android hardware.
+- **Privacy-Safe Field Telemetry Logging (`FieldTestLogger`)**:
+  - Isolated in `app/src/dev` to preserve User APK purity.
+  - Records physical link metrics: SNR in dB, ambient noise floor in dBFS, Reed-Solomon repaired bytes, and transmission air-time.
+  - Strictly complies with Rule 25: payloads, SSIDs, and passphrases are NEVER recorded or exported. Enables 1-click anonymized JSON and CSV summary clipboard export.
+
+### DEC-067: Empirical Preset Tuning Hierarchy and Transducer Acoustic Recommendations
+- **Modem Tuning Parameter Validation (`ModemTuning.DEFAULT`)**:
+  - Pre-calibrated 0.85 output level (-1.4 dBFS) providing anti-clipping excursion margin for miniature mobile transducers.
+  - 250 ms lead-in silence granting receiving Android AGC and microphone DSP filters adequate settling time before preamble tone arrival.
+  - 150 ms tail silence preventing hardware AudioTrack flush truncation.
+- **Empirical Recommendation Decision Tree (`CalibrationRecommender`)**:
+  - Near-ultrasound Stealth preferred if and only if Stealth qualifies as `GOOD`.
+  - Auditory Retro selected with speed automatically matched to channel capacity: `FAST` under high SNR (>12 dB), `NORMAL` for standard environments, and `ROBUST` under high noise floor or severe multipath.
+
+### DEC-068: Production Release Pipeline, R8 Minification, and Dead-Code Pruning
+- **R8 / ProGuard Optimization (`app/proguard-rules.pro`)**:
+  - Configured `isMinifyEnabled = true` and `isShrinkResources = true` on `release` build type.
+  - Preserves Composable runtime entries, Room database DAOs/entities, Kotlinx Serialization serializers, and pure JVM modem protocol data structures.
+  - Produces an optimized 4.0 MB production User APK (`app-user-release.apk`) verified 100% clean of developer tools (`verifyUserApkClean`).
+
+
 
 

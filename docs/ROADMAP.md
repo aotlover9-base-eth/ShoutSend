@@ -61,4 +61,4 @@
 | 56 | F Hardening | Preset tuning from field data | No | **Done** |
 | 57 | F Hardening | Lint, R8, size cleanup | No | **Done** |
 | 58 | F Hardening | Release build and docs | No | **Done** |
-| 59 | F Hardening | Final audit and handoff | No | Todo |
+| 59 | F Hardening | Final audit and handoff | No | **Done** |
