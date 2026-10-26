@@ -394,6 +394,12 @@ where:
   - `RETRO / MFSK16 / FAST / RS0 / x1`: Net throughput 12.3 to 12.5 B/s (100.0% close range/living room, 80.0% in noisy cafe).
   - `RETRO / DTFSK / FAST / RS1 / x1`: Net throughput 9.9 to 10.0 B/s (100.0% close range/living room, 90.0% in noisy cafe).
   - `RETRO / MFSK16 / ROBUST / RS2 / x2`: Net throughput 1.4 B/s (high-noise survival).
+- **Physical Framing & Throughput Mechanics**:
+  - The apparent $4.5\times$ speed differential between Normal (2.8 B/s) and Fast (12.5 B/s) for the standard 44-byte test payload stems from three multiplicative effects:
+    1. **Codeword Capacity**: Fast (`RS0`, $k=54$, capacity $k-6 = 48\text{ B}$) fits 44 bytes in **1 frame**. Normal (`RS1`, $k=48$, capacity $k-6 = 42\text{ B}$) splits 44 bytes into **2 frames**.
+    2. **Frame Repetitions**: Fast uses $1\times$ repeat ($1\text{ frame total}$); Normal uses $2\times$ repeats ($2 \times 2 = 4\text{ frames total}$).
+    3. **Baud Rate**: Fast uses 20 ms symbols ($1.5\times$ faster than Normal's 30 ms).
+    - Result: Normal transmits 4 physical frames at 30 ms (15.92s total $\implies 2.8\text{ B/s}$); Fast transmits 1 physical frame at 20 ms (3.52s total $\implies 12.5\text{ B/s}$).
 - **Physical Layer Confirmations**:
   - Scheme: MFSK16 retained as universal default across both bands; DTFSK retained as optional high-speed preset for clean/close-range channels.
   - Symbol durations: 30 ms (Normal), 20 ms (Fast), 60 ms (Robust).

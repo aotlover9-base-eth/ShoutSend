@@ -33,19 +33,19 @@
 | RETRO / MFSK16 / ROBUST / RS2 / x2 | WEAK_ULTRASOUND_PHONE | 10 | 100.0% ± 0.0% | 30.85s | 30.85s | 1.4 B/s | 0.0 |
 | STEALTH / MFSK16 / NORMAL / RS1 / x2 | CLEAN | 10 | 100.0% ± 0.0% | 15.92s | 15.92s | 2.8 B/s | 0.0 |
 | STEALTH / MFSK16 / NORMAL / RS1 / x2 | CLOSE_RANGE | 10 | 100.0% ± 0.0% | 15.92s | 15.92s | 2.8 B/s | 0.0 |
-| STEALTH / MFSK16 / NORMAL / RS1 / x2 | LIVING_ROOM | 10 | 20.0% ± 24.8% | 15.97s | 15.97s | 0.6 B/s | 0.0 |
+| STEALTH / MFSK16 / NORMAL / RS1 / x2 | LIVING_ROOM | 10 | 30.0% ± 28.4% | 15.97s | 15.97s | 0.8 B/s | 0.0 |
 | STEALTH / MFSK16 / NORMAL / RS1 / x2 | QUIET_ROOM | 10 | 0.0% ± 0.0% | 15.97s | 15.97s | 0.0 B/s | 0.0 |
 | STEALTH / MFSK16 / NORMAL / RS1 / x2 | CAFE | 10 | 100.0% ± 0.0% | 16.04s | 16.04s | 2.7 B/s | 0.5 |
 | STEALTH / MFSK16 / NORMAL / RS1 / x2 | WEAK_ULTRASOUND_PHONE | 10 | 100.0% ± 0.0% | 15.97s | 15.97s | 2.8 B/s | 0.0 |
 | STEALTH / MFSK16 / FAST / RS0 / x1 | CLEAN | 10 | 100.0% ± 0.0% | 3.52s | 3.52s | 12.5 B/s | 0.0 |
 | STEALTH / MFSK16 / FAST / RS0 / x1 | CLOSE_RANGE | 10 | 100.0% ± 0.0% | 3.52s | 3.52s | 12.5 B/s | 0.0 |
-| STEALTH / MFSK16 / FAST / RS0 / x1 | LIVING_ROOM | 10 | 20.0% ± 24.8% | 3.57s | 3.57s | 2.5 B/s | 0.0 |
+| STEALTH / MFSK16 / FAST / RS0 / x1 | LIVING_ROOM | 10 | 30.0% ± 28.4% | 3.57s | 3.57s | 3.7 B/s | 0.0 |
 | STEALTH / MFSK16 / FAST / RS0 / x1 | QUIET_ROOM | 10 | 0.0% ± 0.0% | 3.57s | 3.57s | 0.0 B/s | 0.0 |
 | STEALTH / MFSK16 / FAST / RS0 / x1 | CAFE | 10 | 80.0% ± 24.8% | 3.64s | 3.64s | 9.7 B/s | 0.7 |
 | STEALTH / MFSK16 / FAST / RS0 / x1 | WEAK_ULTRASOUND_PHONE | 10 | 100.0% ± 0.0% | 3.57s | 3.57s | 12.3 B/s | 0.0 |
 | STEALTH / MFSK16 / ROBUST / RS2 / x2 | CLEAN | 10 | 100.0% ± 0.0% | 30.81s | 30.81s | 1.4 B/s | 0.0 |
 | STEALTH / MFSK16 / ROBUST / RS2 / x2 | CLOSE_RANGE | 10 | 100.0% ± 0.0% | 30.81s | 30.81s | 1.4 B/s | 0.0 |
-| STEALTH / MFSK16 / ROBUST / RS2 / x2 | LIVING_ROOM | 10 | 20.0% ± 24.8% | 30.85s | 30.85s | 0.3 B/s | 0.0 |
+| STEALTH / MFSK16 / ROBUST / RS2 / x2 | LIVING_ROOM | 10 | 30.0% ± 28.4% | 30.85s | 30.85s | 0.4 B/s | 0.0 |
 | STEALTH / MFSK16 / ROBUST / RS2 / x2 | QUIET_ROOM | 10 | 0.0% ± 0.0% | 30.85s | 30.85s | 0.0 B/s | 0.0 |
 | STEALTH / MFSK16 / ROBUST / RS2 / x2 | CAFE | 10 | 90.0% ± 18.6% | 30.92s | 30.92s | 1.3 B/s | 0.1 |
 | STEALTH / MFSK16 / ROBUST / RS2 / x2 | WEAK_ULTRASOUND_PHONE | 10 | 100.0% ± 0.0% | 30.85s | 30.85s | 1.4 B/s | 0.0 |
@@ -85,10 +85,10 @@
   - **Fast (20ms)**: High speed for direct contact or adjacent desk line-of-sight.
   - **Normal (30ms) [Default]**: Optimal balance of speed and room reverberation resilience.
   - **Robust (60ms)**: Maximum error correction for noisy, crowded environments.
-- **Transfer Durations for Typical Wi-Fi Payload (~45 bytes on wire)**:
-  - Fast: ~3.8 seconds.
-  - Normal: ~7.2 seconds.
-  - Robust: ~16.5 seconds.
+- **Transfer Durations for Typical Payloads**:
+  - Fast: ~3.5s for 44B payload (1 frame, 1 repeat).
+  - Normal: ~8.5s for <=42B payload (1 frame, 2 repeats); ~15.9s for 44B payload (2 frames, 2 repeats).
+  - Robust: ~30.8s for 44B payload (2 frames, 2 repeats).
 
 ## 5. DSP Performance and Allocation Audit
 

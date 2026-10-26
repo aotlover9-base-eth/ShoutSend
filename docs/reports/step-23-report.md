@@ -30,6 +30,23 @@ Executed the comprehensive simulation benchmark sweep across 42 evaluation cells
 
 ## 5. UI Implications
 - The UI exposes three intuitive preset choices:
-  - **Fast (20ms)**: ~3.8s for typical 45B Wi-Fi transfer.
-  - **Normal (30ms)**: ~7.2s for typical 45B Wi-Fi transfer (default).
-  - **Robust (60ms)**: ~16.5s for typical 45B Wi-Fi transfer.
+  - **Fast (20ms)**: ~3.5s for 44-byte benchmark payload (fits in 1 frame, 1 repeat).
+  - **Normal (30ms)**: ~15.9s for 44-byte benchmark payload (splits into 2 frames, 2 repeats = 4 on-air frames). For payloads <= 42 bytes (1 frame, 2 repeats), duration is ~8.5s.
+  - **Robust (60ms)**: ~30.8s for 44-byte benchmark payload (splits into 2 frames, 2 repeats).
+
+## 6. Throughput Discrepancy Analysis (Normal 2.8 B/s vs Fast 12.5 B/s)
+The measured benchmark throughput difference between Normal (2.8 B/s) and Fast (12.3-12.5 B/s) is explained by three multiplicative physical factors:
+1. **Reed-Solomon Codeword Capacity Threshold**:
+   - The benchmark payload is 44 bytes.
+   - Fast uses `RsProfile.LIGHT` ($k=54$), offering $54 - 6 = 48$ bytes of frame payload capacity. The 44-byte payload fits into **1 single frame**.
+   - Normal uses `RsProfile.STANDARD` ($k=48$), offering $48 - 6 = 42$ bytes of frame payload capacity. Because $44 > 42$, it splits into **2 frames**.
+2. **Repetition Multiplier**:
+   - Fast uses `repeats = 1` $\implies 1 \times 1 = 1$ physical frame transmitted on air.
+   - Normal uses `repeats = 2` $\implies 2 \times 2 = 4$ physical frames transmitted on air ($4\times$ the frame volume of Fast).
+3. **Symbol Duration**:
+   - Fast uses 20 ms symbols ($124 \times 20\text{ ms} = 2.48\text{ s}$ per frame).
+   - Normal uses 30 ms symbols ($124 \times 30\text{ ms} = 3.72\text{ s}$ per frame).
+4. **Total On-Air Time & Net Throughput**:
+   - Fast total on-air time: $1.04\text{ s (preamble/silences)} + 1 \times 2.48\text{ s} = 3.52\text{ s} \implies 44 / 3.52 = \mathbf{12.5\text{ B/s}}$.
+   - Normal total on-air time: $1.04\text{ s (preamble/silences)} + 4 \times 3.72\text{ s} = 15.92\text{ s} \implies 44 / 15.92 = \mathbf{2.8\text{ B/s}}$.
+

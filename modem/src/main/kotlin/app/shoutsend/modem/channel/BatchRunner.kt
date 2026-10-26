@@ -160,10 +160,10 @@ public object BatchRunner {
         sb.append("  - **Fast (20ms)**: High speed for direct contact or adjacent desk line-of-sight.\n")
         sb.append("  - **Normal (30ms) [Default]**: Optimal balance of speed and room reverberation resilience.\n")
         sb.append("  - **Robust (60ms)**: Maximum error correction for noisy, crowded environments.\n")
-        sb.append("- **Transfer Durations for Typical Wi-Fi Payload (~45 bytes on wire)**:\n")
-        sb.append("  - Fast: ~3.8 seconds.\n")
-        sb.append("  - Normal: ~7.2 seconds.\n")
-        sb.append("  - Robust: ~16.5 seconds.\n")
+        sb.append("- **Transfer Durations for Typical Payloads**:\n")
+        sb.append("  - Fast: ~3.5s for 44B payload (1 frame, 1 repeat).\n")
+        sb.append("  - Normal: ~8.5s for <=42B payload (1 frame, 2 repeats); ~15.9s for 44B payload (2 frames, 2 repeats).\n")
+        sb.append("  - Robust: ~30.8s for 44B payload (2 frames, 2 repeats).\n")
 
         return sb.toString()
     }

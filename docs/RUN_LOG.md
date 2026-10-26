@@ -22,4 +22,22 @@
 | 18 | DONE | 2026-10-23 00:38 | Goertzel detector bank, 16x16 crosstalk rejection passed |
 | 19 | DONE | 2026-10-23 00:43 | Dynamic noise floor tracker, asymmetric smoothing passed |
 | 20 | DONE | 2026-10-23 03:00 | Preamble detector, fine sync, 200 random offsets passed |
+| 21 | DONE | 2026-10-25 01:53 | Demodulator, ReceiverPipeline, receive state machine tests passed |
+| 22 | DONE | 2026-10-25 02:10 | ChannelSimulator, EchoRoom multi-path, frequency response tests passed |
+| 23 | DONE | 2026-10-25 14:46 | Modem benchmark sweep (42 cells), simulation tuning passed |
+| 24 | DONE | 2026-10-25 14:56 | DSP performance & allocation audit, zero hot-path allocs, 280x RTF passed |
+| 25 | DONE | 2026-10-23 03:42 | Radix-2 FFT, Hann window, streaming SpectrumAnalyzer tests passed |
 | 26 | DONE | 2026-10-23 03:20 | Permissions logic, AudioConfig, verifyPermissions passed |
+| 27 | DONE | 2026-10-25 01:30 | Low-latency AudioTrack transmitter, ring buffer, state flow passed |
+| 28 | DONE | 2026-10-25 02:38 | AudioRecord receiver, lock-free SPSC ring buffer, overflow handling passed |
+| 29 | DONE | 2026-10-25 14:15 | Ultrasonic capability probe, calibration engine, link test passed |
+| 30 | DONE | 2026-10-25 14:39 | Send/receive sessions, AudioCoordinator, audio focus & routes passed |
+| 31 | DONE | 2026-10-23 03:38 | Encrypted Room vault, AndroidKeystoreCipher AES-256-GCM, migrations passed |
+| 32 | DONE | 2026-10-25 01:27 | DataStore settings repository, proto migration, reactive settings passed |
+| 33 | DONE | 2026-10-25 18:25 | ModemConfigProvider, dev override seam, pure JVM ModemTuning passed |
+| 34 | DONE | 2026-10-26 00:00 | Cyber radio design system components, colormap tokens, dark/light previews passed |
+| 35 | DONE | 2026-10-26 00:23 | Root app shell, adaptive navigation bar/rail, type-safe routes passed |
+| 36 | DONE | 2026-10-26 00:49 | 4-page animated onboarding, mic permission flow, skip logic passed |
+| 37 | DONE | 2026-10-26 03:15 | SendScreen text & URL compose, live byte estimation, ACTION_SEND passed |
+| 38 | DONE | 2026-10-26 03:37 | SendScreen Wi-Fi & contact forms, ContactPickerReader, memory sanitization passed |
+| 39 | DONE | 2026-10-26 04:04 | TransmitScreen soundwave rings, envelope sync, vault archiving passed |
