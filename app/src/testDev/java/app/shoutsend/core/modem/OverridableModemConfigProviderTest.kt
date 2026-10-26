@@ -72,7 +72,7 @@ class OverridableModemConfigProviderTest {
         val config = provider.config.value
         assertEquals(Band.RETRO, config.band)
         assertEquals(Speed.NORMAL, config.speed)
-        assertEquals(2, config.repeats)
+        assertEquals(1, config.repeats)
         assertEquals(ModemTuning.DEFAULT, config.tuning)
         assertNull(config.audioSourceOverride)
     }

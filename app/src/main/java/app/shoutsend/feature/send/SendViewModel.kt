@@ -49,7 +49,7 @@ data class SendUiState(
     // Tuning and hardware
     val selectedBand: Band = Band.RETRO,
     val selectedSpeed: Speed = Speed.NORMAL,
-    val repeats: Int = 2,
+    val repeats: Int = 1,
     val isSecureEnabled: Boolean = false,
     val stealthWarningAccepted: Boolean = false,
     val showStealthWarningDialog: Boolean = false,

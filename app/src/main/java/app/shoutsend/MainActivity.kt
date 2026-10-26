@@ -20,6 +20,7 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import app.shoutsend.core.audio.permissions.createAppSettingsIntent
+import app.shoutsend.core.capability.CapabilityProbe
 import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.feature.calibration.CalibrationViewModel
 import app.shoutsend.feature.onboarding.OnboardingViewModel
@@ -102,7 +103,13 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     val vaultViewModel = remember { VaultViewModel(vaultRepository) }
-                    val settingsViewModel = remember { SettingsViewModel(settingsRepository) }
+                    val settingsViewModel = remember {
+                        SettingsViewModel(
+                            settingsRepository = settingsRepository,
+                            vaultRepository = vaultRepository,
+                            capabilityProbe = CapabilityProbe(this@MainActivity)
+                        )
+                    }
                     val calibrationViewModel = remember { CalibrationViewModel() }
                     val onboardingViewModel = remember {
                         OnboardingViewModel(settingsRepository, permissionRepository)

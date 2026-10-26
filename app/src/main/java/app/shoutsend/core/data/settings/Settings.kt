@@ -48,7 +48,7 @@ data class Settings(
     companion object {
         val DEFAULT_BAND: Band = Band.RETRO
         val DEFAULT_SPEED: Speed = Speed.NORMAL
-        const val DEFAULT_REPEATS: Int = 2
+        const val DEFAULT_REPEATS: Int = 1
         val DEFAULT_THEME_MODE: ThemeMode = ThemeMode.DARK
         const val DEFAULT_DYNAMIC_COLOR: Boolean = false
         const val DEFAULT_HAPTICS_ENABLED: Boolean = true
@@ -56,7 +56,7 @@ data class Settings(
         const val DEFAULT_SECURE_MODE_DEFAULT: Boolean = false
         const val DEFAULT_HISTORY_ENABLED: Boolean = true
         const val DEFAULT_HISTORY_MAX_ENTRIES: Int = 500
-        const val DEFAULT_KEEP_SCREEN_ON: Boolean = true
+        const val DEFAULT_KEEP_SCREEN_ON: Boolean = false
         val DEFAULT_LAST_CALIBRATION: String? = null
         const val DEFAULT_ONBOARDING_COMPLETED: Boolean = false
         const val DEFAULT_MIC_PERMISSION_REQUESTED: Boolean = false

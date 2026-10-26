@@ -223,4 +223,54 @@
     <string name="vault_action_star_desc">Toggle star</string>
     <string name="vault_action_delete_desc">Delete transmission</string>
     <string name="vault_action_back_desc">Navigate back to vault</string>
+
+    <!-- Settings Screen Strings (Step 44) -->
+    <string name="settings_screen_title">Settings</string>
+    <string name="settings_section_transmission">Transmission Defaults</string>
+    <string name="settings_band_label">Carrier Band</string>
+    <string name="settings_band_retro">Audible (Retro)</string>
+    <string name="settings_band_stealth">Ultrasonic (Stealth)</string>
+    <string name="settings_speed_label">Transmission Speed</string>
+    <string name="settings_speed_fast">Fast (~3.8s)</string>
+    <string name="settings_speed_normal">Normal (~7.2s)</string>
+    <string name="settings_speed_robust">Robust (~16.5s)</string>
+    <string name="settings_repeats_label">Frame Repeats</string>
+    <string name="settings_section_vault">Transmission Vault</string>
+    <string name="settings_vault_enable_label">Save to Vault</string>
+    <string name="settings_vault_enable_desc">Encrypted on-device history of sent and received transmissions.</string>
+    <string name="settings_vault_limit_label">Maximum History Limit</string>
+    <string name="settings_vault_prune_title">Reduce History Limit?</string>
+    <string name="settings_vault_prune_message" formatted="false">Lowering the history limit to %d will delete %d older unstarred transmission(s). Starred transmissions will not be deleted.</string>
+    <string name="settings_vault_prune_confirm">Prune &amp; Apply</string>
+    <string name="settings_section_audio_power">Audio, Haptics &amp; Power</string>
+    <string name="settings_haptics_label">Haptic Feedback</string>
+    <string name="settings_haptics_desc">Vibrate on transmit, receive lock, and action taps.</string>
+    <string name="settings_sound_effects_label">Audio Chimes</string>
+    <string name="settings_sound_effects_desc">Play audio tone cues on transmission start and completion.</string>
+    <string name="settings_keep_screen_on_label">Keep Screen Awake</string>
+    <string name="settings_keep_screen_on_desc">Prevent display sleep during active acoustic listening and transmission.</string>
+    <string name="settings_grace_label">Background Grace Timer</string>
+    <string name="settings_grace_desc">Acoustic listening duration after navigating away from ShoutSend.</string>
+    <string name="settings_grace_0s">0s (Immediate)</string>
+    <string name="settings_grace_5s">5s</string>
+    <string name="settings_grace_15s">15s</string>
+    <string name="settings_grace_30s">30s</string>
+    <string name="settings_section_appearance">Appearance</string>
+    <string name="settings_theme_label">Theme Mode</string>
+    <string name="settings_theme_dark">Cyber Dark</string>
+    <string name="settings_theme_light">Cyber Light</string>
+    <string name="settings_theme_system">System Default</string>
+    <string name="settings_dynamic_color_label">Dynamic Color Accent</string>
+    <string name="settings_dynamic_color_desc">Harmonize cyber radio accent colors with Android wallpaper (Material You).</string>
+    <string name="settings_section_diagnostics">Diagnostics &amp; Calibration</string>
+    <string name="settings_diagnostics_desc">Acoustic hardware sampling and latency diagnostics.</string>
+    <string name="settings_btn_open_calibration">Acoustic Calibration &amp; Link Test</string>
+    <string name="settings_section_about">About &amp; Privacy</string>
+    <string name="settings_version_label">ShoutSend v1.0.0-offline</string>
+    <string name="settings_offline_pledge" formatted="false">100% Offline Acoustic Protocol. Zero internet permissions, zero cloud telemetry, 100% local.</string>
+    <string name="settings_btn_replay_onboarding">Replay Onboarding Guide</string>
+    <string name="settings_btn_delete_all_data">Delete All App Data</string>
+    <string name="settings_delete_dialog_title">Delete All App Data?</string>
+    <string name="settings_delete_dialog_message">This will permanently purge all encrypted vault transmissions, reset all settings to defaults, and clear onboarding state. This action cannot be undone.</string>
+    <string name="settings_delete_dialog_confirm">Delete Everything</string>
 </resources>

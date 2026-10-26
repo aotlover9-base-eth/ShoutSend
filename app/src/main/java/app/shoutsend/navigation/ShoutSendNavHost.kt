@@ -219,7 +219,8 @@ fun ShoutSendNavHost(
             SettingsScreen(
                 viewModel = settingsViewModel,
                 onNavigateBack = { navController.popBackStack() },
-                onNavigateToCalibration = { navController.navigate(CalibrationRoute) }
+                onNavigateToCalibration = { navController.navigate(CalibrationRoute) },
+                onNavigateToOnboarding = { navController.navigate(OnboardingRoute) }
             )
         }
 
