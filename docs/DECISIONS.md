@@ -544,4 +544,53 @@
   - Enforces `keepScreenOn = true` on the window during active acoustic modulation via `DisposableEffect`, reverting on exit.
   - Intercepts system back gesture during active transmission with a confirmation dialog to prevent accidental transmission drops. Single-tap "Stop" button available on screen for immediate manual abort.
 
+### DEC-059: Spectrogram Waterfall, Colormap Generation, and Preamble Lock Visualization
+- **Live 256-Bin Rolling Spectrogram (`WaterfallCanvas`)**:
+  - High-performance, zero-allocation spectrogram rendering pre-computed 256-bin FFT power frames using a direct Android Bitmap canvas pipe.
+  - Photometric 4-stop tokenized colormap lookup table (`ColormapFactory`) mapping signal powers dynamically to theme tokens.
+  - Pulsating channel glow and sync marker guidance lines indicating real-time carrier frequencies.
+  - Reduced-motion accessible 16-band energy bar fallback (`ReducedMotionSpectrum`) for low-power and screen-reader accessibility modes.
+
+### DEC-060: Instant Action Cards, Clipboard Handling, and URL Security Protocol
+- **Action Execution Framework (`PayloadActionHelper`)**:
+  - Wi-Fi actions: Generates Android 10+ `WifiNetworkSpecifier` suggestion intents, with backward-compatible fallback to native system Wi-Fi settings. Passwords masked by default with show/hide toggle.
+  - Contact actions: Direct dispatch to `ContactsContract.Intents.Insert` with selective field exclusion.
+  - URL actions: Sanitizes URLs against malicious schemes (`javascript:`, `file:`, `data:` blocked); validates RFC 3986 format before opening via system browser intent.
+  - Sensitive clipboard handling: Injects `ClipDescription.EXTRA_IS_SENSITIVE = true` flag on Android 13+ to prevent clipboard preview popups for secrets.
+
+### DEC-061: Transmission Vault Architecture, Reactive Filtering, and Swipe-to-Delete
+- **Reactive Vault Screen (`VaultScreen` & `VaultDetailScreen`)**:
+  - Filter strip supporting All, Starred, Sent, and Received records with live payload type filtering chips.
+  - Swipe-to-delete with reactive undo snackbar and top-bar "Clear All" with non-reversible deletion confirmation.
+  - Detail screen featuring full telemetry (SNR in dB, airtime duration, modem profile, timestamp), masked secret reveal button, and primary "Re-transmit" flow preserving security warnings and passphrase prompts.
+
+### DEC-062: Grouped Settings Architecture, Near-Ultrasound Disclosure, and Starred Vault Pruning
+- **Card-Based Categorization (`SettingsScreen`)**:
+  - Six grouped settings categories: Transmission Defaults, Transmission Vault, Audio/Haptics/Power, Appearance, Diagnostics & Calibration, and About & Privacy.
+  - Near-ultrasound Stealth mode disclosure dialog requiring explicit consent before activating high-frequency inaudible transmission.
+  - Vault auto-pruning confirmation dialog guaranteeing starred entries are never pruned.
+  - Complete application data reset behind non-recoverable confirmation modal.
+
+### DEC-063: Acoustic Transducer Calibration, Loopback Diagnostics, and Tone Plan Recommendations
+- **Full-Duplex Calibration Engine (`CalibrationRunner`)**:
+  - Exception to half-duplex constraint: runs full-duplex acoustic frequency sweep (1 kHz – 21.5 kHz) using low-volume chirp excitation.
+  - Real-time ambient noise floor baseline evaluation (1 second measurement), spectral response profiling, and SNR determination.
+  - Band verdict categorization (`GOOD`, `USABLE`, `POOR`) and one-tap "Apply Recommendations" updating DataStore defaults.
+
+### DEC-064: Authenticated Secure Mode UI, Linear PCM Earcon Synthesis, Predictive Back, and DSP Lab Isolation
+- **Cryptographic Secure Mode UI (`SendScreen` & `SendViewModel`)**:
+  - AES-GCM 256-bit payload encryption modal with live PBKDF2 entropy evaluation (`PassphraseEvaluator`), sealed cyber lock badge, and wire overhead budget accounting (28 bytes).
+  - In-place volatile memory sanitization (`clearSensitiveData`) zeroing passphrase buffers upon screen departure or transmission completion.
+- **Synthesized Acoustic Earcon Audio Feedback (`EarconSynthesizer`)**:
+  - Pure Kotlin in-memory synthesis of linear PCM 16-bit 48kHz audio buffers for Start chirp, Lock click, Success harmonic chord, and Discordant error tones.
+  - Gated by user sound effect settings, system ringer modes (`RINGER_MODE_SILENT`), and phone call states.
+- **Predictive Back & Motion Transitions (`ShoutSendNavHost` & `AppScaffold`)**:
+  - Full adherence to Android 14+ Predictive Back with `enableOnBackInvokedCallback="true"`.
+  - Non-blocking back gesture interception protecting active acoustic sessions.
+  - Animated bottom navigation bar and navigation rail transitions obeying `isReducedMotion`.
+- **Developer Panel DSP Lab (`DspLabScreen` & `DspLabViewModel`)**:
+  - Contained 100% in `src/dev` and `src/testDev`, providing 16-bar Goertzel power meters, synthetic tone injection pad, and real-time SNR telemetry.
+  - Verified 0 dev marker leakage in User APK via `verifyUserApkClean`.
+
+
 
