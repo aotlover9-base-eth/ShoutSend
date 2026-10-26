@@ -53,7 +53,7 @@
 | 48 | E UI | Motion, transitions, predictive back | Yes | **Done** |
 | 49 | E UI | Accessibility pass | Light | **Done** |
 | 50 | E UI | Developer panel: DSP Lab | Light | **Done** |
-| 51 | F Hardening | Robustness and edge cases | No | Todo |
+| 51 | F Hardening | Robustness and edge cases | No | **Done** |
 | 52 | F Hardening | Security and privacy review | No | Todo |
 | 53 | F Hardening | Test consolidation | No | Todo |
 | 54 | F Hardening | Performance and battery profile | No | Todo |
