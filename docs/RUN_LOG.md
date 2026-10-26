@@ -59,3 +59,4 @@
 | 55 | DONE | 2026-10-27 02:44 | Field test plan & dev tooling, FIELD_TEST_PLAN.md, FieldTestLogger JSON/CSV export, 4 tests passed |
 | 56 | DONE | 2026-10-27 02:54 | Preset tuning from field data, empirical calibration hierarchy, 5 tests passed |
 | 57 | DONE | 2026-10-27 03:10 | Lint, R8, size cleanup, proguard-rules.pro, 4.0MB release APK, lint 0 errors |
+| 58 | DONE | 2026-10-27 03:23 | Release build & docs, README.md, assembleUserRelease & assembleDevRelease verified |

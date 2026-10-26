@@ -187,6 +187,9 @@ app/src/user/java/app/shoutsend/core/devtools/  # No-op dev tools implementation
 
 - Step 57 completed: Lint, R8, and size cleanup completed. Authored comprehensive R8 / ProGuard rules (`app/proguard-rules.pro`), enabled `isMinifyEnabled = true` and `isShrinkResources = true` in release configuration. Successfully compiled `assembleUserRelease` producing an optimized 4.0 MB APK. Passed `lintDevDebug` and `lintUserDebug` with 0 errors.
 
+- Step 58 completed: Release build and docs completed. Built both `assembleUserRelease` (4.0 MB) and `assembleDevRelease` (4.1 MB) with R8 dead code elimination and resource shrinking. Overhauled root `README.md` with complete physical layer specifications, architectural stack diagram, security statements, and build commands. Passed all architectural guards.
+
+
 
 
 
