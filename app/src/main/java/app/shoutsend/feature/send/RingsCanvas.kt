@@ -12,6 +12,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.core.designsystem.ColorTokens
 import kotlin.math.hypot
@@ -107,7 +109,13 @@ fun RingsCanvas(
         }
     }
 
-    Canvas(modifier = modifier.fillMaxSize()) {
+    Canvas(
+        modifier = modifier
+            .fillMaxSize()
+            .semantics {
+                contentDescription = RingsSemantics.formatDescription(isTransmitting)
+            }
+    ) {
         // Read frameClock to trigger draw phase invalidated purely by frame ticker
         @Suppress("UNUSED_VARIABLE")
         val tick = frameClock.longValue
@@ -166,5 +174,18 @@ private fun resolveToneColor(toneIndex: Int, colors: ColorTokens): Color {
             lerp(colors.tertiary, colors.signalPeak, frac)
         }
         else -> colors.primary
+    }
+}
+
+/**
+ * Formatter for RingsCanvas accessibility announcements.
+ */
+object RingsSemantics {
+    fun formatDescription(isTransmitting: Boolean): String {
+        return if (isTransmitting) {
+            "Acoustic transmission soundwave ripple animation, broadcasting data over sound"
+        } else {
+            "Acoustic soundwave ripple animation, idle"
+        }
     }
 }

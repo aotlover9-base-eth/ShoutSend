@@ -15,6 +15,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import app.shoutsend.core.designsystem.ChirpTheme
 
 /**
@@ -39,7 +41,11 @@ fun LevelMeter(
     val isClipping = levelDbfs >= -3.0f
     val barColor = if (isClipping) ChirpTheme.colors.signalError else ChirpTheme.colors.signalActive
 
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier.semantics {
+            contentDescription = "Audio input level: ${levelDbfs.toInt()} dBFS${if (isClipping) ", warning: signal clipping" else ""}"
+        }
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()

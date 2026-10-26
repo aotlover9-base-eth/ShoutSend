@@ -14,6 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import app.shoutsend.core.designsystem.ChirpTheme
 
 /**
@@ -37,7 +39,11 @@ fun ByteMeter(
         else -> ChirpTheme.colors.primary
     }
 
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier.semantics {
+            contentDescription = "Payload size: $bytesUsed of $maxBytes bytes, estimated transmission duration: ${"%.1f".format(estimatedDurationSeconds)} seconds"
+        }
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically

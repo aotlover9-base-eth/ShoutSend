@@ -22,6 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import app.shoutsend.core.designsystem.ChirpTheme
 
 enum class AcousticStatus {
@@ -68,8 +70,13 @@ fun StatusPill(
         alpha
     }
 
+    val labelText = customLabel ?: defaultLabel
+
     Row(
         modifier = modifier
+            .semantics {
+                contentDescription = "Status: $labelText"
+            }
             .clip(ChirpTheme.shapes.extraLarge)
             .background(ChirpTheme.colors.surfaceContainerHigh)
             .border(
@@ -94,7 +101,7 @@ fun StatusPill(
         Spacer(modifier = Modifier.width(ChirpTheme.spacing.xs))
 
         Text(
-            text = customLabel ?: defaultLabel,
+            text = labelText,
             style = ChirpTheme.typography.radioReadoutSmall,
             color = statusColor
         )

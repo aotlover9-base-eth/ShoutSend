@@ -14,6 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import app.shoutsend.core.designsystem.ChirpTheme
 
 /**
@@ -34,7 +36,9 @@ fun SignalMeter(
     val activeSegments = (normalized * totalSegments).toInt()
 
     Column(
-        modifier = modifier,
+        modifier = modifier.semantics {
+            contentDescription = "Signal to noise ratio: ${snrDb.toInt()} decibels"
+        },
         horizontalAlignment = Alignment.Start
     ) {
         Row(
