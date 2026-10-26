@@ -185,6 +185,9 @@ app/src/user/java/app/shoutsend/core/devtools/  # No-op dev tools implementation
 
 - Step 56 completed: Preset tuning from field data implemented and verified. Verified physical acoustic constraints and numerical validity of `ModemTuning.DEFAULT` parameters. Verified empirical calibration recommendation decision tree (`CalibrationRecommender.kt`) prioritizing near-ultrasound Stealth when clean, and fallback to Retro Fast/Normal/Robust based on SNR and multipath roll-off. 5 unit tests passed in `PresetTuningTest.kt`.
 
+- Step 57 completed: Lint, R8, and size cleanup completed. Authored comprehensive R8 / ProGuard rules (`app/proguard-rules.pro`), enabled `isMinifyEnabled = true` and `isShrinkResources = true` in release configuration. Successfully compiled `assembleUserRelease` producing an optimized 4.0 MB APK. Passed `lintDevDebug` and `lintUserDebug` with 0 errors.
+
+
 
 
 
