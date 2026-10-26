@@ -64,6 +64,10 @@ android {
         compose = true
         resValues = true
     }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 tasks.register("assembleBothDebug") {

@@ -43,3 +43,4 @@
 | 39 | DONE | 2026-10-26 04:04 | TransmitScreen soundwave rings, envelope sync, vault archiving passed |
 | 40 | DONE | 2026-10-26 13:25 | ReceiveScreen spectrogram waterfall, lock glow, 11 tests passed |
 | 41 | DONE | 2026-10-26 14:15 | Receive progress & success states, SegmentedProgressBar, ReceivedPayloadCard, 14 tests passed |
+| 42 | DONE | 2026-10-26 14:35 | Instant action cards, PayloadActionHelper, Wi-Fi/Contact/URL/Text actions, 10 tests passed |

@@ -158,3 +158,77 @@ fun ReceiveScreenSuccessPreview() {
         }
     }
 }
+
+@Preview(name = "Action Card - Wi-Fi Credential", showBackground = true)
+@Composable
+fun ActionCardWiFiPreview() {
+    ChirpTheme(tokens = DesignTokens.defaultDark()) {
+        Box(
+            modifier = Modifier
+                .background(ChirpTheme.colors.background)
+        ) {
+            ReceivedPayloadCard(
+                payload = Payload.WiFi(
+                    ssid = "CyberRadio-Guest",
+                    password = "SecretPassphrase123",
+                    security = app.shoutsend.modem.payload.WifiSecurity.WPA2
+                ),
+                snrDb = 22.4,
+                profileSummary = "Retro Normal",
+                isStarred = false,
+                isSavedToVault = true,
+                hasAutoRepairedNoise = true,
+                onToggleStar = {},
+                onReceiveAnother = {}
+            )
+        }
+    }
+}
+
+@Preview(name = "Action Card - Contact Card", showBackground = true)
+@Composable
+fun ActionCardContactPreview() {
+    ChirpTheme(tokens = DesignTokens.defaultDark()) {
+        Box(
+            modifier = Modifier
+                .background(ChirpTheme.colors.background)
+        ) {
+            ReceivedPayloadCard(
+                payload = Payload.Contact(
+                    displayName = "Alex Rivera",
+                    phones = listOf("+15550192834", "+15550199999"),
+                    email = "alex.rivera@example.com"
+                ),
+                snrDb = 19.8,
+                profileSummary = "Retro Normal",
+                isStarred = true,
+                isSavedToVault = true,
+                hasAutoRepairedNoise = false,
+                onToggleStar = {},
+                onReceiveAnother = {}
+            )
+        }
+    }
+}
+
+@Preview(name = "Action Card - Web Link HTTP Warning", showBackground = true)
+@Composable
+fun ActionCardUrlWarningPreview() {
+    ChirpTheme(tokens = DesignTokens.defaultDark()) {
+        Box(
+            modifier = Modifier
+                .background(ChirpTheme.colors.background)
+        ) {
+            ReceivedPayloadCard(
+                payload = Payload.Url("http://insecure-domain.org/data?id=42"),
+                snrDb = 24.1,
+                profileSummary = "Stealth Fast",
+                isStarred = false,
+                isSavedToVault = true,
+                hasAutoRepairedNoise = false,
+                onToggleStar = {},
+                onReceiveAnother = {}
+            )
+        }
+    }
+}

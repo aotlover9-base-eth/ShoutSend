@@ -156,4 +156,26 @@
     <string name="receive_btn_open_link">Open Link</string>
     <string name="receive_btn_receive_another">Receive Another</string>
     <string name="receive_saved_to_vault">Saved to Vault history</string>
+
+    <!-- Instant Action Card Strings (Step 42) -->
+    <string name="receive_btn_share">Share</string>
+    <string name="receive_btn_connect_wifi">Connect to Wi-Fi</string>
+    <string name="receive_btn_copy_password">Copy Password</string>
+    <string name="receive_btn_save_contact">Save Contact</string>
+    <string name="receive_btn_call">Call</string>
+    <string name="receive_btn_sms">Text</string>
+    <string name="receive_btn_email">Email</string>
+    <string name="receive_wifi_copy_notice">Password copied. Select network in Wi-Fi settings to connect.</string>
+    <string name="receive_url_not_secure">Not secure (HTTP)</string>
+    <string name="receive_url_security_notice">Acoustic link received. Verify domain before opening.</string>
+    <string name="receive_action_call_desc" formatted="false">Call %s</string>
+    <string name="receive_action_sms_desc" formatted="false">Send text message to %s</string>
+    <string name="receive_action_email_desc" formatted="false">Send email to %s</string>
+    <string name="receive_action_save_contact_desc" formatted="false">Save %s to contacts</string>
+    <string name="receive_action_open_link_desc" formatted="false">Open link %s in browser</string>
+    <string name="receive_action_share_desc">Share to other apps</string>
+    <string name="receive_action_copy_desc">Copy content to clipboard</string>
+    <string name="receive_action_connect_wifi_desc">Copy password and open Wi-Fi settings</string>
+    <string name="receive_password_toggle_show">Show password</string>
+    <string name="receive_password_toggle_hide">Hide password</string>
 </resources>
