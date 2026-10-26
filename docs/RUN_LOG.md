@@ -61,3 +61,4 @@
 | 57 | DONE | 2026-10-27 03:10 | Lint, R8, size cleanup, proguard-rules.pro, 4.0MB release APK, lint 0 errors |
 | 58 | DONE | 2026-10-27 03:23 | Release build & docs, README.md, assembleUserRelease & assembleDevRelease verified |
 | 59 | DONE | 2026-10-27 03:24 | Final audit and handoff, all 28 rules verified, DEC-065-068, 100% roadmap complete |
+| 60 | DONE | 2026-10-27 04:10 | Release v1.0.0, README makeover, signed user APK (4.0 MB), SHA-256 published |

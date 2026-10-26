@@ -423,8 +423,8 @@ class ModulatorTest {
         val chunkBuffer = FloatArray(chunkSize)
 
         // Warm up JIT and pre-populate RampTable cache
-        for (i in 0 until 50) {
-            modulator.render((i * chunkSize).toLong() % modulator.totalSamples, chunkBuffer, 0, chunkSize)
+        repeat(5_000) { i ->
+            modulator.render((i.toLong() * chunkSize) % (modulator.totalSamples - chunkSize), chunkBuffer, 0, chunkSize)
         }
 
         val threadMxBean = try {

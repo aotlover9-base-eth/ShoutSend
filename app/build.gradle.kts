@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -37,6 +39,30 @@ android {
         }
     }
 
+    val signingPropsFile = file("${System.getProperty("user.home")}/.shoutsend-signing/signing.properties")
+    val hasReleaseSigning = signingPropsFile.exists() || (
+        System.getenv("RELEASE_STORE_FILE") != null &&
+        System.getenv("RELEASE_STORE_PASSWORD") != null &&
+        System.getenv("RELEASE_KEY_ALIAS") != null &&
+        System.getenv("RELEASE_KEY_PASSWORD") != null
+    )
+
+    val releaseSigning = if (hasReleaseSigning) {
+        val props = Properties()
+        if (signingPropsFile.exists()) {
+            signingPropsFile.inputStream().use { props.load(it) }
+        }
+        signingConfigs.create("release") {
+            val storePath = props.getProperty("RELEASE_STORE_FILE") ?: System.getenv("RELEASE_STORE_FILE") ?: ""
+            storeFile = file(storePath)
+            storePassword = props.getProperty("RELEASE_STORE_PASSWORD") ?: System.getenv("RELEASE_STORE_PASSWORD") ?: ""
+            keyAlias = props.getProperty("RELEASE_KEY_ALIAS") ?: System.getenv("RELEASE_KEY_ALIAS") ?: ""
+            keyPassword = props.getProperty("RELEASE_KEY_PASSWORD") ?: System.getenv("RELEASE_KEY_PASSWORD") ?: ""
+        }
+    } else {
+        null
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -45,7 +71,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = releaseSigning
         }
         debug {
             isDebuggable = true
