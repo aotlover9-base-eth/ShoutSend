@@ -110,7 +110,13 @@ class MainActivity : ComponentActivity() {
                             capabilityProbe = CapabilityProbe(this@MainActivity)
                         )
                     }
-                    val calibrationViewModel = remember { CalibrationViewModel() }
+                    val calibrationViewModel = remember {
+                        CalibrationViewModel(
+                            calibrationRunner = app.appContainer.calibrationRunner,
+                            settingsRepository = settingsRepository,
+                            audioCoordinator = audioCoordinator
+                        )
+                    }
                     val onboardingViewModel = remember {
                         OnboardingViewModel(settingsRepository, permissionRepository)
                     }

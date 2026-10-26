@@ -13,6 +13,7 @@ import app.shoutsend.modem.tuning.ModemTuning
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay
@@ -33,20 +34,23 @@ class CalibrationRunner(
     private val transmitter: AcousticTransmitter,
     private val audioSpec: AudioSpec = AudioSpec.RATE_48K,
     private val routeInfoProvider: () -> app.shoutsend.core.audio.transmitter.OutputRouteInfo,
-    private val configProvider: ModemConfigProvider? = null
+    private val configProvider: ModemConfigProvider? = null,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) {
     constructor(
         context: Context,
         receiver: AcousticReceiver,
         transmitter: AcousticTransmitter,
         audioSpec: AudioSpec = AudioSpec.RATE_48K,
-        configProvider: ModemConfigProvider? = null
+        configProvider: ModemConfigProvider? = null,
+        dispatcher: CoroutineDispatcher = Dispatchers.Default
     ) : this(
         receiver = receiver,
         transmitter = transmitter,
         audioSpec = audioSpec,
         routeInfoProvider = { getOutputRouteInfo(context) },
-        configProvider = configProvider
+        configProvider = configProvider,
+        dispatcher = dispatcher
     )
 
     /**
@@ -60,7 +64,7 @@ class CalibrationRunner(
      */
     suspend fun runCalibration(
         onProgress: (progress: Float) -> Unit = {}
-    ): CalibrationResult = withContext(Dispatchers.Default) {
+    ): CalibrationResult = withContext(dispatcher) {
         val warnings = ArrayList<String>()
         val route = routeInfoProvider()
 

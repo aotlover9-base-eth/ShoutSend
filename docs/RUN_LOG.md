@@ -46,3 +46,4 @@
 | 42 | DONE | 2026-10-26 14:35 | Instant action cards, PayloadActionHelper, Wi-Fi/Contact/URL/Text actions, 10 tests passed |
 | 43 | DONE | 2026-10-26 14:55 | Transmission Vault screen, VaultDetailScreen, retransmit, swipe-to-delete, 9 tests passed |
 | 44 | DONE | 2026-10-26 21:15 | Settings screen with 6 grouped sections, stealth disclosure, vault prune confirmation, data reset |
+| 45 | DONE | 2026-10-26 22:15 | Acoustic calibration & link test screen, loopback analysis, SNR meter, recommended preset auto-apply |

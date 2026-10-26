@@ -16,3 +16,4 @@
 buildSrc/build/
 
 .kotlin/
+.agents/

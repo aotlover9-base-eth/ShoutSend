@@ -9,6 +9,7 @@ import app.shoutsend.core.audio.receiver.AudioRecordSource
 import app.shoutsend.core.audio.receiver.DefaultAcousticReceiver
 import app.shoutsend.core.audio.transmitter.AcousticTransmitter
 import app.shoutsend.core.audio.transmitter.DefaultAcousticTransmitter
+import app.shoutsend.core.calibration.CalibrationRunner
 import app.shoutsend.core.data.settings.DataStoreMicPermissionRequestedProvider
 import app.shoutsend.core.data.settings.SettingsRepository
 import app.shoutsend.core.data.settings.bindToThemeController
@@ -78,6 +79,15 @@ class AppContainer(val context: Context) {
 
     val audioRouteMonitor: AudioRouteMonitor by lazy {
         DefaultAudioRouteMonitor(context.applicationContext)
+    }
+
+    val calibrationRunner: CalibrationRunner by lazy {
+        CalibrationRunner(
+            context = context,
+            receiver = acousticReceiver,
+            transmitter = acousticTransmitter,
+            configProvider = modemConfigProvider
+        )
     }
 
     val vaultDatabase: VaultDatabase by lazy {

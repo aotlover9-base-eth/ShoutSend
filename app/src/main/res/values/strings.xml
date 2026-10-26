@@ -273,4 +273,27 @@
     <string name="settings_delete_dialog_title">Delete All App Data?</string>
     <string name="settings_delete_dialog_message">This will permanently purge all encrypted vault transmissions, reset all settings to defaults, and clear onboarding state. This action cannot be undone.</string>
     <string name="settings_delete_dialog_confirm">Delete Everything</string>
+
+    <!-- Calibration & Link Test Screen Strings (Step 45) -->
+    <string name="calibration_title">Acoustic Calibration</string>
+    <string name="calibration_desc">Profiles speaker and microphone frequency response, measures ambient room noise, and optimizes speed presets for your environment.</string>
+    <string name="calibration_btn_start">Start Calibration</string>
+    <string name="calibration_btn_cancel">Cancel</string>
+    <string name="calibration_btn_apply">Apply Recommendations</string>
+    <string name="calibration_applied">Applied to Settings</string>
+    <string name="calibration_status_idle">Ready to calibrate</string>
+    <string name="calibration_status_sampling">Measuring ambient noise floor…</string>
+    <string name="calibration_status_chirping">Transmitting acoustic test chirps…</string>
+    <string name="calibration_status_analyzing">Analyzing frequency response…</string>
+    <string name="calibration_status_completed">Calibration complete</string>
+    <string name="calibration_status_failed">Calibration failed</string>
+    <string name="calibration_retro_summary" formatted="false">Audible (Retro): %s</string>
+    <string name="calibration_stealth_summary" formatted="false">Ultrasonic (Stealth): %s</string>
+    <string name="calibration_recommended_band">Recommended Band</string>
+    <string name="calibration_recommended_speed">Recommended Speed</string>
+    <string name="calibration_noise_floor">Ambient Noise Floor</string>
+    <string name="calibration_warning_volume">Media volume is low. Turn up volume for accurate results.</string>
+    <string name="calibration_warning_headset">Headphones or external audio connected. Disconnect for speaker-to-mic loopback.</string>
+    <string name="link_test_title">Acoustic Link Diagnostics</string>
+    <string name="link_test_desc">Real-time acoustic channel analysis and SNR link testing.</string>
 </resources>

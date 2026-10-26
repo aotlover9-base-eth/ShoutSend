@@ -47,7 +47,7 @@
 | 42 | E UI | Instant action cards | Yes | **Done** |
 | 43 | E UI | Transmission Vault screen | Yes | **Done** |
 | 44 | E UI | Settings screen | Yes | **Done** |
-| 45 | E UI | Calibration and link test screen | Yes | Todo |
+| 45 | E UI | Calibration and link test screen | Yes | **Done** |
 | 46 | E UI | Secure mode UI | Yes | Todo |
 | 47 | E UI | Haptics and audio feedback | Light | Todo |
 | 48 | E UI | Motion, transitions, predictive back | Yes | Todo |

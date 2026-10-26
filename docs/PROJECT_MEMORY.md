@@ -161,6 +161,9 @@ app/src/user/java/app/shoutsend/core/devtools/  # No-op dev tools implementation
 
 - Step 44 completed: Settings screen implemented and verified. Implemented `SettingsViewModel` backed by single source of truth `SettingsRepository` (DataStore) and `VaultRepository`. Built `SettingsScreen` structured into 6 card-based grouped sections: Transmission Defaults, Transmission Vault, Audio/Haptics/Power, Appearance, Diagnostics & Calibration, and About & Privacy. Integrated near-ultrasound Stealth mode disclosure gate, vault history limit pruning with unstarred entry calculation dialog (starred entries strictly preserved), audio chime/haptic/grace toggles, Material You dynamic color switch, and a guarded "Delete all app data" confirmation dialog wiping encrypted records and resetting configuration. Added dev previews in `SettingsScreenPreview.kt` and 7 unit tests in `SettingsViewModelTest.kt`. All architectural guards and multi-flavor compilation passing (`check`, `assembleDevDebug`, `assembleUserDebug`, `lintDevDebug`, `lintUserDebug`).
 
+- Step 45 completed: Acoustic calibration and link test screen implemented and verified. Implemented `CalibrationViewModel` managing loopback calibration lifecycle (noise baseline sampling, chirp playback, spectral response evaluation, result persistence). Built `CalibrationScreen` with cyber radio meters (`SignalMeter`, `LevelMeter`, `StatusPill`, `RadioReadout`), volume/headphone warning badges, band quality verdict cards, and one-tap "Apply Recommendations" updating user settings. Updated `LinkTestScreen` to match design tokens. Injected `CalibrationRunner` in `AppContainer` and `MainActivity`. Added dev previews in `CalibrationScreenPreview.kt` and 5 unit tests in `CalibrationViewModelTest.kt`. Full verification suite passing (`check`, `assembleDevDebug`, `assembleUserDebug`, `lintDevDebug`, `lintUserDebug`).
+
+
 
 
 
