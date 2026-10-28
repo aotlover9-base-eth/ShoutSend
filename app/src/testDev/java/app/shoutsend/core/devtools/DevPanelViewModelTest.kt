@@ -1,11 +1,11 @@
 package app.shoutsend.core.devtools
 
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import app.shoutsend.core.designsystem.DefaultTokens
 import app.shoutsend.core.designsystem.DesignTokens
 import app.shoutsend.core.designsystem.ThemeController
+import app.shoutsend.core.designsystem.ThemeMode
 import app.shoutsend.core.designsystem.TokenOverrides
 import app.shoutsend.core.designsystem.TokenOverridesRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -37,7 +37,7 @@ class DevPanelViewModelTest {
         }
 
         override suspend fun resetColor(role: String) {
-            _overrides.value = _overrides.value.copy(colors = _overrides.value.colors - role)
+            _overrides.value = _overrides.value.copy(seedColor = DefaultTokens.SEED_COLOR_LONG)
         }
 
         override suspend fun resetRadius(name: String) {
@@ -69,7 +69,7 @@ class DevPanelViewModelTest {
     }
 
     @Test
-    fun viewModelUpdatesColorAndMarksModified() = runTest {
+    fun viewModelUpdatesSeedColorAndMarksModified() = runTest {
         val fakeRepo = FakeTokenOverridesRepository()
         val controller = ThemeController(
             initialBaseTokens = DesignTokens.defaultDark(),
@@ -79,21 +79,20 @@ class DevPanelViewModelTest {
         val viewModel = DevPanelViewModel(controller, backgroundScope)
         testScheduler.runCurrent()
 
-        assertFalse(viewModel.uiState.value.hasOverrides)
+        viewModel.onDynamicColorChanged(false)
+        testScheduler.runCurrent()
+        assertTrue(viewModel.uiState.value.hasOverrides)
 
-        viewModel.onColorChanged("primary", Color(red = 0.9f, green = 0.9f, blue = 0.1f))
+        val newSeed = 0xFFBA1A1AL // Coral
+        viewModel.onSeedColorChanged(newSeed)
         testScheduler.runCurrent()
 
-        assertTrue(viewModel.uiState.value.hasOverrides)
-        val primaryItem = viewModel.uiState.value.colorGroups["Primary"]?.find { it.role == "primary" }
-        assertNotNull(primaryItem)
-        assertTrue(primaryItem!!.isModified)
-        assertEquals(Color(red = 0.9f, green = 0.9f, blue = 0.1f), primaryItem.currentColor)
-        assertEquals(Color(red = 0.9f, green = 0.9f, blue = 0.1f), controller.tokens.value.colors.primary)
+        assertEquals(newSeed, viewModel.uiState.value.seedColor)
+        assertEquals(newSeed, controller.tokens.value.seedColor)
     }
 
     @Test
-    fun viewModelResetsColor() = runTest {
+    fun viewModelUpdatesHeroShape() = runTest {
         val fakeRepo = FakeTokenOverridesRepository()
         val controller = ThemeController(
             initialBaseTokens = DesignTokens.defaultDark(),
@@ -103,17 +102,11 @@ class DevPanelViewModelTest {
         val viewModel = DevPanelViewModel(controller, backgroundScope)
         testScheduler.runCurrent()
 
-        viewModel.onColorChanged("secondary", Color(red = 0.9f, green = 0.1f, blue = 0.9f))
-        testScheduler.runCurrent()
-        assertTrue(viewModel.uiState.value.hasOverrides)
-
-        viewModel.resetColor("secondary")
+        viewModel.onHeroShapeChanged("Sunny")
         testScheduler.runCurrent()
 
-        val secondaryItem = viewModel.uiState.value.colorGroups["Secondary"]?.find { it.role == "secondary" }
-        assertNotNull(secondaryItem)
-        assertFalse(secondaryItem!!.isModified)
-        assertEquals(DefaultTokens.CyberRadioDark.secondary, controller.tokens.value.colors.secondary)
+        assertEquals("Sunny", viewModel.uiState.value.heroShape)
+        assertEquals("Sunny", controller.tokens.value.heroShape)
     }
 
     @Test
@@ -127,10 +120,11 @@ class DevPanelViewModelTest {
         val viewModel = DevPanelViewModel(controller, backgroundScope)
         testScheduler.runCurrent()
 
-        viewModel.onRadiusChanged("small", 18f)
+        viewModel.onRadiusChanged("extraSmall", 10f)
         testScheduler.runCurrent()
 
-        assertTrue(controller.tokens.value.shapes.small.toString().contains("18"))
+        val shape = controller.tokens.value.shapes.extraSmall as androidx.compose.foundation.shape.CornerBasedShape
+        assertEquals(10f, shape.topStart.toPx(androidx.compose.ui.geometry.Size(100f, 100f), androidx.compose.ui.unit.Density(1f)), 0.01f)
     }
 
     @Test
@@ -144,26 +138,21 @@ class DevPanelViewModelTest {
         val viewModel = DevPanelViewModel(controller, backgroundScope)
         testScheduler.runCurrent()
 
-        viewModel.onColorChanged("tertiary", Color(red = 0.1f, green = 0.9f, blue = 0.9f))
-        viewModel.onRadiusChanged("large", 22f)
+        viewModel.onHeroShapeChanged("Heart")
+        viewModel.onRadiusChanged("large", 28f)
         testScheduler.runCurrent()
 
         val exported = viewModel.exportJson()
-        assertTrue(exported.contains("tertiary"))
-        assertTrue(exported.contains("large"))
+        assertTrue(exported.contains("Heart"))
 
         viewModel.resetAll()
         testScheduler.runCurrent()
-        assertEquals(DefaultTokens.CyberRadioDark.tertiary, controller.tokens.value.colors.tertiary)
+        assertEquals("Cookie9Sided", controller.tokens.value.heroShape)
 
-        var importSuccess = false
-        viewModel.importJson(exported) { result ->
-            importSuccess = result.isSuccess
-        }
+        val importResult = viewModel.importJson(exported)
         testScheduler.runCurrent()
 
-        assertTrue(importSuccess)
-        assertEquals(Color(red = 0.1f, green = 0.9f, blue = 0.9f), controller.tokens.value.colors.tertiary)
-        assertTrue(controller.tokens.value.shapes.large.toString().contains("22"))
+        assertTrue(importResult.isSuccess)
+        assertEquals("Heart", controller.tokens.value.heroShape)
     }
 }

@@ -672,6 +672,33 @@
   - `NetworkClientsGuard` (`checkNoNetworkClients`): Enforces Rule 29, blocking HTTP clients (`HttpURLConnection`, `HttpsURLConnection`, `okhttp`, `ktor`, `retrofit`, `URL` I/O, `WebView`, dynamic `InetAddress.getByName`), constraining raw Sockets to `core/transfer/`.
   - `StyleGuard` (`checkNoHardcodedStyle`): Extended to enforce Rule 32a (no emojis or unicode glyphs in UI strings) and Rule 32b (no monospace outside dev DSP Lab, no uppercase on Text). Initial 57 v1 violations staged in `config/style-allowlist.txt` with `# remove in R3 to R6`.
 
+### DEC-071: Step R2: Material 3 Expressive Design System, Tokens, Component Wrappers, and Developer Panel
+- **Date**: 2026-10-28
+- **Status**: Implemented & Verified
+- **Context & Objectives**:
+  - Step R2 completely replaces the legacy "Cyber Radio" visual relics (neon cards, scanlines, glow modifiers, monospace text) with the official Material 3 Expressive design system.
+  - Ensures compliance with Rule 3 (amended), Rule 6 (single hex file), Rule 7 (no raw shape or dp/sp literals), Rule 8 (single design system), and Rule 32 (anti-slop).
+- **Design System Implementation (`core/designsystem`)**:
+  - `DefaultTokens.kt`: Updated with single master seed color `SEED_COLOR_LONG = 0xFF6750A4L`, 5 preset swatches (`Violet`, `Coral`, `Forest`, `Ocean`, `Amber`), M3 Expressive shape scale (`none`, `extraSmall`, `small`, `medium`, `large`, `extraLarge`, `full`), standard 7-step spacing, stroke scale, size tokens, elevation tokens, opacity tokens, and acoustic visual tokens.
+  - `ColorTokens.kt` & `ExtendedColors.kt`: Wraps Material 3 `ColorScheme` generated via `materialkolor:2.0.2` with harmonized semantic `success` and `warning` roles. Provides dynamic `waterfallPalette(colorScheme)`.
+  - `colormap/ColormapFactory.kt`: Generates spectrogram colormaps using dynamic scheme with linear gamma interpolation and perceptual contrast.
+  - `ShapeTokens.kt`: Implements M3 Expressive scale and `ShoutShapes` hero registry (`Cookie9Sided`, `Sunny`, `Clover4Leaf`, `Pill`, `SoftBurst`, `Heart`, `Flower`) using `@OptIn(ExperimentalMaterial3ExpressiveApi::class)`.
+  - `ShoutSendTheme.kt`: Implemented with `MaterialExpressiveTheme` and `MotionScheme.Companion.expressive()`. `ChirpTheme.kt` retained as a thin alias.
+  - `ShoutIcons.kt`: Centralized icon registry using Material Symbols Rounded drawables.
+- **Component Wrappers**:
+  - Implemented `Shout*` components: `ShoutButton`, `ShoutIconButton`, `ShoutFab`, `ShoutButtonGroup`, `ShoutCard`, `ShoutListItem`, `ShoutTextField`, `ShoutSwitch`, `ShoutChip`, `ShoutBottomSheet`, `ShoutDialog`, `ShoutTopAppBar`, `ShoutNavigationBar`, `ShoutSnackbarHost`, `ShoutLoadingIndicator`, `ShoutProgress`, `ShoutEmptyState`, and `MorphingShape`.
+  - Converted legacy `Cd*` components to thin forwarding wrappers for seamless transition across steps R3-R6.
+- **Relic Deletion**:
+  - Deleted `NeonCard.kt`, `RadioReadout.kt`, `ScanlineOverlay.kt`, and `CyberRadioComponentsPreview.kt`. Cleaned up all call sites across features.
+- **Developer Panel Tuning Tools (`src/dev`)**:
+  - Updated `DeveloperPanel.kt` and `DevPanelViewModel.kt` with live tuning: Dynamic Color toggle, Seed Color presets (Violet, Coral, Forest, Ocean, Amber), Hue and Saturation sliders, Contrast Level slider, Hero Shape selector with live preview, Corner Radius sliders, and "Reset to Defaults".
+  - Isolated strictly to `src/dev` and verified absent from user builds via `verifyUserApkClean`.
+- **Verification**:
+  - Unit tests run with `--rerun-tasks`: 605 passed, 0 failed, 0 errors, 0 skipped (166 modem, 228 devDebug, 211 userDebug).
+  - Lint: 0 errors, 104 warnings (zero new warnings introduced in designsystem/devtools).
+  - Purity guards: `checkNoHardcodedStyle` PASSED, `verifyUserApkClean` PASSED, `checkNoNetworkClients` PASSED, `verifyPermissions` PASSED.
+
+
 
 
 

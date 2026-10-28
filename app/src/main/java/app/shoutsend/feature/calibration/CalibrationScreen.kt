@@ -36,9 +36,7 @@ import app.shoutsend.core.designsystem.components.CdButton
 import app.shoutsend.core.designsystem.components.CdIconButton
 import app.shoutsend.core.designsystem.components.CdOutlinedButton
 import app.shoutsend.core.designsystem.components.MicPermissionCard
-import app.shoutsend.core.designsystem.components.NeonCard
-import app.shoutsend.core.designsystem.components.RadioReadout
-import app.shoutsend.core.designsystem.components.ReadoutScale
+import app.shoutsend.core.designsystem.components.ShoutCard
 import app.shoutsend.core.designsystem.components.SignalMeter
 import app.shoutsend.core.designsystem.components.StatusPill
 
@@ -117,7 +115,7 @@ fun CalibrationScreen(
         }
 
         // Overview / Status Card
-        NeonCard(modifier = Modifier.fillMaxWidth()) {
+        ShoutCard(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.padding(ChirpTheme.spacing.md),
                 verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)
@@ -167,7 +165,7 @@ fun CalibrationScreen(
         // Last Calibration Result Card
         val result = uiState.lastResult
         if (result != null) {
-            NeonCard(modifier = Modifier.fillMaxWidth()) {
+            ShoutCard(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier = Modifier.padding(ChirpTheme.spacing.md),
                     verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.md)
@@ -214,18 +212,30 @@ fun CalibrationScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)
                     ) {
-                        RadioReadout(
-                            label = stringResource(R.string.calibration_recommended_band),
-                            value = result.recommendedBand.name,
-                            scale = ReadoutScale.MEDIUM,
-                            modifier = Modifier.weight(1f)
-                        )
-                        RadioReadout(
-                            label = stringResource(R.string.calibration_recommended_speed),
-                            value = result.recommendedSpeed.name,
-                            scale = ReadoutScale.MEDIUM,
-                            modifier = Modifier.weight(1f)
-                        )
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.calibration_recommended_band),
+                                style = ChirpTheme.typography.labelSmall,
+                                color = colors.onSurfaceVariant
+                            )
+                            Text(
+                                text = result.recommendedBand.name,
+                                style = ChirpTheme.typography.titleMedium,
+                                color = colors.primary
+                            )
+                        }
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.calibration_recommended_speed),
+                                style = ChirpTheme.typography.labelSmall,
+                                color = colors.onSurfaceVariant
+                            )
+                            Text(
+                                text = result.recommendedSpeed.name,
+                                style = ChirpTheme.typography.titleMedium,
+                                color = colors.primary
+                            )
+                        }
                     }
 
                     // Band Reports

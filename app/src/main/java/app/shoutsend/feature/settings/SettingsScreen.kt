@@ -35,7 +35,7 @@ import app.shoutsend.core.designsystem.components.CdButton
 import app.shoutsend.core.designsystem.components.CdIconButton
 import app.shoutsend.core.designsystem.components.CdOutlinedButton
 import app.shoutsend.core.designsystem.components.CdSwitch
-import app.shoutsend.core.designsystem.components.NeonCard
+import app.shoutsend.core.designsystem.components.ShoutCard
 import app.shoutsend.modem.profile.Band
 import app.shoutsend.modem.profile.Speed
 
@@ -140,7 +140,7 @@ fun SettingsScreen(
                 Text(
                     text = stringResource(R.string.settings_delete_dialog_title),
                     style = ChirpTheme.typography.titleMedium,
-                    color = colors.signalError
+                    color = colors.error
                 )
             },
             text = {
@@ -154,7 +154,7 @@ fun SettingsScreen(
                 CdButton(
                     onClick = { viewModel.confirmDeleteAllData() },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = colors.signalError,
+                        containerColor = colors.error,
                         contentColor = colors.onError
                     )
                 ) {
@@ -202,7 +202,7 @@ fun SettingsScreen(
         }
 
         // Section 1: Transmission Defaults
-        NeonCard(modifier = Modifier.fillMaxWidth()) {
+        ShoutCard(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.padding(ChirpTheme.spacing.md),
                 verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)
@@ -306,7 +306,7 @@ fun SettingsScreen(
         }
 
         // Section 2: Transmission Vault
-        NeonCard(modifier = Modifier.fillMaxWidth()) {
+        ShoutCard(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.padding(ChirpTheme.spacing.md),
                 verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)
@@ -369,7 +369,7 @@ fun SettingsScreen(
         }
 
         // Section 3: Audio, Haptics & Power
-        NeonCard(modifier = Modifier.fillMaxWidth()) {
+        ShoutCard(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.padding(ChirpTheme.spacing.md),
                 verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)
@@ -482,7 +482,7 @@ fun SettingsScreen(
         }
 
         // Section 4: Appearance
-        NeonCard(modifier = Modifier.fillMaxWidth()) {
+        ShoutCard(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.padding(ChirpTheme.spacing.md),
                 verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)
@@ -552,7 +552,7 @@ fun SettingsScreen(
         }
 
         // Section 5: Diagnostics & Calibration
-        NeonCard(modifier = Modifier.fillMaxWidth()) {
+        ShoutCard(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.padding(ChirpTheme.spacing.md),
                 verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)
@@ -587,7 +587,7 @@ fun SettingsScreen(
         }
 
         // Section 6: About & Privacy
-        NeonCard(modifier = Modifier.fillMaxWidth()) {
+        ShoutCard(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.padding(ChirpTheme.spacing.md),
                 verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)
@@ -625,7 +625,7 @@ fun SettingsScreen(
                         .fillMaxWidth()
                         .defaultMinSize(minHeight = ChirpTheme.sizes.touchTargetMin),
                     colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = colors.signalError
+                        contentColor = colors.error
                     )
                 ) {
                     Text(stringResource(R.string.settings_btn_delete_all_data))

@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import app.shoutsend.core.designsystem.ChirpTheme
+import app.shoutsend.core.designsystem.ShoutSendTheme
 
 /**
  * Payload byte budget meter showing bytes utilized out of the 320-byte air frame limit
@@ -34,9 +34,9 @@ fun ByteMeter(
     val isNearLimit = bytesUsed > 280
 
     val barColor = when {
-        isOverLimit -> ChirpTheme.colors.signalError
-        isNearLimit -> ChirpTheme.colors.warning
-        else -> ChirpTheme.colors.primary
+        isOverLimit -> MaterialTheme.colorScheme.error
+        isNearLimit -> ShoutSendTheme.colors.warning
+        else -> MaterialTheme.colorScheme.primary
     }
 
     Column(
@@ -50,7 +50,7 @@ fun ByteMeter(
         ) {
             Text(
                 text = "$bytesUsed / $maxBytes B",
-                style = ChirpTheme.typography.radioReadoutMedium,
+                style = MaterialTheme.typography.labelMedium,
                 color = barColor
             )
 
@@ -59,20 +59,20 @@ fun ByteMeter(
             if (estimatedDurationSeconds > 0.0) {
                 Text(
                     text = "~%.1f s".format(estimatedDurationSeconds),
-                    style = ChirpTheme.typography.radioReadoutSmall,
-                    color = ChirpTheme.colors.onSurfaceVariant
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(ChirpTheme.spacing.xs))
+        Spacer(modifier = Modifier.height(ShoutSendTheme.spacing.xs))
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(ChirpTheme.spacing.xs)
-                .clip(ChirpTheme.shapes.extraSmall)
-                .background(ChirpTheme.colors.surfaceContainerHighest)
+                .height(ShoutSendTheme.spacing.xs)
+                .clip(ShoutSendTheme.shapes.extraSmall)
+                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
         ) {
             Box(
                 modifier = Modifier

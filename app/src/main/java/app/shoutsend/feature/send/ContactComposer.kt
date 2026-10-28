@@ -24,7 +24,7 @@ import app.shoutsend.core.designsystem.components.CdCheckbox
 import app.shoutsend.core.designsystem.components.CdOutlinedButton
 import app.shoutsend.core.designsystem.components.CdOutlinedTextField
 import app.shoutsend.core.designsystem.components.CdTextButton
-import app.shoutsend.core.designsystem.components.NeonCard
+import app.shoutsend.core.designsystem.components.ShoutCard
 
 /**
  * Contact card composer form (Step 38).
@@ -60,7 +60,7 @@ fun ContactComposer(
     ) {
         if (!uiState.isContactManualMode && !hasContactData) {
             // Initial State: Pick Contact or Manual Entry Prompt
-            NeonCard(modifier = Modifier.fillMaxWidth()) {
+            ShoutCard(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier = Modifier.padding(ChirpTheme.spacing.md),
                     verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm),
@@ -91,7 +91,7 @@ fun ContactComposer(
             }
         } else {
             // Review & Editing Card ("This is exactly what will be sent")
-            NeonCard(modifier = Modifier.fillMaxWidth()) {
+            ShoutCard(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier = Modifier.padding(ChirpTheme.spacing.md),
                     verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)

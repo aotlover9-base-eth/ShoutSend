@@ -8,28 +8,26 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
-import app.shoutsend.core.designsystem.ChirpTheme
+import app.shoutsend.core.designsystem.ShoutSendTheme
 
 /**
  * Animated acoustic emblem rendering concentric sound wave pulses expanding outward.
- *
- * Drawn purely with Compose Canvas primitives using [ChirpTheme.radioVisuals] tokens.
- * Automatically falls back to static concentric rings when [ChirpTheme.isReducedMotion] is active.
+ * Drawn purely with Compose Canvas primitives. No neon glows or bloom shaders.
  */
 @Composable
 fun BrandMark(
     modifier: Modifier = Modifier,
-    color: Color = ChirpTheme.colors.primary
+    color: Color = MaterialTheme.colorScheme.primary
 ) {
-    val ringCount = ChirpTheme.radioVisuals.ringCount
-    val strokeWidth = ChirpTheme.radioVisuals.ringStrokeWidths
-    val isReducedMotion = ChirpTheme.isReducedMotion
-    val glowOpacity = ChirpTheme.opacity.glow
+    val ringCount = ShoutSendTheme.acousticVisuals.ringCount
+    val strokeWidth = ShoutSendTheme.strokes.regular
+    val isReducedMotion = ShoutSendTheme.isReducedMotion
 
     val phase = if (isReducedMotion) {
         0.0f
@@ -40,7 +38,7 @@ fun BrandMark(
             targetValue = 1.0f,
             animationSpec = infiniteRepeatable(
                 animation = tween(
-                    durationMillis = ChirpTheme.motion.durationExtraLong2,
+                    durationMillis = ShoutSendTheme.motion.durationExtraLong2,
                     easing = LinearEasing
                 ),
                 repeatMode = RepeatMode.Restart
@@ -50,8 +48,10 @@ fun BrandMark(
         progress
     }
 
+    val mutedOpacity = ShoutSendTheme.opacity.muted
+
     Canvas(
-        modifier = modifier.size(ChirpTheme.sizes.iconXl)
+        modifier = modifier.size(ShoutSendTheme.sizes.iconXl)
     ) {
         val center = this.center
         val maxRadius = size.minDimension / 2.0f
@@ -73,7 +73,7 @@ fun BrandMark(
             }
 
             val radius = maxRadius * ringProgress
-            val alpha = (1.0f - ringProgress).coerceIn(0.0f, 1.0f) * glowOpacity
+            val alpha = (1.0f - ringProgress).coerceIn(0.0f, 1.0f) * mutedOpacity
 
             if (radius > strokePx) {
                 drawCircle(

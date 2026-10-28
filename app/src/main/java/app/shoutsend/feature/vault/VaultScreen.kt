@@ -51,9 +51,7 @@ import app.shoutsend.core.designsystem.components.CdButton
 import app.shoutsend.core.designsystem.components.CdIconButton
 import app.shoutsend.core.designsystem.components.CdOutlinedButton
 import app.shoutsend.core.designsystem.components.CdSnackbarHost
-import app.shoutsend.core.designsystem.components.NeonCard
-import app.shoutsend.core.designsystem.components.RadioReadout
-import app.shoutsend.core.designsystem.components.ReadoutScale
+import app.shoutsend.core.designsystem.components.ShoutCard
 import app.shoutsend.core.designsystem.components.StatusPill
 import app.shoutsend.modem.payload.Payload
 import java.text.SimpleDateFormat
@@ -108,7 +106,7 @@ fun VaultScreen(
                 Text(
                     text = stringResource(R.string.vault_clear_dialog_title),
                     style = ChirpTheme.typography.titleMedium,
-                    color = colors.signalError
+                    color = colors.error
                 )
             },
             text = {
@@ -260,7 +258,7 @@ fun VaultScreen(
                         .padding(vertical = ChirpTheme.spacing.xl),
                     contentAlignment = Alignment.Center
                 ) {
-                    NeonCard(
+                    ShoutCard(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(
@@ -314,7 +312,7 @@ fun VaultScreen(
                                     modifier = Modifier
                                         .fillMaxSize()
                                         .clip(ChirpTheme.shapes.card)
-                                        .background(colors.signalError.copy(alpha = 0.25f))
+                                        .background(colors.error.copy(alpha = 0.25f))
                                         .padding(horizontal = ChirpTheme.spacing.md),
                                     contentAlignment = if (dismissState.dismissDirection == SwipeToDismissBoxValue.StartToEnd) {
                                         Alignment.CenterStart
@@ -325,7 +323,7 @@ fun VaultScreen(
                                     Text(
                                         text = stringResource(R.string.vault_detail_delete),
                                         style = ChirpTheme.typography.labelMedium,
-                                        color = colors.signalError
+                                        color = colors.error
                                     )
                                 }
                             },
@@ -368,7 +366,7 @@ private fun VaultItemRow(
         sdf.format(Date(item.timestamp))
     }
 
-    NeonCard(
+    ShoutCard(
         modifier = modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
@@ -392,7 +390,7 @@ private fun VaultItemRow(
                         text = if (isSent) "↑ SENT" else "↓ RCVD",
                         style = ChirpTheme.typography.labelSmall,
                         fontFamily = FontFamily.Monospace,
-                        color = if (isSent) colors.secondary else colors.syncMarker
+                        color = if (isSent) colors.secondary else colors.tertiary
                     )
 
                     Text(
@@ -431,7 +429,7 @@ private fun VaultItemRow(
                     Text(
                         text = "Encrypted message (unreadable)",
                         style = ChirpTheme.typography.bodySmall,
-                        color = colors.signalError
+                        color = colors.error
                     )
                 }
 

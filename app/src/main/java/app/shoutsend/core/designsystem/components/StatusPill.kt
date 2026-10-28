@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -21,10 +22,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import app.shoutsend.core.designsystem.ChirpTheme
+import app.shoutsend.core.designsystem.ShoutSendTheme
 
 enum class AcousticStatus {
     IDLE,
@@ -45,15 +45,15 @@ fun StatusPill(
     customLabel: String? = null
 ) {
     val (statusColor, defaultLabel) = when (status) {
-        AcousticStatus.IDLE -> ChirpTheme.colors.signalIdle to "IDLE"
-        AcousticStatus.LISTENING -> ChirpTheme.colors.signalActive to "LISTENING"
-        AcousticStatus.LOCKED -> ChirpTheme.colors.syncMarker to "LOCKED"
-        AcousticStatus.RECEIVING -> ChirpTheme.colors.primary to "RECEIVING"
-        AcousticStatus.SUCCESS -> ChirpTheme.colors.success to "COMPLETE"
-        AcousticStatus.ERROR -> ChirpTheme.colors.signalError to "ERROR"
+        AcousticStatus.IDLE -> MaterialTheme.colorScheme.outline to "Idle"
+        AcousticStatus.LISTENING -> MaterialTheme.colorScheme.primary to "Listening"
+        AcousticStatus.LOCKED -> MaterialTheme.colorScheme.tertiary to "Locked"
+        AcousticStatus.RECEIVING -> MaterialTheme.colorScheme.primary to "Receiving"
+        AcousticStatus.SUCCESS -> ShoutSendTheme.colors.success to "Complete"
+        AcousticStatus.ERROR -> MaterialTheme.colorScheme.error to "Error"
     }
 
-    val isReducedMotion = ChirpTheme.isReducedMotion
+    val isReducedMotion = ShoutSendTheme.isReducedMotion
     val dotAlpha = if (isReducedMotion || status == AcousticStatus.IDLE) {
         1.0f
     } else {
@@ -62,7 +62,7 @@ fun StatusPill(
             initialValue = 0.3f,
             targetValue = 1.0f,
             animationSpec = infiniteRepeatable(
-                animation = tween(ChirpTheme.motion.durationExtraLong1),
+                animation = tween(ShoutSendTheme.motion.durationExtraLong1),
                 repeatMode = RepeatMode.Reverse
             ),
             label = "pulseAlpha"
@@ -77,33 +77,33 @@ fun StatusPill(
             .semantics {
                 contentDescription = "Status: $labelText"
             }
-            .clip(ChirpTheme.shapes.extraLarge)
-            .background(ChirpTheme.colors.surfaceContainerHigh)
+            .clip(ShoutSendTheme.shapes.extraLarge)
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
             .border(
-                width = ChirpTheme.strokes.thin,
-                color = statusColor.copy(alpha = ChirpTheme.opacity.glow),
-                shape = ChirpTheme.shapes.extraLarge
+                width = ShoutSendTheme.strokes.thin,
+                color = MaterialTheme.colorScheme.outlineVariant,
+                shape = ShoutSendTheme.shapes.extraLarge
             )
             .padding(
-                horizontal = ChirpTheme.spacing.sm,
-                vertical = ChirpTheme.spacing.xs
+                horizontal = ShoutSendTheme.spacing.sm,
+                vertical = ShoutSendTheme.spacing.xs
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
-                .size(ChirpTheme.spacing.sm)
+                .size(ShoutSendTheme.spacing.sm)
                 .alpha(dotAlpha)
                 .clip(CircleShape)
                 .background(statusColor)
         )
 
-        Spacer(modifier = Modifier.width(ChirpTheme.spacing.xs))
+        Spacer(modifier = Modifier.width(ShoutSendTheme.spacing.xs))
 
         Text(
             text = labelText,
-            style = ChirpTheme.typography.radioReadoutSmall,
-            color = statusColor
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

@@ -44,9 +44,7 @@ import app.shoutsend.core.designsystem.components.CdButton
 import app.shoutsend.core.designsystem.components.CdIconButton
 import app.shoutsend.core.designsystem.components.CdOutlinedButton
 import app.shoutsend.core.designsystem.components.CdTextField
-import app.shoutsend.core.designsystem.components.NeonCard
-import app.shoutsend.core.designsystem.components.RadioReadout
-import app.shoutsend.core.designsystem.components.ReadoutScale
+import app.shoutsend.core.designsystem.components.ShoutCard
 import app.shoutsend.core.designsystem.components.StatusPill
 import app.shoutsend.feature.receive.PayloadActionHelper
 import app.shoutsend.modem.payload.Payload
@@ -94,7 +92,7 @@ fun VaultDetailScreen(
                 .padding(ChirpTheme.spacing.md),
             contentAlignment = Alignment.Center
         ) {
-            NeonCard(modifier = Modifier.fillMaxWidth()) {
+            ShoutCard(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier = Modifier.padding(ChirpTheme.spacing.lg),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -271,14 +269,14 @@ fun VaultDetailScreen(
                     Text(
                         text = "🗑",
                         style = ChirpTheme.typography.titleMedium,
-                        color = colors.signalError
+                        color = colors.error
                     )
                 }
             }
         }
 
         // Telemetry & Diagnostics Card
-        NeonCard(modifier = Modifier.fillMaxWidth()) {
+        ShoutCard(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.padding(ChirpTheme.spacing.md),
                 verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs)
@@ -302,7 +300,7 @@ fun VaultDetailScreen(
                         text = if (currentItem.direction == Direction.SENT) "↑ SENT" else "↓ RECEIVED",
                         style = ChirpTheme.typography.bodySmall,
                         fontFamily = FontFamily.Monospace,
-                        color = if (currentItem.direction == Direction.SENT) colors.secondary else colors.syncMarker
+                        color = if (currentItem.direction == Direction.SENT) colors.secondary else colors.tertiary
                     )
                 }
 
@@ -400,9 +398,8 @@ fun VaultDetailScreen(
 
         // Formatted Payload Card
         val payload = currentItem.payload
-        NeonCard(
-            modifier = Modifier.fillMaxWidth(),
-            borderColor = colors.outlineVariant
+        ShoutCard(
+            modifier = Modifier.fillMaxWidth()
         ) {
             Column(
                 modifier = Modifier.padding(ChirpTheme.spacing.md),
@@ -413,7 +410,7 @@ fun VaultDetailScreen(
                         Text(
                             text = "Unreadable Encrypted Record",
                             style = ChirpTheme.typography.titleMedium,
-                            color = colors.signalError
+                            color = colors.error
                         )
                         Text(
                             text = "The cryptographic key or hardware Keystore entry for this message is inaccessible.",

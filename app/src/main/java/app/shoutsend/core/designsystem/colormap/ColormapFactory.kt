@@ -1,17 +1,19 @@
 package app.shoutsend.core.designsystem.colormap
 
+import androidx.compose.material3.ColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import app.shoutsend.core.designsystem.waterfallPalette
 import kotlin.math.sqrt
 
 /**
  * Factory assembling a 256-entry ARGB lookup table for the acoustic waterfall display.
  *
  * Interpolates smoothly across four tokenized stops:
- * - Index 0: [signalLow] (ambient floor)
- * - Index 85: [signalMid] (low signal activity)
- * - Index 170: [signalHigh] (strong demodulation candidate)
- * - Index 255: [signalPeak] (carrier/preamble lock peak)
+ * - Index 0: Stop 0 (ambient noise floor, surfaceContainerLowest)
+ * - Index 85: Stop 1 (low signal activity, primaryContainer)
+ * - Index 170: Stop 2 (demodulation candidate, primary)
+ * - Index 255: Stop 3 (peak energy, tertiary)
  *
  * Interpolation executes in gamma-corrected linear photometric space to guarantee
  * smooth perceptual energy gradients without dark transition banding.
@@ -23,6 +25,11 @@ object ColormapFactory {
     private const val STOP_MID = 85
     private const val STOP_HIGH = 170
     private const val STOP_PEAK = 255
+
+    fun build(colorScheme: ColorScheme): IntArray {
+        val palette = waterfallPalette(colorScheme)
+        return build(palette[0], palette[1], palette[2], palette[3])
+    }
 
     fun build(
         signalLow: Color,

@@ -1,143 +1,87 @@
 package app.shoutsend.core.designsystem
 
 import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
 /**
- * Complete color tokens mapping to Material 3 color roles with extended slots for radio/spectrum visuals.
+ * Waterfall/spectrogram palette derived strictly from the active [ColorScheme]
+ * (surfaceContainerLowest -> primaryContainer -> primary -> tertiary).
+ */
+fun waterfallPalette(colorScheme: ColorScheme): List<Color> = listOf(
+    colorScheme.surfaceContainerLowest,
+    colorScheme.primaryContainer,
+    colorScheme.primary,
+    colorScheme.tertiary
+)
+
+/**
+ * Complete color tokens wrapping Material 3 color roles and extended semantic roles.
  */
 data class ColorTokens(
-    val primary: Color,
-    val onPrimary: Color,
-    val primaryContainer: Color,
-    val onPrimaryContainer: Color,
-    val secondary: Color,
-    val onSecondary: Color,
-    val secondaryContainer: Color,
-    val onSecondaryContainer: Color,
-    val tertiary: Color,
-    val onTertiary: Color,
-    val tertiaryContainer: Color,
-    val onTertiaryContainer: Color,
-    val error: Color,
-    val onError: Color,
-    val errorContainer: Color,
-    val onErrorContainer: Color,
-    val background: Color,
-    val onBackground: Color,
-    val surface: Color,
-    val onSurface: Color,
-    val surfaceVariant: Color,
-    val onSurfaceVariant: Color,
-    val surfaceContainerLowest: Color,
-    val surfaceContainerLow: Color,
-    val surfaceContainer: Color,
-    val surfaceContainerHigh: Color,
-    val surfaceContainerHighest: Color,
-    val outline: Color,
-    val outlineVariant: Color,
-    val scrim: Color,
-    val inverseSurface: Color,
-    val inverseOnSurface: Color,
-    val inversePrimary: Color,
-    val surfaceTint: Color,
-    // Extended slots for radio, waterfall and signal states
-    val spectrumGlow: Color,
-    val signalActive: Color,
-    val signalIdle: Color,
-    val signalError: Color,
-    val signalLow: Color,
-    val signalMid: Color,
-    val signalHigh: Color,
-    val signalPeak: Color,
-    val noiseFloorLine: Color,
-    val syncMarker: Color,
-    val toneGuide: Color,
-    val glowPrimary: Color,
-    val glowSecondary: Color,
-    val success: Color,
-    val onSuccess: Color,
-    val warning: Color,
-    val onWarning: Color,
-    val scanline: Color
+    val colorScheme: ColorScheme,
+    val extended: ExtendedColors
 ) {
-    fun toMaterialColorScheme(isDark: Boolean): ColorScheme {
-        return if (isDark) {
-            darkColorScheme(
-                primary = primary,
-                onPrimary = onPrimary,
-                primaryContainer = primaryContainer,
-                onPrimaryContainer = onPrimaryContainer,
-                secondary = secondary,
-                onSecondary = onSecondary,
-                secondaryContainer = secondaryContainer,
-                onSecondaryContainer = onSecondaryContainer,
-                tertiary = tertiary,
-                onTertiary = onTertiary,
-                tertiaryContainer = tertiaryContainer,
-                onTertiaryContainer = onTertiaryContainer,
-                error = error,
-                onError = onError,
-                errorContainer = errorContainer,
-                onErrorContainer = onErrorContainer,
-                background = background,
-                onBackground = onBackground,
-                surface = surface,
-                onSurface = onSurface,
-                surfaceVariant = surfaceVariant,
-                onSurfaceVariant = onSurfaceVariant,
-                surfaceContainerLowest = surfaceContainerLowest,
-                surfaceContainerLow = surfaceContainerLow,
-                surfaceContainer = surfaceContainer,
-                surfaceContainerHigh = surfaceContainerHigh,
-                surfaceContainerHighest = surfaceContainerHighest,
-                outline = outline,
-                outlineVariant = outlineVariant,
-                scrim = scrim,
-                inverseSurface = inverseSurface,
-                inverseOnSurface = inverseOnSurface,
-                inversePrimary = inversePrimary,
-                surfaceTint = surfaceTint
-            )
-        } else {
-            lightColorScheme(
-                primary = primary,
-                onPrimary = onPrimary,
-                primaryContainer = primaryContainer,
-                onPrimaryContainer = onPrimaryContainer,
-                secondary = secondary,
-                onSecondary = onSecondary,
-                secondaryContainer = secondaryContainer,
-                onSecondaryContainer = onSecondaryContainer,
-                tertiary = tertiary,
-                onTertiary = onTertiary,
-                tertiaryContainer = tertiaryContainer,
-                onTertiaryContainer = onTertiaryContainer,
-                error = error,
-                onError = onError,
-                errorContainer = errorContainer,
-                onErrorContainer = onErrorContainer,
-                background = background,
-                onBackground = onBackground,
-                surface = surface,
-                onSurface = onSurface,
-                surfaceVariant = surfaceVariant,
-                onSurfaceVariant = onSurfaceVariant,
-                surfaceContainerLowest = surfaceContainerLowest,
-                surfaceContainerLow = surfaceContainerLow,
-                surfaceContainer = surfaceContainer,
-                surfaceContainerHigh = surfaceContainerHigh,
-                surfaceContainerHighest = surfaceContainerHighest,
-                outline = outline,
-                outlineVariant = outlineVariant,
-                scrim = scrim,
-                inverseSurface = inverseSurface,
-                inverseOnSurface = inverseOnSurface,
-                inversePrimary = inversePrimary,
-                surfaceTint = surfaceTint
-            )
-        }
-    }
+    val primary: Color get() = colorScheme.primary
+    val onPrimary: Color get() = colorScheme.onPrimary
+    val primaryContainer: Color get() = colorScheme.primaryContainer
+    val onPrimaryContainer: Color get() = colorScheme.onPrimaryContainer
+    val secondary: Color get() = colorScheme.secondary
+    val onSecondary: Color get() = colorScheme.onSecondary
+    val secondaryContainer: Color get() = colorScheme.secondaryContainer
+    val onSecondaryContainer: Color get() = colorScheme.onSecondaryContainer
+    val tertiary: Color get() = colorScheme.tertiary
+    val onTertiary: Color get() = colorScheme.onTertiary
+    val tertiaryContainer: Color get() = colorScheme.tertiaryContainer
+    val onTertiaryContainer: Color get() = colorScheme.onTertiaryContainer
+    val error: Color get() = colorScheme.error
+    val onError: Color get() = colorScheme.onError
+    val errorContainer: Color get() = colorScheme.errorContainer
+    val onErrorContainer: Color get() = colorScheme.onErrorContainer
+    val background: Color get() = colorScheme.background
+    val onBackground: Color get() = colorScheme.onBackground
+    val surface: Color get() = colorScheme.surface
+    val onSurface: Color get() = colorScheme.onSurface
+    val surfaceVariant: Color get() = colorScheme.surfaceVariant
+    val onSurfaceVariant: Color get() = colorScheme.onSurfaceVariant
+    val surfaceContainerLowest: Color get() = colorScheme.surfaceContainerLowest
+    val surfaceContainerLow: Color get() = colorScheme.surfaceContainerLow
+    val surfaceContainer: Color get() = colorScheme.surfaceContainer
+    val surfaceContainerHigh: Color get() = colorScheme.surfaceContainerHigh
+    val surfaceContainerHighest: Color get() = colorScheme.surfaceContainerHighest
+    val outline: Color get() = colorScheme.outline
+    val outlineVariant: Color get() = colorScheme.outlineVariant
+    val scrim: Color get() = colorScheme.scrim
+    val inverseSurface: Color get() = colorScheme.inverseSurface
+    val inverseOnSurface: Color get() = colorScheme.inverseOnSurface
+    val inversePrimary: Color get() = colorScheme.inversePrimary
+    val surfaceTint: Color get() = colorScheme.surfaceTint
+
+    // Extended semantic roles
+    val success: Color get() = extended.success
+    val onSuccess: Color get() = extended.onSuccess
+    val successContainer: Color get() = extended.successContainer
+    val onSuccessContainer: Color get() = extended.onSuccessContainer
+    val warning: Color get() = extended.warning
+    val onWarning: Color get() = extended.onWarning
+    val warningContainer: Color get() = extended.warningContainer
+    val onWarningContainer: Color get() = extended.onWarningContainer
+
+    // Migration accessors mapped to M3 roles (to be cleaned up in R3-R6 screens)
+    val signalActive: Color get() = primary
+    val signalIdle: Color get() = outline
+    val signalError: Color get() = error
+    val signalLow: Color get() = surfaceVariant
+    val signalMid: Color get() = primaryContainer
+    val signalHigh: Color get() = primary
+    val signalPeak: Color get() = secondary
+    val syncMarker: Color get() = tertiary
+    val toneGuide: Color get() = outlineVariant
+    val noiseFloorLine: Color get() = tertiary
+    val glowPrimary: Color get() = primary
+    val glowSecondary: Color get() = secondary
+    val spectrumGlow: Color get() = primary
+    val scanline: Color get() = Color.Transparent
+
+    fun toMaterialColorScheme(): ColorScheme = colorScheme
+    fun toMaterialColorScheme(isDark: Boolean): ColorScheme = colorScheme
 }

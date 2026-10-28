@@ -43,7 +43,7 @@ import app.shoutsend.core.designsystem.components.CdOutlinedButton
 import app.shoutsend.core.designsystem.components.CdOutlinedTextField
 import app.shoutsend.core.designsystem.components.CdSwitch
 import app.shoutsend.core.designsystem.components.ModeSelector
-import app.shoutsend.core.designsystem.components.NeonCard
+import app.shoutsend.core.designsystem.components.ShoutCard
 import app.shoutsend.core.designsystem.components.SpeedSelector
 import app.shoutsend.core.designsystem.components.StatusPill
 import app.shoutsend.modem.crypto.PassphraseEvaluator
@@ -139,7 +139,7 @@ fun SendScreen(
                     }
                 }
 
-                NeonCard(modifier = Modifier.fillMaxWidth()) {
+                ShoutCard(modifier = Modifier.fillMaxWidth()) {
                     Column(
                         modifier = Modifier.padding(ChirpTheme.spacing.md),
                         verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs)
@@ -327,7 +327,7 @@ fun SendScreen(
 
         // --- 2. Dynamic Input Composers ---
         if (uiState.isSecureEnabled) {
-            NeonCard(
+            ShoutCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { viewModel.openPassphraseDialog() }
@@ -456,7 +456,7 @@ fun SendScreen(
             Text(
                 text = stringResource(R.string.send_error_too_long),
                 style = ChirpTheme.typography.bodySmall,
-                color = ChirpTheme.colors.signalError
+                color = ChirpTheme.colors.error
             )
         } else if (uiState.validationError != null) {
             Text(
@@ -475,7 +475,7 @@ fun SendScreen(
         }
 
         // --- 4. Settings Strip ---
-        NeonCard(modifier = Modifier.fillMaxWidth()) {
+        ShoutCard(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.padding(ChirpTheme.spacing.md),
                 verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.md)

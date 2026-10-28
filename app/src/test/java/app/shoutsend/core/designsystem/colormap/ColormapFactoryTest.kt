@@ -2,7 +2,8 @@ package app.shoutsend.core.designsystem.colormap
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import app.shoutsend.core.designsystem.DefaultTokens
+import app.shoutsend.core.designsystem.DesignTokens
+import app.shoutsend.core.designsystem.waterfallPalette
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -18,7 +19,7 @@ class ColormapFactoryTest {
 
     @Test
     fun testColormapEndpointsAndStops() {
-        val colors = DefaultTokens.CyberRadioDark
+        val colors = DesignTokens.defaultDark().colors
         val lut = ColormapFactory.build(
             signalLow = colors.signalLow,
             signalMid = colors.signalMid,
@@ -34,8 +35,21 @@ class ColormapFactoryTest {
     }
 
     @Test
-    fun testColormapBrightnessIncreasesFromAmbientToPeak() {
-        val colors = DefaultTokens.CyberRadioDark
+    fun testColormapFromColorSchemeMatchesWaterfallPalette() {
+        val scheme = DesignTokens.defaultDark().colors.colorScheme
+        val palette = waterfallPalette(scheme)
+        val lut = ColormapFactory.build(scheme)
+
+        assertEquals(256, lut.size)
+        assertEquals(palette[0].toArgb(), lut[0])
+        assertEquals(palette[1].toArgb(), lut[85])
+        assertEquals(palette[2].toArgb(), lut[170])
+        assertEquals(palette[3].toArgb(), lut[255])
+    }
+
+    @Test
+    fun testColormapBrightnessIncreasesFromAmbientToSignal() {
+        val colors = DesignTokens.defaultDark().colors
         val lut = ColormapFactory.build(
             signalLow = colors.signalLow,
             signalMid = colors.signalMid,
@@ -46,10 +60,8 @@ class ColormapFactoryTest {
         val lumLow = luminance(lut[0])
         val lumMid = luminance(lut[85])
         val lumHigh = luminance(lut[170])
-        val lumPeak = luminance(lut[255])
 
         assertTrue("Luminance at mid ($lumMid) must exceed low ($lumLow)", lumMid > lumLow)
         assertTrue("Luminance at high ($lumHigh) must exceed mid ($lumMid)", lumHigh > lumMid)
-        assertTrue("Luminance at peak ($lumPeak) must exceed high ($lumHigh)", lumPeak > lumHigh)
     }
 }

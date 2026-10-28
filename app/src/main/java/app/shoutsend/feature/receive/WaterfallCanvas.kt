@@ -34,7 +34,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.core.designsystem.colormap.ColormapFactory
-import app.shoutsend.core.designsystem.components.ScanlineOverlay
 import app.shoutsend.modem.profile.Band
 
 /**
@@ -68,13 +67,8 @@ fun WaterfallCanvas(
     val regularStrokePx = with(density) { ChirpTheme.strokes.regular.toPx() }
 
     // Recompute colormap lookup table whenever theme color tokens change
-    LaunchedEffect(colors.signalLow, colors.signalMid, colors.signalHigh, colors.signalPeak) {
-        val lut = ColormapFactory.build(
-            signalLow = colors.signalLow,
-            signalMid = colors.signalMid,
-            signalHigh = colors.signalHigh,
-            signalPeak = colors.signalPeak
-        )
+    LaunchedEffect(colors.colorScheme) {
+        val lut = ColormapFactory.build(colors.colorScheme)
         buffer.updateColormap(lut)
     }
 
@@ -167,7 +161,7 @@ fun WaterfallCanvas(
                         val toneHz = toneBaseHz + (i * toneStepHz)
                         val x = (((toneHz - bandStartHz) / totalBandSpan) * size.width).toFloat()
                         val isToneActive = (i == activeToneIndex)
-                        val lineColor = if (isToneActive) colors.signalPeak else colors.toneGuide
+                        val lineColor = if (isToneActive) colors.primary else colors.outlineVariant
                         val lineAlpha = if (isToneActive) 0.85f else 0.22f
                         val stroke = if (isToneActive) thinStrokePx else hairlinePx
 
@@ -181,38 +175,33 @@ fun WaterfallCanvas(
 
                     // 3. Draw Carrier Channel Boundaries
                     drawLine(
-                        color = colors.syncMarker.copy(alpha = 0.5f),
+                        color = colors.tertiary.copy(alpha = 0.5f),
                         start = Offset(channelLeftX, 0.0f),
                         end = Offset(channelLeftX, size.height),
                         strokeWidth = thinStrokePx
                     )
                     drawLine(
-                        color = colors.syncMarker.copy(alpha = 0.5f),
+                        color = colors.tertiary.copy(alpha = 0.5f),
                         start = Offset(channelRightX, 0.0f),
                         end = Offset(channelRightX, size.height),
                         strokeWidth = thinStrokePx
                     )
 
-                    // 4. Glowing Channel Highlight when Preamble Lock is Active
+                    // 4. Highlight when Preamble Lock is Active
                     if (isPreambleLocked) {
-                        // Translucent illuminated column
                         drawRect(
-                            color = colors.syncMarker.copy(alpha = pulseAlpha),
+                            color = colors.tertiary.copy(alpha = pulseAlpha),
                             topLeft = Offset(channelLeftX, 0.0f),
                             size = Size(channelWidth, size.height)
                         )
-                        // Perimeter accent stroke
                         drawRect(
-                            color = colors.syncMarker.copy(alpha = 0.9f),
+                            color = colors.tertiary.copy(alpha = 0.9f),
                             topLeft = Offset(channelLeftX, 0.0f),
                             size = Size(channelWidth, size.height),
                             style = Stroke(width = regularStrokePx)
                         )
                     }
                 }
-
-                // Retro CRT Scanline Texture Overlay
-                ScanlineOverlay(modifier = Modifier.fillMaxSize())
             }
 
             // Top Status Label (Inside Waterfall)
@@ -327,11 +316,11 @@ private fun ReducedMotionSpectrum(
 
             val isActive = (i == activeToneIndex)
             val barColor = when {
-                isActive -> colors.signalPeak
-                isPreambleLocked -> colors.syncMarker
-                power > 0.6f -> colors.signalHigh
-                power > 0.3f -> colors.signalMid
-                else -> colors.signalLow
+                isActive -> colors.primary
+                isPreambleLocked -> colors.tertiary
+                power > 0.6f -> colors.primary
+                power > 0.3f -> colors.primaryContainer
+                else -> colors.surfaceVariant
             }
 
             // Draw filled bar
@@ -343,7 +332,7 @@ private fun ReducedMotionSpectrum(
 
             // Draw bar top edge
             drawLine(
-                color = if (isActive) colors.signalPeak else colors.toneGuide,
+                color = if (isActive) colors.primary else colors.outlineVariant,
                 start = Offset(x + 2.0f, y),
                 end = Offset(x + barWidth - 2.0f, y),
                 strokeWidth = thinStrokePx

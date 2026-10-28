@@ -1,6 +1,7 @@
 package app.shoutsend.accessibility
 
 import app.shoutsend.core.designsystem.DefaultTokens
+import app.shoutsend.core.designsystem.DesignTokens
 import app.shoutsend.feature.receive.WaterfallSemantics
 import app.shoutsend.feature.send.RingsSemantics
 import app.shoutsend.modem.profile.Band
@@ -46,7 +47,7 @@ class AccessibilityTest {
 
     @Test
     fun colorTokensProvideNonZeroAlphaForAccessibility() {
-        val colors = DefaultTokens.CyberRadioDark
+        val colors = DesignTokens.defaultDark().colors
         assertTrue(colors.onSurface.alpha > 0.0f)
         assertTrue(colors.onPrimary.alpha > 0.0f)
         assertTrue(colors.primary.alpha > 0.0f)

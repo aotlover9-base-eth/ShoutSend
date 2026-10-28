@@ -25,7 +25,7 @@ import app.shoutsend.core.designsystem.components.CdButton
 import app.shoutsend.core.designsystem.components.CdIconButton
 import app.shoutsend.core.designsystem.components.CdOutlinedTextField
 import app.shoutsend.core.designsystem.components.CdSwitch
-import app.shoutsend.core.designsystem.components.NeonCard
+import app.shoutsend.core.designsystem.components.ShoutCard
 import app.shoutsend.modem.payload.WifiSecurity
 
 /**
@@ -153,7 +153,7 @@ fun WifiComposer(
 
         // Wi-Fi privacy cue warning card (hidden only when security is Open)
         if (uiState.wifiSecurity != WifiSecurity.OPEN) {
-            NeonCard(modifier = Modifier.fillMaxWidth()) {
+            ShoutCard(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier = Modifier.padding(ChirpTheme.spacing.md),
                     verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)

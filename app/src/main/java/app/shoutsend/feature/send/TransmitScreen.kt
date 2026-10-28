@@ -37,9 +37,7 @@ import app.shoutsend.core.designsystem.components.AcousticStatus
 import app.shoutsend.core.designsystem.components.CdButton
 import app.shoutsend.core.designsystem.components.CdOutlinedButton
 import app.shoutsend.core.designsystem.components.CdScaffold
-import app.shoutsend.core.designsystem.components.NeonCard
-import app.shoutsend.core.designsystem.components.RadioReadout
-import app.shoutsend.core.designsystem.components.ReadoutScale
+import app.shoutsend.core.designsystem.components.ShoutCard
 import app.shoutsend.core.designsystem.components.StatusPill
 import java.util.Locale
 
@@ -155,7 +153,7 @@ fun TransmitScreen(
                         enter = fadeIn(),
                         exit = fadeOut()
                     ) {
-                        NeonCard(modifier = Modifier.fillMaxWidth()) {
+                        ShoutCard(modifier = Modifier.fillMaxWidth()) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -185,7 +183,7 @@ fun TransmitScreen(
                     }
 
                     if (uiState.routeWarning != null && uiState.isTransmitting) {
-                        NeonCard(modifier = Modifier.fillMaxWidth()) {
+                        ShoutCard(modifier = Modifier.fillMaxWidth()) {
                             Text(
                                 text = uiState.routeWarning!!,
                                 style = ChirpTheme.typography.bodySmall,
@@ -280,9 +278,9 @@ fun TransmitScreen(
                             else -> {
                                 // Active Countdown Timer
                                 val remainingFormatted = String.format(Locale.US, "%.1f", uiState.remainingSeconds)
-                                RadioReadout(
-                                    value = remainingFormatted,
-                                    scale = ReadoutScale.LARGE,
+                                Text(
+                                    text = remainingFormatted,
+                                    style = ChirpTheme.typography.displaySmall,
                                     color = ChirpTheme.colors.primary
                                 )
                                 Text(

@@ -160,7 +160,7 @@ fun RingsCanvas(
 private fun resolveToneColor(toneIndex: Int, colors: ColorTokens): Color {
     return when (toneIndex) {
         -1 -> colors.primary
-        16, 17 -> colors.syncMarker
+        16, 17 -> colors.tertiary
         in 0..5 -> {
             val frac = toneIndex / 5.0f
             lerp(colors.primary, colors.secondary, frac)
@@ -171,7 +171,7 @@ private fun resolveToneColor(toneIndex: Int, colors: ColorTokens): Color {
         }
         in 11..15 -> {
             val frac = (toneIndex - 11) / 4.0f
-            lerp(colors.tertiary, colors.signalPeak, frac)
+            lerp(colors.tertiary, colors.primary, frac)
         }
         else -> colors.primary
     }

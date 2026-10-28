@@ -3,12 +3,10 @@ package app.shoutsend.core.designsystem
 import androidx.compose.ui.unit.Dp
 
 /**
- * Visual tuning and rendering tokens for acoustic radio meters, waterfall display,
- * and radar glyph animations.
+ * Visual tuning and rendering tokens for acoustic meters and spectrogram waterfall display.
+ * Purely functional parameters; no glows, blooms, or neon shaders.
  */
-data class RadioVisualTokens(
-    val glowRadius: Dp,
-    val glowAlpha: Float,
+data class AcousticVisualTokens(
     val ringStrokeWidths: Dp,
     val ringCount: Int,
     val ringSpawnIntervalMs: Int,
@@ -17,3 +15,5 @@ data class RadioVisualTokens(
     val colormapResolution: Int,
     val meterSegmentCount: Int
 )
+
+typealias RadioVisualTokens = AcousticVisualTokens

@@ -71,7 +71,7 @@
 |---|---|---|---|---|
 | R0 | Foundation | Baseline audit and v2 docs (no code changes) | No | **Done** |
 | R1 | Foundation | Foundation: dependency upgrade, proper ViewModels, permission and network guards | No | **Done** |
-| R2 | Design | New Material 3 Expressive design system and dev panel update | Components only | Todo |
+| R2 | Design | New Material 3 Expressive design system and dev panel update | Components only | **Done** |
 | R3 | UI | App shell and Home hub | Yes | Todo |
 | R4 | UI | Composer sheets: Text, Link, Wi-Fi, Contact | Yes | Todo |
 | R5 | UI | Sending and receiving moments, result cards | Yes | Todo |

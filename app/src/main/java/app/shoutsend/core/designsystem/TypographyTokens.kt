@@ -4,7 +4,8 @@ import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 
 /**
- * Typography tokens mapping to Material 3 type scale plus radio readout monospace styles.
+ * Typography tokens mapping strictly to the Material 3 type scale.
+ * All styles use the device default font family. Monospace is prohibited in user UI (Rule 32b).
  */
 data class TypographyTokens(
     val displayLarge: TextStyle,
@@ -21,12 +22,13 @@ data class TypographyTokens(
     val bodySmall: TextStyle,
     val labelLarge: TextStyle,
     val labelMedium: TextStyle,
-    val labelSmall: TextStyle,
-    // Radio readout monospace styles for frequencies, SNR, bytes
-    val radioReadoutLarge: TextStyle,
-    val radioReadoutMedium: TextStyle,
-    val radioReadoutSmall: TextStyle
+    val labelSmall: TextStyle
 ) {
+    // Migration helpers delegating to standard M3 styles (no monospace)
+    val radioReadoutLarge: TextStyle get() = titleMedium
+    val radioReadoutMedium: TextStyle get() = labelLarge
+    val radioReadoutSmall: TextStyle get() = labelSmall
+
     fun toMaterialTypography(): Typography {
         return Typography(
             displayLarge = displayLarge,

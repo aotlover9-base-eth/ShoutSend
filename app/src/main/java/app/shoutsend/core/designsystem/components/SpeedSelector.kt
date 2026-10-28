@@ -10,12 +10,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import app.shoutsend.core.designsystem.ChirpTheme
+import app.shoutsend.core.designsystem.ShoutSendTheme
 import app.shoutsend.modem.profile.Speed
 
 /**
@@ -31,14 +32,14 @@ fun SpeedSelector(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(ChirpTheme.shapes.small)
-            .background(ChirpTheme.colors.surfaceContainer)
+            .clip(ShoutSendTheme.shapes.small)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .border(
-                width = ChirpTheme.strokes.thin,
-                color = ChirpTheme.colors.outlineVariant,
-                shape = ChirpTheme.shapes.small
+                width = ShoutSendTheme.strokes.thin,
+                color = MaterialTheme.colorScheme.outlineVariant,
+                shape = ShoutSendTheme.shapes.small
             )
-            .padding(ChirpTheme.spacing.xxs)
+            .padding(ShoutSendTheme.spacing.xxs)
     ) {
         val speeds = listOf(
             Triple(Speed.ROBUST, "Robust", "~16.5 s"),
@@ -48,29 +49,29 @@ fun SpeedSelector(
 
         for ((speed, title, estDuration) in speeds) {
             val isSelected = speed == selectedSpeed
-            val containerColor = if (isSelected) ChirpTheme.colors.primaryContainer else ChirpTheme.colors.surfaceContainer
-            val contentColor = if (isSelected) ChirpTheme.colors.onPrimaryContainer else ChirpTheme.colors.onSurfaceVariant
-            val subColor = if (isSelected) ChirpTheme.colors.primary else ChirpTheme.colors.onSurfaceVariant
+            val containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainer
+            val contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+            val subColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
 
             Box(
                 modifier = Modifier
                     .weight(1.0f)
-                    .clip(ChirpTheme.shapes.small)
+                    .clip(ShoutSendTheme.shapes.small)
                     .background(containerColor)
                     .clickable { onSpeedSelected(speed) }
-                    .padding(vertical = ChirpTheme.spacing.sm),
+                    .padding(vertical = ShoutSendTheme.spacing.sm),
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = title,
-                        style = ChirpTheme.typography.labelMedium,
+                        style = MaterialTheme.typography.labelMedium,
                         color = contentColor
                     )
-                    Spacer(modifier = Modifier.height(ChirpTheme.spacing.xxs))
+                    Spacer(modifier = Modifier.height(ShoutSendTheme.spacing.xxs))
                     Text(
                         text = estDuration,
-                        style = ChirpTheme.typography.radioReadoutSmall,
+                        style = MaterialTheme.typography.labelSmall,
                         color = subColor
                     )
                 }

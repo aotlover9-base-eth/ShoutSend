@@ -42,7 +42,7 @@ import app.shoutsend.core.audio.permissions.MicPermissionState
 import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.core.designsystem.components.CdButton
 import app.shoutsend.core.designsystem.components.CdTextButton
-import app.shoutsend.core.designsystem.components.NeonCard
+import app.shoutsend.core.designsystem.components.ShoutCard
 import app.shoutsend.core.designsystem.components.StatusPill
 import kotlinx.coroutines.launch
 
@@ -195,7 +195,7 @@ private fun PageTalkInSound() {
             TalkInSoundIllustration(modifier = Modifier.size(ChirpTheme.sizes.iconXl * 4))
         }
 
-        NeonCard(modifier = Modifier.fillMaxWidth()) {
+        ShoutCard(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.padding(ChirpTheme.spacing.md),
                 verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)
@@ -234,7 +234,7 @@ private fun PageHowItWorks() {
             HowItWorksIllustration(modifier = Modifier.fillMaxSize())
         }
 
-        NeonCard(modifier = Modifier.fillMaxWidth()) {
+        ShoutCard(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.padding(ChirpTheme.spacing.md),
                 verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)
@@ -297,7 +297,7 @@ private fun PageGoodToKnow() {
             GoodToKnowIllustration(modifier = Modifier.fillMaxSize())
         }
 
-        NeonCard(modifier = Modifier.fillMaxWidth()) {
+        ShoutCard(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.padding(ChirpTheme.spacing.md),
                 verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)
@@ -360,7 +360,7 @@ private fun PageAllowMicrophone(
             AllowMicrophoneIllustration(modifier = Modifier.fillMaxSize())
         }
 
-        NeonCard(modifier = Modifier.fillMaxWidth()) {
+        ShoutCard(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier.padding(ChirpTheme.spacing.md),
                 verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)

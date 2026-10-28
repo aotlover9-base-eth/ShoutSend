@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,32 +19,30 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import app.shoutsend.R
-import app.shoutsend.core.designsystem.ChirpTheme
+import app.shoutsend.core.designsystem.ShoutSendTheme
 import app.shoutsend.core.designsystem.components.CdButton
 import app.shoutsend.core.designsystem.components.CdIconButton
-import app.shoutsend.core.designsystem.components.NeonCard
-import app.shoutsend.core.designsystem.components.RadioReadout
-import app.shoutsend.core.designsystem.components.ReadoutScale
+import app.shoutsend.core.designsystem.components.ShoutCard
 
 @Composable
 fun LinkTestScreen(
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = ChirpTheme.colors
+    val colors = ShoutSendTheme.colors
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(colors.background)
-            .padding(ChirpTheme.spacing.md),
-        verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.md)
+            .padding(ShoutSendTheme.spacing.md),
+        verticalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.md)
     ) {
         // Navigation Header
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)
+            horizontalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.sm)
         ) {
             val backDesc = stringResource(R.string.vault_action_back_desc)
             CdIconButton(
@@ -58,31 +57,38 @@ fun LinkTestScreen(
             }
             Text(
                 text = stringResource(R.string.link_test_title),
-                style = ChirpTheme.typography.titleLarge,
+                style = ShoutSendTheme.typography.titleLarge,
                 color = colors.primary
             )
         }
 
-        NeonCard(modifier = Modifier.fillMaxWidth()) {
+        ShoutCard(modifier = Modifier.fillMaxWidth()) {
             Column(
-                modifier = Modifier.padding(ChirpTheme.spacing.md),
-                verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)
+                modifier = Modifier.padding(ShoutSendTheme.spacing.md),
+                verticalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.sm)
             ) {
                 Text(
                     text = stringResource(R.string.link_test_title),
-                    style = ChirpTheme.typography.titleMedium,
+                    style = ShoutSendTheme.typography.titleMedium,
                     color = colors.primary
                 )
                 Text(
                     text = stringResource(R.string.link_test_desc),
-                    style = ChirpTheme.typography.bodyMedium,
+                    style = ShoutSendTheme.typography.bodyMedium,
                     color = colors.onSurfaceVariant
                 )
-                RadioReadout(
-                    label = "Acoustic Channel State",
-                    value = "MONITORING",
-                    scale = ReadoutScale.MEDIUM
-                )
+                Column {
+                    Text(
+                        text = "Acoustic channel state",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = colors.onSurfaceVariant
+                    )
+                    Text(
+                        text = "Monitoring",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = colors.primary
+                    )
+                }
             }
         }
 

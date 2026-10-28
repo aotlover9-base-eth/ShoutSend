@@ -1,21 +1,21 @@
 package app.shoutsend.core.designsystem.components
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import app.shoutsend.R
 import app.shoutsend.core.audio.permissions.MicPermissionState
-import app.shoutsend.core.designsystem.ChirpTheme
+import app.shoutsend.core.designsystem.ShoutSendTheme
 
 /**
- * Reusable tokenized card prompting users for microphone access across Receive and Calibration screens.
+ * Explanatory card rendered when RECORD_AUDIO permission is not granted.
+ * Provides clear rationale explaining that microphone access is required purely for acoustic demodulation.
  */
 @Composable
 fun MicPermissionCard(
@@ -24,63 +24,69 @@ fun MicPermissionCard(
     onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    if (state == MicPermissionState.Granted) return
+    MicPermissionCard(
+        isPermanentlyDenied = state == MicPermissionState.PermanentlyDenied,
+        onRequestPermission = onRequestPermission,
+        onOpenSettings = onOpenSettings,
+        modifier = modifier
+    )
+}
 
-    val isPermanentlyDenied = state == MicPermissionState.PermanentlyDenied
-    val borderColor = if (isPermanentlyDenied) ChirpTheme.colors.warning else ChirpTheme.colors.primary
-    val glowColor = if (isPermanentlyDenied) ChirpTheme.colors.warning else ChirpTheme.colors.glowPrimary
+@Composable
+fun MicPermissionCard(
+    isPermanentlyDenied: Boolean,
+    onRequestPermission: () -> Unit,
+    onOpenSettings: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val containerColor = if (isPermanentlyDenied) {
+        MaterialTheme.colorScheme.errorContainer
+    } else {
+        MaterialTheme.colorScheme.surfaceContainerHigh
+    }
 
-    NeonCard(
+    ShoutCard(
         modifier = modifier.fillMaxWidth(),
-        borderColor = borderColor,
-        glowColor = glowColor
+        colors = CardDefaults.cardColors(containerColor = containerColor)
     ) {
         Column(
-            modifier = Modifier.padding(ChirpTheme.spacing.md),
-            verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(ShoutSendTheme.spacing.md)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(
-                        if (isPermanentlyDenied) R.string.permission_denied_title
-                        else R.string.permission_rationale_title
-                    ),
-                    style = ChirpTheme.typography.titleMedium,
-                    color = borderColor
-                )
-
-                StatusPill(
-                    status = if (isPermanentlyDenied) AcousticStatus.ERROR else AcousticStatus.IDLE,
-                    customLabel = if (isPermanentlyDenied) "BLOCKED" else "REQUIRED"
-                )
-            }
-
             Text(
-                text = stringResource(
-                    if (isPermanentlyDenied) R.string.permission_denied_body
-                    else R.string.permission_rationale_body
-                ),
-                style = ChirpTheme.typography.bodyMedium,
-                color = ChirpTheme.colors.onSurfaceVariant
+                text = if (isPermanentlyDenied) "Microphone permission required" else "Microphone access needed",
+                style = MaterialTheme.typography.titleMedium,
+                color = if (isPermanentlyDenied) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onSurface
             )
 
+            Spacer(modifier = Modifier.height(ShoutSendTheme.spacing.xs))
+
+            Text(
+                text = if (isPermanentlyDenied) {
+                    "Microphone access is permanently denied. ShoutSend needs the microphone to listen for acoustic data chirps. Please enable it in system settings."
+                } else {
+                    "ShoutSend decodes data transmitted through sound waves. Microphone permission is strictly required to detect acoustic signals. No audio is ever recorded or transmitted over the internet."
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (isPermanentlyDenied) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            Spacer(modifier = Modifier.height(ShoutSendTheme.spacing.md))
+
             if (isPermanentlyDenied) {
-                CdButton(
+                ShoutFilledButton(
                     onClick = onOpenSettings,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(stringResource(R.string.permission_btn_open_settings))
+                    Text("Open settings")
                 }
             } else {
-                CdButton(
+                ShoutFilledButton(
                     onClick = onRequestPermission,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(stringResource(R.string.permission_btn_grant))
+                    Text("Grant microphone permission")
                 }
             }
         }

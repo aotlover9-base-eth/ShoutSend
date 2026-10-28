@@ -34,9 +34,7 @@ import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.core.designsystem.components.AcousticStatus
 import app.shoutsend.core.designsystem.components.LevelMeter
 import app.shoutsend.core.designsystem.components.MicPermissionCard
-import app.shoutsend.core.designsystem.components.NeonCard
-import app.shoutsend.core.designsystem.components.RadioReadout
-import app.shoutsend.core.designsystem.components.ReadoutScale
+import app.shoutsend.core.designsystem.components.ShoutCard
 import app.shoutsend.core.designsystem.components.SignalMeter
 import app.shoutsend.core.designsystem.components.StatusPill
 import app.shoutsend.modem.profile.Band
@@ -122,7 +120,7 @@ fun ReceiveScreen(
         }
 
         // --- 3. Hero Waterfall Card ---
-        NeonCard(
+        ShoutCard(
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(
@@ -168,12 +166,12 @@ fun ReceiveScreen(
                     Text(
                         text = statusText,
                         style = ChirpTheme.typography.bodySmall,
-                        color = if (uiState.isPreambleLocked) ChirpTheme.colors.syncMarker else ChirpTheme.colors.onSurfaceVariant
+                        color = if (uiState.isPreambleLocked) ChirpTheme.colors.tertiary else ChirpTheme.colors.onSurfaceVariant
                     )
 
-                    RadioReadout(
-                        value = "${uiState.sampleRateHz / 1000} kHz",
-                        scale = ReadoutScale.SMALL,
+                    Text(
+                        text = "${uiState.sampleRateHz / 1000} kHz",
+                        style = ChirpTheme.typography.labelSmall,
                         color = ChirpTheme.colors.primary
                     )
                 }
@@ -194,10 +192,8 @@ fun ReceiveScreen(
                 modifier = Modifier.fillMaxWidth()
             )
         } else if (uiState.isPreambleLocked || uiState.status == AcousticStatus.RECEIVING || uiState.isReadingHeader) {
-            NeonCard(
-                modifier = Modifier.fillMaxWidth(),
-                borderColor = ChirpTheme.colors.syncMarker,
-                glowColor = ChirpTheme.colors.syncMarker
+            ShoutCard(
+                modifier = Modifier.fillMaxWidth()
             ) {
                 Column(
                     modifier = Modifier.padding(ChirpTheme.spacing.md),
@@ -254,7 +250,7 @@ fun ReceiveScreen(
         }
 
         // --- 6. Signal & Volume Input Meters ---
-        NeonCard(
+        ShoutCard(
             modifier = Modifier.fillMaxWidth()
         ) {
             Column(

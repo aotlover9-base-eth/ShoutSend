@@ -40,7 +40,7 @@ import app.shoutsend.core.designsystem.components.AcousticStatus
 import app.shoutsend.core.designsystem.components.CdButton
 import app.shoutsend.core.designsystem.components.CdIconButton
 import app.shoutsend.core.designsystem.components.CdOutlinedButton
-import app.shoutsend.core.designsystem.components.NeonCard
+import app.shoutsend.core.designsystem.components.ShoutCard
 import app.shoutsend.core.designsystem.components.StatusPill
 import app.shoutsend.modem.payload.Payload
 import java.util.Locale
@@ -77,10 +77,8 @@ fun ReceivedPayloadCard(
     var copiedNotice by remember { mutableStateOf<String?>(null) }
     var showPassword by remember { mutableStateOf(false) }
 
-    NeonCard(
-        modifier = modifier.fillMaxWidth(),
-        glowColor = colors.success,
-        borderColor = colors.success
+    ShoutCard(
+        modifier = modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier.padding(ChirpTheme.spacing.md),

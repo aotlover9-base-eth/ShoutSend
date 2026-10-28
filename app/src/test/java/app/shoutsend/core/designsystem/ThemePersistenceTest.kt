@@ -17,11 +17,12 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
 /**
- * Unit tests for ThemeController, TokenOverrides, validation, and debounce.
+ * Unit tests for ThemeController, TokenOverrides, validation, and debounce in Material 3 Expressive.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class ThemePersistenceTest {
@@ -39,7 +40,7 @@ class ThemePersistenceTest {
         }
 
         override suspend fun resetColor(role: String) {
-            _overrides.value = _overrides.value.copy(colors = _overrides.value.colors - role)
+            _overrides.value = _overrides.value.copy(seedColor = DefaultTokens.SEED_COLOR_LONG)
         }
 
         override suspend fun resetRadius(name: String) {
@@ -48,7 +49,7 @@ class ThemePersistenceTest {
     }
 
     @Test
-    fun themeControllerMergesColorOverrides() = runTest {
+    fun themeControllerUpdatesSeedColorAndThemeMode() = runTest {
         val fakeRepo = FakeTokenOverridesRepository()
         val controller = ThemeController(
             initialBaseTokens = DesignTokens.defaultDark(),
@@ -57,14 +58,14 @@ class ThemePersistenceTest {
         )
         testScheduler.runCurrent()
 
-        val testColor = Color(red = 0.1f, green = 0.9f, blue = 0.3f)
-        controller.setColor("primary", testColor)
+        val testSeed = 0xFFBA1A1AL // Coral
+        controller.setSeedColor(testSeed)
+        controller.updateThemeMode(ThemeMode.LIGHT)
         testScheduler.runCurrent()
 
         val activeTokens = controller.tokens.value
-        assertEquals(testColor, activeTokens.colors.primary)
-        // Untouched colors must retain factory defaults
-        assertEquals(DefaultTokens.CyberRadioDark.secondary, activeTokens.colors.secondary)
+        assertEquals(testSeed, activeTokens.seedColor)
+        assertEquals(ThemeMode.LIGHT, activeTokens.themeMode)
     }
 
     @Test
@@ -77,21 +78,18 @@ class ThemePersistenceTest {
         )
         testScheduler.runCurrent()
 
-        controller.setRadius("small", 14f)
+        controller.setRadius("extraSmall", 10f)
         testScheduler.runCurrent()
 
         val activeTokens = controller.tokens.value
-        val expectedShape = RoundedCornerShape(14.dp)
-        assertEquals(expectedShape, activeTokens.shapes.small)
-        assertEquals(expectedShape, activeTokens.shapes.button)
-        assertEquals(expectedShape, activeTokens.shapes.textField)
-        assertEquals(expectedShape, activeTokens.shapes.chip)
+        val expectedShape = RoundedCornerShape(10.dp)
+        assertEquals(expectedShape, activeTokens.shapes.extraSmall)
         // Medium and card remain untouched
         assertEquals(DefaultTokens.Shapes.medium, activeTokens.shapes.medium)
     }
 
     @Test
-    fun resetIndividualKeysAndResetAll() = runTest {
+    fun themeControllerUpdatesHeroShape() = runTest {
         val fakeRepo = FakeTokenOverridesRepository()
         val controller = ThemeController(
             initialBaseTokens = DesignTokens.defaultDark(),
@@ -100,27 +98,43 @@ class ThemePersistenceTest {
         )
         testScheduler.runCurrent()
 
-        controller.setColor("primary", Color(red = 0.2f, green = 0.3f, blue = 0.9f))
+        controller.setHeroShape("Sunny")
+        testScheduler.runCurrent()
+
+        assertEquals("Sunny", controller.tokens.value.heroShape)
+    }
+
+    @Test
+    fun resetAllRestoresFactoryDefaults() = runTest {
+        val fakeRepo = FakeTokenOverridesRepository()
+        val controller = ThemeController(
+            initialBaseTokens = DesignTokens.defaultDark(),
+            repository = fakeRepo,
+            scope = backgroundScope
+        )
+        testScheduler.runCurrent()
+
+        val oceanSeed = DefaultTokens.SeedPresets[3].second
+        controller.setSeedColor(oceanSeed)
         controller.setRadius("medium", 20f)
+        controller.setHeroShape("Flower")
         testScheduler.runCurrent()
 
-        assertEquals(Color(red = 0.2f, green = 0.3f, blue = 0.9f), controller.tokens.value.colors.primary)
-        assertEquals(RoundedCornerShape(20.dp), controller.tokens.value.shapes.medium)
-
-        controller.resetColor("primary")
-        testScheduler.runCurrent()
-        assertEquals(DefaultTokens.CyberRadioDark.primary, controller.tokens.value.colors.primary)
-        assertEquals(RoundedCornerShape(20.dp), controller.tokens.value.shapes.medium)
+        assertEquals(oceanSeed, controller.tokens.value.seedColor)
+        assertEquals("Flower", controller.tokens.value.heroShape)
 
         controller.resetAll()
         testScheduler.runCurrent()
+
+        assertEquals(DefaultTokens.SEED_COLOR_LONG, controller.tokens.value.seedColor)
+        assertEquals("Cookie9Sided", controller.tokens.value.heroShape)
         assertEquals(DefaultTokens.Shapes.medium, controller.tokens.value.shapes.medium)
     }
 
     @Test
-    fun validationRejectsUnknownKeysAndOutOfRangeValues() {
-        val unknownColor = TokenOverrides(colors = mapOf("neonUltraviolet" to 12345L))
-        assertTrue(TokenOverrides.validate(unknownColor).isFailure)
+    fun validationRejectsOutOfRangeContrastAndRadii() {
+        val invalidContrast = TokenOverrides(contrast = 2.5f)
+        assertTrue(TokenOverrides.validate(invalidContrast).isFailure)
 
         val negativeRadius = TokenOverrides(radii = mapOf("small" to -2f))
         assertTrue(TokenOverrides.validate(negativeRadius).isFailure)
@@ -128,8 +142,15 @@ class ThemePersistenceTest {
         val excessiveRadius = TokenOverrides(radii = mapOf("large" to 150f))
         assertTrue(TokenOverrides.validate(excessiveRadius).isFailure)
 
+        val unknownHero = TokenOverrides(heroShape = "NonExistentShape")
+        assertTrue(TokenOverrides.validate(unknownHero).isFailure)
+
         val validOverrides = TokenOverrides(
-            colors = mapOf("primary" to 54321L),
+            dynamicColor = false,
+            themeMode = "DARK",
+            seedColor = DefaultTokens.SEED_COLOR_LONG,
+            contrast = 0.5f,
+            heroShape = "Sunny",
             radii = mapOf("extraSmall" to 6f)
         )
         assertTrue(TokenOverrides.validate(validOverrides).isSuccess)
@@ -145,25 +166,25 @@ class ThemePersistenceTest {
         )
         testScheduler.runCurrent()
 
-        controller.setColor("secondary", Color(red = 0.9f, green = 0.2f, blue = 0.2f))
-        controller.setRadius("large", 24f)
+        val forestSeed = DefaultTokens.SeedPresets[2].second
+        controller.setSeedColor(forestSeed)
+        controller.setHeroShape("Heart")
         testScheduler.runCurrent()
 
         val exported = controller.exportToJson()
-        assertTrue(exported.contains("secondary"))
-        assertTrue(exported.contains("large"))
+        assertTrue(exported.contains("Heart"))
 
         // Reset all
         controller.resetAll()
         testScheduler.runCurrent()
-        assertEquals(DefaultTokens.CyberRadioDark.secondary, controller.tokens.value.colors.secondary)
+        assertEquals("Cookie9Sided", controller.tokens.value.heroShape)
 
         // Import back
         val importResult = controller.importFromJson(exported)
         assertTrue(importResult.isSuccess)
         testScheduler.runCurrent()
-        assertEquals(Color(red = 0.9f, green = 0.2f, blue = 0.2f), controller.tokens.value.colors.secondary)
-        assertEquals(RoundedCornerShape(24.dp), controller.tokens.value.shapes.large)
+        assertEquals("Heart", controller.tokens.value.heroShape)
+        assertEquals(forestSeed, controller.tokens.value.seedColor)
     }
 
     @Test
@@ -176,7 +197,7 @@ class ThemePersistenceTest {
         )
         testScheduler.runCurrent()
 
-        val malformedJson = "{ colors: not_a_valid_json }"
+        val malformedJson = "{ heroShape: not_a_valid_json }"
         val result = controller.importFromJson(malformedJson)
         assertTrue(result.isFailure)
     }

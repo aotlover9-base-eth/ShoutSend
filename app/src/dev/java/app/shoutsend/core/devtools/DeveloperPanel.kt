@@ -6,6 +6,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -13,11 +15,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
@@ -27,26 +32,32 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
-import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.core.designsystem.DefaultTokens
+import app.shoutsend.core.designsystem.ShoutIcons
+import app.shoutsend.core.designsystem.ShoutSendTheme
+import app.shoutsend.core.designsystem.ShoutShapes
+import app.shoutsend.core.designsystem.ThemeMode
 import app.shoutsend.core.designsystem.components.CdButton
-import androidx.compose.material3.Card
-import app.shoutsend.core.designsystem.components.CdIconButton
 import app.shoutsend.core.designsystem.components.CdOutlinedButton
-import app.shoutsend.core.designsystem.components.CdOutlinedTextField
 import app.shoutsend.core.designsystem.components.CdTextButton
-import app.shoutsend.core.designsystem.components.CdTextField
+import app.shoutsend.core.designsystem.components.MorphingShape
+import app.shoutsend.core.designsystem.components.ShoutButton
+import app.shoutsend.core.designsystem.components.ShoutCard
+import app.shoutsend.core.designsystem.components.ShoutDialog
+import app.shoutsend.core.designsystem.components.ShoutFilterChip
+import app.shoutsend.core.designsystem.components.ShoutIconButton
+import app.shoutsend.core.designsystem.components.ShoutSwitch
+import app.shoutsend.core.designsystem.components.ShoutTextField
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,6 +67,7 @@ fun DeveloperPanel(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val clipboardManager = LocalClipboardManager.current
+    val coroutineScope = rememberCoroutineScope()
     var showResetDialog by remember { mutableStateOf(false) }
     var showImportDialog by remember { mutableStateOf(false) }
     var importText by remember { mutableStateOf("") }
@@ -63,53 +75,61 @@ fun DeveloperPanel(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        modifier = Modifier.fillMaxHeight(0.9f)
+        modifier = Modifier.fillMaxHeight(0.92f)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = ChirpTheme.spacing.md),
-            verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)
+                .padding(horizontal = ShoutSendTheme.spacing.md),
+            verticalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.sm)
         ) {
-            // Header with Title, Tabs, and Escape Hatch Reset
+            // Header with Title, Status, Escape Hatch Reset, and Close
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = "Design System DevTools",
-                        style = ChirpTheme.typography.titleMedium,
-                        color = ChirpTheme.colors.onSurface
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
                         text = if (uiState.hasOverrides) "Custom overrides active" else "Factory defaults",
-                        style = ChirpTheme.typography.bodySmall,
-                        color = if (uiState.hasOverrides) ChirpTheme.colors.tertiary else ChirpTheme.colors.onSurfaceVariant
+                        style = MaterialTheme.typography.bodySmall,
+                        color = if (uiState.hasOverrides) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
 
-                Row(horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs)) {
-                    // Escape hatch reset button (fixed default styling to guarantee readability)
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.xs),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     Box(
                         modifier = Modifier
                             .background(
-                                color = DefaultTokens.CyberRadioDark.errorContainer,
-                                shape = ChirpTheme.shapes.button
+                                color = MaterialTheme.colorScheme.errorContainer,
+                                shape = ShoutSendTheme.shapes.button
                             )
                             .clickable { showResetDialog = true }
-                            .padding(horizontal = ChirpTheme.spacing.sm, vertical = ChirpTheme.spacing.xs)
+                            .padding(horizontal = ShoutSendTheme.spacing.sm, vertical = ShoutSendTheme.spacing.xs)
                     ) {
                         Text(
                             text = "Reset All",
-                            style = ChirpTheme.typography.labelMedium,
-                            color = DefaultTokens.CyberRadioDark.onErrorContainer
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onErrorContainer
                         )
                     }
 
-                    CdIconButton(onClick = onDismiss) {
-                        Text("✕", style = ChirpTheme.typography.titleMedium)
+                    ShoutIconButton(
+                        onClick = onDismiss
+                    ) {
+                        Icon(
+                            imageVector = ShoutIcons.Close,
+                            contentDescription = "Close DevTools",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
                     }
                 }
             }
@@ -117,22 +137,22 @@ fun DeveloperPanel(
             // Tab Selector
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)
+                horizontalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.sm)
             ) {
-                FilterChip(
-                    selected = uiState.activeTab == DevPanelTab.COLORS,
-                    onClick = { viewModel.selectTab(DevPanelTab.COLORS) },
-                    label = { Text("Colors") }
+                ShoutFilterChip(
+                    selected = uiState.activeTab == DevPanelTab.THEME_AND_COLORS,
+                    onClick = { viewModel.selectTab(DevPanelTab.THEME_AND_COLORS) },
+                    label = "Theme & Colors"
                 )
-                FilterChip(
-                    selected = uiState.activeTab == DevPanelTab.SHAPES,
-                    onClick = { viewModel.selectTab(DevPanelTab.SHAPES) },
-                    label = { Text("Shapes & Radii") }
+                ShoutFilterChip(
+                    selected = uiState.activeTab == DevPanelTab.SHAPES_AND_HERO,
+                    onClick = { viewModel.selectTab(DevPanelTab.SHAPES_AND_HERO) },
+                    label = "Shapes & Hero"
                 )
-                FilterChip(
+                ShoutFilterChip(
                     selected = uiState.activeTab == DevPanelTab.DSP_LAB,
                     onClick = { viewModel.selectTab(DevPanelTab.DSP_LAB) },
-                    label = { Text("DSP Lab") }
+                    label = "DSP Lab"
                 )
             }
 
@@ -141,16 +161,18 @@ fun DeveloperPanel(
             // Active Tab Content
             Box(modifier = Modifier.weight(1f)) {
                 when (uiState.activeTab) {
-                    DevPanelTab.COLORS -> ColorsTabContent(
-                        colorGroups = uiState.colorGroups,
-                        onColorChanged = viewModel::onColorChanged,
-                        onHexChanged = viewModel::onHexChanged,
-                        onResetColor = viewModel::resetColor
+                    DevPanelTab.THEME_AND_COLORS -> ThemeAndColorsTabContent(
+                        uiState = uiState,
+                        onDynamicColorChanged = viewModel::onDynamicColorChanged,
+                        onThemeModeChanged = viewModel::onThemeModeChanged,
+                        onSeedColorChanged = viewModel::onSeedColorChanged,
+                        onContrastChanged = viewModel::onContrastChanged
                     )
-                    DevPanelTab.SHAPES -> ShapesTabContent(
-                        radiusItems = uiState.radiusItems,
+                    DevPanelTab.SHAPES_AND_HERO -> ShapesAndHeroTabContent(
+                        uiState = uiState,
                         onRadiusChanged = viewModel::onRadiusChanged,
-                        onResetRadius = viewModel::resetRadius
+                        onResetRadius = viewModel::resetRadius,
+                        onHeroShapeChanged = viewModel::onHeroShapeChanged
                     )
                     DevPanelTab.DSP_LAB -> DspLabContent(
                         viewModel = viewModel.dspLabViewModel
@@ -164,8 +186,8 @@ fun DeveloperPanel(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = ChirpTheme.spacing.xs),
-                horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm),
+                    .padding(vertical = ShoutSendTheme.spacing.xs),
+                horizontalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.sm),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 CdOutlinedButton(
@@ -195,12 +217,12 @@ fun DeveloperPanel(
 
     // Reset All Confirmation Dialog
     if (showResetDialog) {
-        AlertDialog(
+        ShoutDialog(
             onDismissRequest = { showResetDialog = false },
             title = { Text("Reset Design Tokens?") },
-            text = { Text("This will clear all custom color and radius overrides and restore factory Cyber Radio tokens.") },
+            text = { Text("This will clear all custom color, contrast, shape, and hero overrides and restore factory defaults.") },
             confirmButton = {
-                CdButton(onClick = {
+                ShoutButton(onClick = {
                     viewModel.resetAll()
                     showResetDialog = false
                 }) {
@@ -217,33 +239,38 @@ fun DeveloperPanel(
 
     // Import Dialog
     if (showImportDialog) {
-        AlertDialog(
+        ShoutDialog(
             onDismissRequest = { showImportDialog = false },
             title = { Text("Import Token Overrides") },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)) {
-                    Text("Paste a valid TokenOverrides JSON string:")
-                    CdOutlinedTextField(
+                Column(verticalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.sm)) {
+                    Text(
+                        text = "Paste a valid TokenOverrides JSON string:",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    ShoutTextField(
                         value = importText,
                         onValueChange = {
                             importText = it
                             importError = null
                         },
                         modifier = Modifier.fillMaxWidth(),
+                        minLines = 3,
                         maxLines = 6
                     )
                     if (importError != null) {
                         Text(
                             text = importError!!,
-                            color = ChirpTheme.colors.error,
-                            style = ChirpTheme.typography.bodySmall
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }
             },
             confirmButton = {
-                CdButton(onClick = {
-                    viewModel.importJson(importText) { result ->
+                ShoutButton(onClick = {
+                    coroutineScope.launch {
+                        val result = viewModel.importJson(importText)
                         if (result.isSuccess) {
                             showImportDialog = false
                         } else {
@@ -263,231 +290,319 @@ fun DeveloperPanel(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun ColorsTabContent(
-    colorGroups: Map<String, List<ColorRoleItem>>,
-    onColorChanged: (String, Color) -> Unit,
-    onHexChanged: (String, String) -> Boolean,
-    onResetColor: (String) -> Unit
+private fun ThemeAndColorsTabContent(
+    uiState: DevPanelUiState,
+    onDynamicColorChanged: (Boolean) -> Unit,
+    onThemeModeChanged: (ThemeMode) -> Unit,
+    onSeedColorChanged: (Long) -> Unit,
+    onContrastChanged: (Float) -> Unit
 ) {
+    val currentColor = remember(uiState.seedColor) { Color(uiState.seedColor) }
+    val hsv = remember(currentColor) { ColorUtils.rgbToHsv(currentColor) }
+    var hue by remember(currentColor) { mutableFloatStateOf(hsv[0]) }
+    var saturation by remember(currentColor) { mutableFloatStateOf(hsv[1]) }
+
     LazyColumn(
-        verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.md),
+        verticalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.md),
         modifier = Modifier.fillMaxWidth()
     ) {
-        colorGroups.forEach { (groupName, roles) ->
-            item {
-                Text(
-                    text = groupName,
-                    style = ChirpTheme.typography.titleSmall,
-                    color = ChirpTheme.colors.primary,
-                    modifier = Modifier.padding(top = ChirpTheme.spacing.xs)
-                )
-            }
-
-            items(roles, key = { it.role }) { item ->
-                ColorRoleRow(
-                    item = item,
-                    onColorChanged = { onColorChanged(item.role, it) },
-                    onHexChanged = { hex -> onHexChanged(item.role, hex) },
-                    onReset = { onResetColor(item.role) }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun ColorRoleRow(
-    item: ColorRoleItem,
-    onColorChanged: (Color) -> Unit,
-    onHexChanged: (String) -> Boolean,
-    onReset: () -> Unit
-) {
-    var expanded by remember { mutableStateOf(false) }
-    val hsv = remember(item.currentColor) { ColorUtils.rgbToHsv(item.currentColor) }
-    var hue by remember(item.currentColor) { mutableFloatStateOf(hsv[0]) }
-    var saturation by remember(item.currentColor) { mutableFloatStateOf(hsv[1]) }
-    var brightness by remember(item.currentColor) { mutableFloatStateOf(hsv[2]) }
-    var hexText by remember(item.currentColor) { mutableStateOf(ColorUtils.colorToHex(item.currentColor)) }
-
-    Card(
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(ChirpTheme.spacing.sm),
-            verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { expanded = !expanded },
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+        // Dynamic Color Toggle
+        item {
+            ShoutCard(modifier = Modifier.fillMaxWidth()) {
                 Row(
-                    horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(ShoutSendTheme.spacing.md),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(ChirpTheme.sizes.iconLg)
-                            .background(item.currentColor, CircleShape)
-                            .border(ChirpTheme.strokes.thin, ChirpTheme.colors.outline, CircleShape)
-                    )
-
-                    Column {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = item.role,
-                            style = ChirpTheme.typography.titleSmall,
-                            color = ChirpTheme.colors.onSurface
+                            text = "Dynamic Color",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = hexText,
-                            style = ChirpTheme.typography.radioReadoutSmall,
-                            color = ChirpTheme.colors.onSurfaceVariant
+                            text = "Extract palette from Android wallpaper (API 31+)",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                }
-
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (item.isModified) {
-                        Text(
-                            text = "Modified",
-                            style = ChirpTheme.typography.labelSmall,
-                            color = ChirpTheme.colors.tertiary
-                        )
-                        CdIconButton(onClick = onReset) {
-                            Text("↺", style = ChirpTheme.typography.titleSmall)
-                        }
-                    }
-                    Text(
-                        text = if (expanded) "▲" else "▼",
-                        style = ChirpTheme.typography.bodySmall,
-                        color = ChirpTheme.colors.onSurfaceVariant
-                    )
-                }
-            }
-
-            if (expanded) {
-                HorizontalDivider(modifier = Modifier.padding(vertical = ChirpTheme.spacing.xs))
-
-                // Hex input field
-                CdOutlinedTextField(
-                    value = hexText,
-                    onValueChange = {
-                        hexText = it
-                        onHexChanged(it)
-                    },
-                    label = { Text("Hex Color") },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                // Hue slider
-                Column {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("Hue", style = ChirpTheme.typography.bodySmall)
-                        Text("${hue.toInt()}°", style = ChirpTheme.typography.radioReadoutSmall)
-                    }
-                    Slider(
-                        value = hue,
-                        onValueChange = {
-                            hue = it
-                            val newColor = ColorUtils.hsvToColor(hue, saturation, brightness)
-                            hexText = ColorUtils.colorToHex(newColor)
-                            onColorChanged(newColor)
-                        },
-                        valueRange = 0f..360f,
-                        colors = SliderDefaults.colors(
-                            thumbColor = item.currentColor,
-                            activeTrackColor = ChirpTheme.colors.primary
-                        )
-                    )
-                }
-
-                // Saturation slider
-                Column {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("Saturation", style = ChirpTheme.typography.bodySmall)
-                        Text("${(saturation * 100f).toInt()}%", style = ChirpTheme.typography.radioReadoutSmall)
-                    }
-                    Slider(
-                        value = saturation,
-                        onValueChange = {
-                            saturation = it
-                            val newColor = ColorUtils.hsvToColor(hue, saturation, brightness)
-                            hexText = ColorUtils.colorToHex(newColor)
-                            onColorChanged(newColor)
-                        },
-                        valueRange = 0f..1f,
-                        colors = SliderDefaults.colors(
-                            thumbColor = item.currentColor,
-                            activeTrackColor = ChirpTheme.colors.primary
-                        )
-                    )
-                }
-
-                // Brightness slider
-                Column {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text("Brightness", style = ChirpTheme.typography.bodySmall)
-                        Text("${(brightness * 100f).toInt()}%", style = ChirpTheme.typography.radioReadoutSmall)
-                    }
-                    Slider(
-                        value = brightness,
-                        onValueChange = {
-                            brightness = it
-                            val newColor = ColorUtils.hsvToColor(hue, saturation, brightness)
-                            hexText = ColorUtils.colorToHex(newColor)
-                            onColorChanged(newColor)
-                        },
-                        valueRange = 0f..1f,
-                        colors = SliderDefaults.colors(
-                            thumbColor = item.currentColor,
-                            activeTrackColor = ChirpTheme.colors.primary
-                        )
+                    ShoutSwitch(
+                        checked = uiState.dynamicColor,
+                        onCheckedChange = onDynamicColorChanged
                     )
                 }
             }
         }
-    }
-}
 
-@Composable
-private fun ShapesTabContent(
-    radiusItems: List<RadiusTokenItem>,
-    onRadiusChanged: (String, Float) -> Unit,
-    onResetRadius: (String) -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = ChirpTheme.spacing.sm),
-        verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.md)
-    ) {
-        radiusItems.forEach { item ->
-            var currentRadius by remember(item.currentRadiusDp) { mutableFloatStateOf(item.currentRadiusDp) }
-
-            Card(modifier = Modifier.fillMaxWidth()) {
+        // Theme Mode Selector
+        item {
+            ShoutCard(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(ChirpTheme.spacing.sm),
-                    verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs)
+                        .padding(ShoutSendTheme.spacing.md),
+                    verticalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.sm)
+                ) {
+                    Text(
+                        text = "Theme Mode",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.xs)
+                    ) {
+                        ThemeMode.entries.forEach { mode ->
+                            ShoutFilterChip(
+                                selected = uiState.themeMode == mode,
+                                onClick = { onThemeModeChanged(mode) },
+                                label = mode.name.lowercase().replaceFirstChar { it.uppercase() },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // Seed Color Palette (when dynamic color is disabled)
+        item {
+            ShoutCard(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(ShoutSendTheme.spacing.md),
+                    verticalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.sm)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Seed Palette",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Box(
+                            modifier = Modifier
+                                .size(ShoutSendTheme.sizes.iconLg)
+                                .clip(CircleShape)
+                                .background(currentColor)
+                                .border(
+                                    width = ShoutSendTheme.strokes.thin,
+                                    color = MaterialTheme.colorScheme.outline,
+                                    shape = CircleShape
+                                )
+                        )
+                    }
+
+                    Text(
+                        text = "Preset Seeds",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.xs),
+                        verticalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.xs)
+                    ) {
+                        DefaultTokens.SeedPresets.forEach { (name, colorLong) ->
+                            val isSelected = uiState.seedColor == colorLong
+                            ShoutFilterChip(
+                                selected = isSelected,
+                                onClick = { onSeedColorChanged(colorLong) },
+                                label = name
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(ShoutSendTheme.spacing.xs))
+
+                    // Hue Slider
+                    Column {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text("Hue", style = MaterialTheme.typography.bodySmall)
+                            Text("${hue.toInt()}°", style = MaterialTheme.typography.labelSmall)
+                        }
+                        Slider(
+                            value = hue,
+                            onValueChange = {
+                                hue = it
+                                val newColor = ColorUtils.hsvToColor(hue, saturation, 0.7f)
+                                onSeedColorChanged(newColor.value.toLong())
+                            },
+                            valueRange = 0f..360f,
+                            colors = SliderDefaults.colors(
+                                thumbColor = currentColor,
+                                activeTrackColor = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                    }
+
+                    // Chroma / Saturation Slider
+                    Column {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text("Chroma / Saturation", style = MaterialTheme.typography.bodySmall)
+                            Text("${(saturation * 100f).toInt()}%", style = MaterialTheme.typography.labelSmall)
+                        }
+                        Slider(
+                            value = saturation,
+                            onValueChange = {
+                                saturation = it
+                                val newColor = ColorUtils.hsvToColor(hue, saturation, 0.7f)
+                                onSeedColorChanged(newColor.value.toLong())
+                            },
+                            valueRange = 0f..1f,
+                            colors = SliderDefaults.colors(
+                                thumbColor = currentColor,
+                                activeTrackColor = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
+        // Contrast Level
+        item {
+            ShoutCard(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(ShoutSendTheme.spacing.md),
+                    verticalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.xs)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Contrast Level",
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = when {
+                                uiState.contrast <= -0.5f -> "Reduced (${uiState.contrast})"
+                                uiState.contrast >= 0.5f -> "High (${uiState.contrast})"
+                                else -> "Standard (0.0)"
+                            },
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    Slider(
+                        value = uiState.contrast,
+                        onValueChange = onContrastChanged,
+                        valueRange = -1f..1f,
+                        steps = 2
+                    )
+                }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun ShapesAndHeroTabContent(
+    uiState: DevPanelUiState,
+    onRadiusChanged: (String, Float) -> Unit,
+    onResetRadius: (String) -> Unit,
+    onHeroShapeChanged: (String) -> Unit
+) {
+    LazyColumn(
+        verticalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.md),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        // Hero Shape Selector & Live Preview
+        item {
+            ShoutCard(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(ShoutSendTheme.spacing.md),
+                    verticalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.sm),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Hero Shape",
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.align(Alignment.Start)
+                    )
+
+                    // Hero Preview Box with Morphing Shape
+                    Box(
+                        modifier = Modifier
+                            .size(ShoutSendTheme.sizes.buttonHeight * 2f)
+                            .clip(ShoutShapes.getHeroShape(uiState.heroShape))
+                            .background(MaterialTheme.colorScheme.primaryContainer),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = ShoutIcons.Tune,
+                            contentDescription = null,
+                            modifier = Modifier.size(ShoutSendTheme.sizes.iconLg),
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                    }
+
+                    Text(
+                        text = uiState.heroShape,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+                    FlowRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.xs),
+                        verticalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.xs)
+                    ) {
+                        ShoutShapes.AVAILABLE_HERO_SHAPES.keys.forEach { shapeName ->
+                            ShoutFilterChip(
+                                selected = uiState.heroShape == shapeName,
+                                onClick = { onHeroShapeChanged(shapeName) },
+                                label = shapeName
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // Corner Radii Sliders
+        item {
+            Text(
+                text = "Corner Radii (dp)",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+
+        items(uiState.radiusItems, key = { it.name }) { item ->
+            var currentRadius by remember(item.currentRadiusDp) { mutableFloatStateOf(item.currentRadiusDp) }
+
+            ShoutCard(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(ShoutSendTheme.spacing.sm),
+                    verticalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.xs)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -496,24 +611,30 @@ private fun ShapesTabContent(
                     ) {
                         Text(
                             text = item.name,
-                            style = ChirpTheme.typography.titleSmall,
-                            color = ChirpTheme.colors.onSurface
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Row(
-                            horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs),
+                            horizontalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.xs),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
                                 text = "${currentRadius.toInt()} dp",
-                                style = ChirpTheme.typography.radioReadoutMedium,
-                                color = ChirpTheme.colors.primary
+                                style = MaterialTheme.typography.labelMedium,
+                                color = MaterialTheme.colorScheme.primary
                             )
                             if (currentRadius != item.defaultRadiusDp) {
-                                CdIconButton(onClick = {
-                                    currentRadius = item.defaultRadiusDp
-                                    onResetRadius(item.name)
-                                }) {
-                                    Text("↺", style = ChirpTheme.typography.titleSmall)
+                                ShoutIconButton(
+                                    onClick = {
+                                        currentRadius = item.defaultRadiusDp
+                                        onResetRadius(item.name)
+                                    }
+                                ) {
+                                    Icon(
+                                        imageVector = ShoutIcons.Tune,
+                                        contentDescription = "Reset ${item.name} radius",
+                                        modifier = Modifier.size(ShoutSendTheme.sizes.iconSm)
+                                    )
                                 }
                             }
                         }
@@ -525,40 +646,41 @@ private fun ShapesTabContent(
                             currentRadius = it
                             onRadiusChanged(item.name, it)
                         },
-                        valueRange = 0f..36f
+                        valueRange = 0f..48f
                     )
                 }
             }
         }
 
-        HorizontalDivider()
+        // Live Component Previews
+        item {
+            Text(
+                text = "Live Component Previews",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
 
-        // Live preview of components with the active shape tokens
-        Text(
-            text = "Live Component Previews",
-            style = ChirpTheme.typography.titleSmall,
-            color = ChirpTheme.colors.primary
-        )
-
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(ChirpTheme.spacing.md),
-                verticalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)
-            ) {
-                CdButton(
-                    onClick = {},
-                    modifier = Modifier.fillMaxWidth()
+            ShoutCard(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(ShoutSendTheme.spacing.md),
+                    verticalArrangement = Arrangement.spacedBy(ShoutSendTheme.spacing.sm)
                 ) {
-                    Text("CdButton (ShapeSmall)")
-                }
+                    ShoutButton(
+                        onClick = {},
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("ShoutButton (Full pill shape)")
+                    }
 
-                CdTextField(
-                    value = "TextField preview",
-                    onValueChange = {},
-                    modifier = Modifier.fillMaxWidth()
-                )
+                    ShoutTextField(
+                        value = "Expressive TextField",
+                        onValueChange = {},
+                        modifier = Modifier.fillMaxWidth(),
+                        label = { Text("Label") }
+                    )
+                }
             }
         }
     }

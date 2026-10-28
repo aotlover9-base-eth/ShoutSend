@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -17,13 +17,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import app.shoutsend.core.designsystem.ChirpTheme
+import app.shoutsend.core.designsystem.ShoutSendTheme
 
 /**
  * Horizontal acoustic energy level meter displaying continuous input/output dBFS with a peak-hold marker.
- *
  * Visual range: -70 dBFS to 0 dBFS.
- * Highlights in [ChirpTheme.colors.signalError] when audio level approaches analog clipping (-3 dBFS).
  */
 @Composable
 fun LevelMeter(
@@ -39,7 +37,7 @@ fun LevelMeter(
     val normPeak = ((peakDbfs - minDbfs) / span).coerceIn(0.0f, 1.0f)
 
     val isClipping = levelDbfs >= -3.0f
-    val barColor = if (isClipping) ChirpTheme.colors.signalError else ChirpTheme.colors.signalActive
+    val barColor = if (isClipping) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
 
     Column(
         modifier = modifier.semantics {
@@ -49,9 +47,9 @@ fun LevelMeter(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(ChirpTheme.spacing.sm)
-                .clip(ChirpTheme.shapes.extraSmall)
-                .background(ChirpTheme.colors.surfaceContainerHighest)
+                .height(ShoutSendTheme.spacing.sm)
+                .clip(ShoutSendTheme.shapes.extraSmall)
+                .background(MaterialTheme.colorScheme.surfaceContainerHighest)
         ) {
             // Active level fill
             Box(
@@ -71,31 +69,31 @@ fun LevelMeter(
                 ) {
                     Box(
                         modifier = Modifier
-                            .width(ChirpTheme.strokes.thick)
+                            .width(ShoutSendTheme.strokes.thick)
                             .fillMaxHeight()
-                            .background(ChirpTheme.colors.noiseFloorLine)
+                            .background(MaterialTheme.colorScheme.tertiary)
                     )
                 }
             }
         }
 
         if (showReadout) {
-            Spacer(modifier = Modifier.height(ChirpTheme.spacing.xxs))
+            Spacer(modifier = Modifier.height(ShoutSendTheme.spacing.xxs))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = "${levelDbfs.toInt()} dBFS",
-                    style = ChirpTheme.typography.radioReadoutSmall,
-                    color = if (isClipping) ChirpTheme.colors.signalError else ChirpTheme.colors.onSurfaceVariant
+                    style = MaterialTheme.typography.labelSmall,
+                    color = if (isClipping) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.weight(1.0f))
                 if (isClipping) {
                     Text(
-                        text = "CLIP",
-                        style = ChirpTheme.typography.radioReadoutSmall,
-                        color = ChirpTheme.colors.signalError
+                        text = "Clipping",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.error
                     )
                 }
             }

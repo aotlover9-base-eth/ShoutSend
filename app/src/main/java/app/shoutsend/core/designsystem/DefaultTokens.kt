@@ -2,8 +2,8 @@ package app.shoutsend.core.designsystem
 
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -19,137 +19,64 @@ import androidx.compose.ui.unit.sp
  */
 object DefaultTokens {
 
-    // --- CYBER RADIO DARK PALETTE (Default) ---
-    val CyberRadioDark = ColorTokens(
-        primary = Color(0xFF00F0FF),
-        onPrimary = Color(0xFF00363D),
-        primaryContainer = Color(0xFF004F58),
-        onPrimaryContainer = Color(0xFF97F0FF),
-        secondary = Color(0xFF00FF66),
-        onSecondary = Color(0xFF003912),
-        secondaryContainer = Color(0xFF00531D),
-        onSecondaryContainer = Color(0xFF73FF8B),
-        tertiary = Color(0xFFFFB300),
-        onTertiary = Color(0xFF412D00),
-        tertiaryContainer = Color(0xFF5D4200),
-        onTertiaryContainer = Color(0xFFFFDF9E),
-        error = Color(0xFFFF5449),
-        onError = Color(0xFF410002),
-        errorContainer = Color(0xFF93000A),
-        onErrorContainer = Color(0xFFFFDAD6),
-        background = Color(0xFF0B0E14),
-        onBackground = Color(0xFFE1E7F0),
-        surface = Color(0xFF0B0E14),
-        onSurface = Color(0xFFE1E7F0),
-        surfaceVariant = Color(0xFF171C26),
-        onSurfaceVariant = Color(0xFFA5B0C2),
-        surfaceContainerLowest = Color(0xFF06080C),
-        surfaceContainerLow = Color(0xFF10141D),
-        surfaceContainer = Color(0xFF171C26),
-        surfaceContainerHigh = Color(0xFF1E2430),
-        surfaceContainerHighest = Color(0xFF252C3A),
-        outline = Color(0xFF525E75),
-        outlineVariant = Color(0xFF343D4F),
-        scrim = Color(0xFF000000),
-        inverseSurface = Color(0xFFE1E7F0),
-        inverseOnSurface = Color(0xFF1E2430),
-        inversePrimary = Color(0xFF006874),
-        surfaceTint = Color(0xFF00F0FF),
-        spectrumGlow = Color(0xFF00F0FF),
-        signalActive = Color(0xFF00FF66),
-        signalIdle = Color(0xFF525E75),
-        signalError = Color(0xFFFF5449),
-        signalLow = Color(0xFF0D1B2A),
-        signalMid = Color(0xFF0077B6),
-        signalHigh = Color(0xFF00F0FF),
-        signalPeak = Color(0xFFFFFFFF),
-        noiseFloorLine = Color(0xFFFFB300),
-        syncMarker = Color(0xFFFF007F),
-        toneGuide = Color(0xFF1E2D3D),
-        glowPrimary = Color(0xFF00F0FF),
-        glowSecondary = Color(0xFF00FF66),
-        success = Color(0xFF00FF66),
-        onSuccess = Color(0xFF003912),
-        warning = Color(0xFFFFB300),
-        onWarning = Color(0xFF412D00),
-        scanline = Color(0x0A00F0FF)
+    // --- SEED COLOR & SEMANTIC FIXED HUES ---
+    const val SEED_COLOR_LONG = 0xFF6750A4L
+    val SeedColor = Color(SEED_COLOR_LONG)
+
+    val SeedPresets: List<Pair<String, Long>> = listOf(
+        "Violet" to SEED_COLOR_LONG,
+        "Coral" to 0xFFBA1A1AL,
+        "Forest" to 0xFF386A20L,
+        "Ocean" to 0xFF006874L,
+        "Amber" to 0xFF825500L
     )
 
-    // --- CYBER RADIO LIGHT PALETTE ---
-    val CyberRadioLight = ColorTokens(
-        primary = Color(0xFF006874),
-        onPrimary = Color(0xFFFFFFFF),
-        primaryContainer = Color(0xFF97F0FF),
-        onPrimaryContainer = Color(0xFF001F24),
-        secondary = Color(0xFF006E26),
-        onSecondary = Color(0xFFFFFFFF),
-        secondaryContainer = Color(0xFF73FF8B),
-        onSecondaryContainer = Color(0xFF002207),
-        tertiary = Color(0xFF7A5900),
-        onTertiary = Color(0xFFFFFFFF),
-        tertiaryContainer = Color(0xFFFFDF9E),
-        onTertiaryContainer = Color(0xFF261A00),
-        error = Color(0xFFBA1A1A),
-        onError = Color(0xFFFFFFFF),
-        errorContainer = Color(0xFFFFDAD6),
-        onErrorContainer = Color(0xFF410002),
-        background = Color(0xFFF7F9FE),
-        onBackground = Color(0xFF171C26),
-        surface = Color(0xFFF7F9FE),
-        onSurface = Color(0xFF171C26),
-        surfaceVariant = Color(0xFFDCE2EE),
-        onSurfaceVariant = Color(0xFF404753),
-        surfaceContainerLowest = Color(0xFFFFFFFF),
-        surfaceContainerLow = Color(0xFFF1F4FA),
-        surfaceContainer = Color(0xFFEAEFF6),
-        surfaceContainerHigh = Color(0xFFE4E9F0),
-        surfaceContainerHighest = Color(0xFFDEE3EA),
-        outline = Color(0xFF707885),
-        outlineVariant = Color(0xFFBFC7D5),
-        scrim = Color(0xFF000000),
-        inverseSurface = Color(0xFF2C313C),
-        inverseOnSurface = Color(0xFFEFF0F8),
-        inversePrimary = Color(0xFF00F0FF),
-        surfaceTint = Color(0xFF006874),
-        spectrumGlow = Color(0xFF006874),
-        signalActive = Color(0xFF006E26),
-        signalIdle = Color(0xFF707885),
-        signalError = Color(0xFFBA1A1A),
-        signalLow = Color(0xFFE0E8F0),
-        signalMid = Color(0xFF0288D1),
-        signalHigh = Color(0xFF006874),
-        signalPeak = Color(0xFF004D40),
-        noiseFloorLine = Color(0xFFE65100),
-        syncMarker = Color(0xFFC2185B),
-        toneGuide = Color(0xFFCFD8DC),
-        glowPrimary = Color(0xFF006874),
-        glowSecondary = Color(0xFF006E26),
-        success = Color(0xFF006E26),
-        onSuccess = Color(0xFFFFFFFF),
-        warning = Color(0xFF7A5900),
-        onWarning = Color(0xFFFFFFFF),
-        scanline = Color(0x05000000)
-    )
+    // Fixed semantic seeds for harmonization with primary
+    val SuccessSeed = Color(0xFF388E3C)
+    val WarningSeed = Color(0xFFF57C00)
 
-    // --- BASE SHAPES ---
+    // Semantic container and on-container roles (fallback and dark/light pairings)
+    val SuccessDarkOn = Color(0xFF003912)
+    val SuccessDarkContainer = Color(0xFF00531D)
+    val SuccessDarkOnContainer = Color(0xFF73FF8B)
+
+    val SuccessLightOn = Color(0xFFFFFFFF)
+    val SuccessLightContainer = Color(0xFF73FF8B)
+    val SuccessLightOnContainer = Color(0xFF002207)
+
+    val WarningDarkOn = Color(0xFF412D00)
+    val WarningDarkContainer = Color(0xFF5D4200)
+    val WarningDarkOnContainer = Color(0xFFFFDF9E)
+
+    val WarningLightOn = Color(0xFFFFFFFF)
+    val WarningLightContainer = Color(0xFFFFDF9E)
+    val WarningLightOnContainer = Color(0xFF261A00)
+
+    // --- BASE SHAPES (M3 Expressive scale) ---
     val ShapeExtraSmall = RoundedCornerShape(4.dp)
     val ShapeSmall = RoundedCornerShape(8.dp)
-    val ShapeMedium = RoundedCornerShape(12.dp)
-    val ShapeLarge = RoundedCornerShape(16.dp)
-    val ShapeExtraLarge = RoundedCornerShape(28.dp)
+    val ShapeMedium = RoundedCornerShape(16.dp)
+    val ShapeLarge = RoundedCornerShape(24.dp)
+    val ShapeLargeIncreased = RoundedCornerShape(28.dp)
+    val ShapeExtraLarge = RoundedCornerShape(32.dp)
+    val ShapeExtraLargeIncreased = RoundedCornerShape(40.dp)
+    val ShapeFull = CircleShape
 
     val Shapes = ShapeTokens(
         extraSmall = ShapeExtraSmall,
         small = ShapeSmall,
         medium = ShapeMedium,
         large = ShapeLarge,
+        largeIncreased = ShapeLargeIncreased,
         extraLarge = ShapeExtraLarge,
-        button = ShapeSmall,
-        card = ShapeMedium,
+        extraLargeIncreased = ShapeExtraLargeIncreased,
+        full = ShapeFull,
+        button = ShapeFull,
+        card = ShapeLarge,
         dialog = ShapeExtraLarge,
-        bottomSheet = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-        textField = ShapeSmall,
-        chip = ShapeSmall,
+        bottomSheet = RoundedCornerShape(topStart = 32.dp, topEnd = 32.dp),
+        textField = ShapeLarge,
+        chip = ShapeMedium,
         fab = ShapeLarge
     )
 
@@ -223,10 +150,8 @@ object DefaultTokens {
         springExit = spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessMedium)
     )
 
-    // --- RADIO VISUAL TOKENS ---
-    val RadioVisuals = RadioVisualTokens(
-        glowRadius = 12.dp,
-        glowAlpha = 0.35f,
+    // --- ACOUSTIC VISUAL TOKENS ---
+    val AcousticVisuals = AcousticVisualTokens(
         ringStrokeWidths = 1.5.dp,
         ringCount = 3,
         ringSpawnIntervalMs = 800,
@@ -236,7 +161,9 @@ object DefaultTokens {
         meterSegmentCount = 12
     )
 
-    // --- TYPOGRAPHY TOKENS ---
+    val RadioVisuals = AcousticVisuals
+
+    // --- TYPOGRAPHY TOKENS (Device Default Family, No Monospace) ---
     val Typography = TypographyTokens(
         displayLarge = TextStyle(
             fontFamily = FontFamily.Default,
@@ -252,13 +179,13 @@ object DefaultTokens {
         ),
         displaySmall = TextStyle(
             fontFamily = FontFamily.Default,
-            fontWeight = FontWeight.Normal,
+            fontWeight = FontWeight.SemiBold,
             fontSize = 36.sp,
             lineHeight = 44.sp
         ),
         headlineLarge = TextStyle(
             fontFamily = FontFamily.Default,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.Bold,
             fontSize = 32.sp,
             lineHeight = 40.sp
         ),
@@ -325,24 +252,6 @@ object DefaultTokens {
         labelSmall = TextStyle(
             fontFamily = FontFamily.Default,
             fontWeight = FontWeight.Medium,
-            fontSize = 11.sp,
-            lineHeight = 16.sp
-        ),
-        radioReadoutLarge = TextStyle(
-            fontFamily = FontFamily.Monospace,
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp,
-            lineHeight = 26.sp
-        ),
-        radioReadoutMedium = TextStyle(
-            fontFamily = FontFamily.Monospace,
-            fontWeight = FontWeight.SemiBold,
-            fontSize = 14.sp,
-            lineHeight = 20.sp
-        ),
-        radioReadoutSmall = TextStyle(
-            fontFamily = FontFamily.Monospace,
-            fontWeight = FontWeight.Normal,
             fontSize = 11.sp,
             lineHeight = 16.sp
         )
