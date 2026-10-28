@@ -625,6 +625,23 @@
   - Preserves Composable runtime entries, Room database DAOs/entities, Kotlinx Serialization serializers, and pure JVM modem protocol data structures.
   - Produces an optimized 4.0 MB production User APK (`app-user-release.apk`) verified 100% clean of developer tools (`verifyUserApkClean`).
 
+### DEC-069: ShoutSend v2 Architecture, Material 3 Expressive Redesign, and Wi-Fi Direct Handoff (Owner Approved v2)
+- **Date**: 2026-10-28
+- **Status**: Accepted (Owner Approved v2)
+- **Context**:
+  - ShoutSend v1.0.0 successfully validated the acoustic modem physical layer (`:modem`) and zero-permission audio transport.
+  - However, v1 suffered from two critical shortcomings: payload cap limited to 320 bytes (unusable for photos/documents), and a "Cyber Radio" UI aesthetic relying on emoji glyphs, neon halo cards, monospace readouts, and `remember`-scoped ViewModels that lost state on rotation.
+  - v2 introduces a hybrid acoustic pairing + Wi-Fi Direct streaming transport and a complete Material 3 Expressive redesign.
+- **Rule Amendments (Owner Approved v2)**:
+  - **Rule 3 (amended)**: Strict Material 3 Expressive (`MaterialExpressiveTheme`, `MaterialShapes`, shape morphing, `LoadingIndicator`, `ButtonGroup`, expressive motion springs). No look-alike custom components when an M3 component exists.
+  - **Rule 6 (amended)**: Dynamic color (wallpaper palette) enabled by default on all supported devices. Fallback scheme generated from ONE seed color in `DefaultTokens.kt`.
+  - **Rule 24 (replaced)**: Exact permission set: `RECORD_AUDIO`, `VIBRATE`, `INTERNET` (strictly for local sockets on Wi-Fi Direct link 192.168.49.0/24, zero internet), `ACCESS_WIFI_STATE`, `CHANGE_WIFI_STATE`, `NEARBY_WIFI_DEVICES` (`neverForLocation`), `ACCESS_FINE_LOCATION` (`maxSdkVersion="32"` for Android 12). No storage permissions (Photo Picker / MediaStore). No foreground service.
+  - **Rule 29 (new)**: No network clients. No HTTP library, no URL connection, no DNS lookups, no analytics.
+  - **Rule 30 (new)**: Files never touch app logs. Never log file names, sizes, URIs, passphrases, or session keys.
+  - **Rule 31 (new)**: Authenticated and end-to-end encrypted Wi-Fi Direct transfers with one-time session keys.
+  - **Rule 32 (new)**: Anti-slop UI rules (Material Symbols Rounded drawables only, sentence case, no glows/neon/scanlines, human copy without raw dB/SNR on main screens, 48dp minimum targets).
+
+
 
 
 

@@ -62,3 +62,22 @@
 | 57 | F Hardening | Lint, R8, size cleanup | No | **Done** |
 | 58 | F Hardening | Release build and docs | No | **Done** |
 | 59 | F Hardening | Final audit and handoff | No | **Done** |
+
+---
+
+## v2: Material You Redesign + Real File Sharing
+
+| Step | Area | Title | Touches UI | Status |
+|---|---|---|---|---|
+| R0 | Foundation | Baseline audit and v2 docs (no code changes) | No | **Done** |
+| R1 | Foundation | Foundation: dependency upgrade, proper ViewModels, permission and network guards | No | Todo |
+| R2 | Design | New Material 3 Expressive design system and dev panel update | Components only | Todo |
+| R3 | UI | App shell and Home hub | Yes | Todo |
+| R4 | UI | Composer sheets: Text, Link, Wi-Fi, Contact | Yes | Todo |
+| R5 | UI | Sending and receiving moments, result cards | Yes | Todo |
+| R6 | UI | History, Settings, Onboarding, Calibration redesign | Yes | Todo |
+| R7 | Modem | Protocol additions: FILE and HANDOFF payloads (`:modem`) | No | Todo |
+| R8 | Transfer | Wi-Fi Direct transfer engine (`core/transfer`) | No | Todo |
+| R9 | UI | File sharing UI and share-sheet intake | Yes | Todo |
+| R10 | Polish | Polish: motion, haptics, accessibility, large screens | Yes | Todo |
+| R11 | Release | Release v2.0.0, README, owner test plan | No | Todo |
