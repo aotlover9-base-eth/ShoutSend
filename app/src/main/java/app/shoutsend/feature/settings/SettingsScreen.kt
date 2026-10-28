@@ -22,6 +22,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.FilterChip
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
@@ -29,9 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.shoutsend.R
 import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.core.designsystem.ThemeMode
-import app.shoutsend.core.designsystem.components.CdAlertDialog
 import app.shoutsend.core.designsystem.components.CdButton
-import app.shoutsend.core.designsystem.components.CdFilterChip
 import app.shoutsend.core.designsystem.components.CdIconButton
 import app.shoutsend.core.designsystem.components.CdOutlinedButton
 import app.shoutsend.core.designsystem.components.CdSwitch
@@ -67,7 +67,7 @@ fun SettingsScreen(
 
     // 1. Stealth Mode Disclosure Dialog
     if (uiState.showStealthWarningDialog) {
-        CdAlertDialog(
+        AlertDialog(
             onDismissRequest = { viewModel.onDismissStealthWarning() },
             title = {
                 Text(
@@ -98,7 +98,7 @@ fun SettingsScreen(
 
     // 2. Vault Prune Confirmation Dialog
     if (uiState.showPruneConfirmDialog) {
-        CdAlertDialog(
+        AlertDialog(
             onDismissRequest = { viewModel.dismissPruneDialog() },
             title = {
                 Text(
@@ -134,7 +134,7 @@ fun SettingsScreen(
 
     // 3. Delete All App Data Confirmation Dialog
     if (uiState.showDeleteAllDataDialog) {
-        CdAlertDialog(
+        AlertDialog(
             onDismissRequest = { viewModel.dismissDeleteAllDataDialog() },
             title = {
                 Text(
@@ -224,13 +224,13 @@ fun SettingsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs)
                     ) {
-                        CdFilterChip(
+                        FilterChip(
                             selected = settings.band == Band.RETRO,
                             onClick = { viewModel.setBand(Band.RETRO) },
                             label = { Text(stringResource(R.string.settings_band_retro)) },
                             modifier = Modifier.weight(1f)
                         )
-                        CdFilterChip(
+                        FilterChip(
                             selected = settings.band == Band.STEALTH,
                             onClick = { viewModel.setBand(Band.STEALTH) },
                             label = { Text(stringResource(R.string.settings_band_stealth)) },
@@ -250,19 +250,19 @@ fun SettingsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs)
                     ) {
-                        CdFilterChip(
+                        FilterChip(
                             selected = settings.speed == Speed.FAST,
                             onClick = { viewModel.setSpeed(Speed.FAST) },
                             label = { Text(stringResource(R.string.settings_speed_fast)) },
                             modifier = Modifier.weight(1f)
                         )
-                        CdFilterChip(
+                        FilterChip(
                             selected = settings.speed == Speed.NORMAL,
                             onClick = { viewModel.setSpeed(Speed.NORMAL) },
                             label = { Text(stringResource(R.string.settings_speed_normal)) },
                             modifier = Modifier.weight(1f)
                         )
-                        CdFilterChip(
+                        FilterChip(
                             selected = settings.speed == Speed.ROBUST,
                             onClick = { viewModel.setSpeed(Speed.ROBUST) },
                             label = { Text(stringResource(R.string.settings_speed_robust)) },
@@ -282,19 +282,19 @@ fun SettingsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs)
                     ) {
-                        CdFilterChip(
+                        FilterChip(
                             selected = settings.repeats == 1,
                             onClick = { viewModel.setRepeats(1) },
                             label = { Text("1x") },
                             modifier = Modifier.weight(1f)
                         )
-                        CdFilterChip(
+                        FilterChip(
                             selected = settings.repeats == 2,
                             onClick = { viewModel.setRepeats(2) },
                             label = { Text("2x") },
                             modifier = Modifier.weight(1f)
                         )
-                        CdFilterChip(
+                        FilterChip(
                             selected = settings.repeats == 3,
                             onClick = { viewModel.setRepeats(3) },
                             label = { Text("3x") },
@@ -355,7 +355,7 @@ fun SettingsScreen(
                         ) {
                             listOf(100, 250, 500, 1000, 2000).forEach { limit ->
                                 item {
-                                    CdFilterChip(
+                                    FilterChip(
                                         selected = settings.historyMaxEntries == limit,
                                         onClick = { viewModel.requestHistoryMaxEntries(limit) },
                                         label = { Text("$limit") }
@@ -469,7 +469,7 @@ fun SettingsScreen(
                         horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs)
                     ) {
                         listOf(0 to "0s", 5 to "5s", 15 to "15s", 30 to "30s").forEach { (sec, label) ->
-                            CdFilterChip(
+                            FilterChip(
                                 selected = settings.backgroundGraceSeconds == sec,
                                 onClick = { viewModel.setBackgroundGraceSeconds(sec) },
                                 label = { Text(label) },
@@ -504,19 +504,19 @@ fun SettingsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs)
                     ) {
-                        CdFilterChip(
+                        FilterChip(
                             selected = settings.themeMode == ThemeMode.DARK,
                             onClick = { viewModel.setThemeMode(ThemeMode.DARK) },
                             label = { Text(stringResource(R.string.settings_theme_dark)) },
                             modifier = Modifier.weight(1f)
                         )
-                        CdFilterChip(
+                        FilterChip(
                             selected = settings.themeMode == ThemeMode.LIGHT,
                             onClick = { viewModel.setThemeMode(ThemeMode.LIGHT) },
                             label = { Text(stringResource(R.string.settings_theme_light)) },
                             modifier = Modifier.weight(1f)
                         )
-                        CdFilterChip(
+                        FilterChip(
                             selected = settings.themeMode == ThemeMode.SYSTEM,
                             onClick = { viewModel.setThemeMode(ThemeMode.SYSTEM) },
                             label = { Text(stringResource(R.string.settings_theme_system)) },

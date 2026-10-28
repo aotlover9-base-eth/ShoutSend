@@ -641,6 +641,37 @@
   - **Rule 31 (new)**: Authenticated and end-to-end encrypted Wi-Fi Direct transfers with one-time session keys.
   - **Rule 32 (new)**: Anti-slop UI rules (Material Symbols Rounded drawables only, sentence case, no glows/neon/scanlines, human copy without raw dB/SNR on main screens, 48dp minimum targets).
 
+### DEC-070: Step R1 Foundation: Dependency Modernization, Proper ViewModels, and Network/Purity Enforcement
+- **Date**: 2026-10-28
+- **Status**: Implemented & Verified
+- **Dependency Upgrades**:
+  - `AGP`: `8.5.2` -> `8.6.1`
+  - `Kotlin`: `2.0.0` -> `2.0.21`
+  - `KSP`: `2.0.0-1.0.24` -> `2.0.21-1.0.28`
+  - `Compose BOM`: `2024.06.00` -> `2024.12.01`
+  - `Material 3`: Pinned to `1.4.0-alpha08` (enables Expressive APIs: `MaterialExpressiveTheme`, `MotionScheme.Companion.expressive()`, `MaterialShapes`, `LoadingIndicator`, `ButtonGroup`).
+  - Added `androidx.graphics:graphics-shapes:1.0.1` (Apache-2.0, ~85 KB) for shape morphing primitives.
+  - Added `com.materialkolor:material-kolor:2.0.2` (Apache-2.0, ~140 KB, minSdk 21) for algorithmically generating the full 30+ role M3 ColorScheme from a single seed color.
+  - Added `compose-material-icons-core` and `compose-material-icons-extended` under BOM management.
+  - `Lifecycle`: `2.8.2` -> `2.8.7`
+  - `Activity Compose`: `1.9.0` -> `1.9.3`
+  - `Navigation Compose`: `2.8.3` -> `2.8.5`
+  - `Core-KTX`: `1.13.1` -> `1.15.0`
+  - `Coroutines`: `1.8.1` -> `1.9.0`
+  - `Serialization`: `1.6.3` -> `1.7.3`
+  - Kept: `minSdk = 31`, `Room = 2.6.1`, `DataStore = 1.1.1`, `JUnit = 4.13.2`.
+- **Architectural Cleanup & ViewModel Migration**:
+  - Created `AppViewModelProvider.kt` with a centralized `ViewModelProvider.Factory` pulling dependencies from `AppContainer`.
+  - All 7 ViewModels in `MainActivity` (`SendViewModel`, `TransmitViewModel`, `ReceiveViewModel`, `VaultViewModel`, `SettingsViewModel`, `CalibrationViewModel`, `OnboardingViewModel`) migrated from `remember { ... }` to scoped `viewModel(factory = AppViewModelProvider.Factory)`.
+  - Zero ViewModels hold an Activity `Context`. `TransmitViewModel` and `SettingsViewModel` now use `applicationContext`.
+  - Dev ViewModels (`DevPanelViewModel`, `DspLabViewModel`) migrated to extend `androidx.lifecycle.ViewModel()`.
+  - Removed dead code: `ReceiveSession`, `ReceiveState`, `SessionLifecycleManager`.
+  - Deleted obsolete wrapper components (`CdCard`, `CdBottomSheet`, `CdChip`, `CdDialog`, `CdDivider`, `CdTopBar`) and migrated all call sites to direct `androidx.compose.material3` components.
+- **Architectural Guards Enforcement**:
+  - `PermissionsGuard`: Updated to enforce the 7 allowed permissions from Rule 24 (replaced) for both flavors.
+  - `NetworkClientsGuard` (`checkNoNetworkClients`): Enforces Rule 29, blocking HTTP clients (`HttpURLConnection`, `HttpsURLConnection`, `okhttp`, `ktor`, `retrofit`, `URL` I/O, `WebView`, dynamic `InetAddress.getByName`), constraining raw Sockets to `core/transfer/`.
+  - `StyleGuard` (`checkNoHardcodedStyle`): Extended to enforce Rule 32a (no emojis or unicode glyphs in UI strings) and Rule 32b (no monospace outside dev DSP Lab, no uppercase on Text). Initial 57 v1 violations staged in `config/style-allowlist.txt` with `# remove in R3 to R6`.
+
 
 
 

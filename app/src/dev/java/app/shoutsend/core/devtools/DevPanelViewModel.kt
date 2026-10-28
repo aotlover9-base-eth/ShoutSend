@@ -1,6 +1,8 @@
 package app.shoutsend.core.devtools
 
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import app.shoutsend.core.designsystem.ColorTokens
 import app.shoutsend.core.designsystem.DefaultTokens
 import app.shoutsend.core.designsystem.DesignTokens
@@ -42,9 +44,11 @@ data class DevPanelUiState(
 
 class DevPanelViewModel(
     val themeController: ThemeController,
-    private val scope: CoroutineScope
-) {
+    coroutineScope: CoroutineScope? = null
+) : ViewModel() {
     val dspLabViewModel = DspLabViewModel()
+
+    private val scope: CoroutineScope = coroutineScope ?: viewModelScope
 
     private val _activeTab = MutableStateFlow(DevPanelTab.COLORS)
     private val _statusMessage = MutableStateFlow<String?>(null)

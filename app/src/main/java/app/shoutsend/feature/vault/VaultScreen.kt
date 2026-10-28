@@ -42,12 +42,12 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.shoutsend.R
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.FilterChip
 import app.shoutsend.core.data.vault.model.Direction
 import app.shoutsend.core.data.vault.model.VaultItem
 import app.shoutsend.core.designsystem.ChirpTheme
-import app.shoutsend.core.designsystem.components.CdAlertDialog
 import app.shoutsend.core.designsystem.components.CdButton
-import app.shoutsend.core.designsystem.components.CdFilterChip
 import app.shoutsend.core.designsystem.components.CdIconButton
 import app.shoutsend.core.designsystem.components.CdOutlinedButton
 import app.shoutsend.core.designsystem.components.CdSnackbarHost
@@ -102,7 +102,7 @@ fun VaultScreen(
 
     // Clear All Confirmation Dialog
     if (uiState.showClearAllDialog) {
-        CdAlertDialog(
+        AlertDialog(
             onDismissRequest = { viewModel.dismissClearAllDialog() },
             title = {
                 Text(
@@ -180,28 +180,28 @@ fun VaultScreen(
                 horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs)
             ) {
                 item {
-                    CdFilterChip(
+                    FilterChip(
                         selected = uiState.directionFilter == VaultFilterDirection.ALL,
                         onClick = { viewModel.setDirectionFilter(VaultFilterDirection.ALL) },
                         label = { Text(stringResource(R.string.vault_filter_all)) }
                     )
                 }
                 item {
-                    CdFilterChip(
+                    FilterChip(
                         selected = uiState.directionFilter == VaultFilterDirection.STARRED,
                         onClick = { viewModel.setDirectionFilter(VaultFilterDirection.STARRED) },
                         label = { Text(stringResource(R.string.vault_filter_starred)) }
                     )
                 }
                 item {
-                    CdFilterChip(
+                    FilterChip(
                         selected = uiState.directionFilter == VaultFilterDirection.SENT,
                         onClick = { viewModel.setDirectionFilter(VaultFilterDirection.SENT) },
                         label = { Text(stringResource(R.string.vault_filter_sent)) }
                     )
                 }
                 item {
-                    CdFilterChip(
+                    FilterChip(
                         selected = uiState.directionFilter == VaultFilterDirection.RECEIVED,
                         onClick = { viewModel.setDirectionFilter(VaultFilterDirection.RECEIVED) },
                         label = { Text(stringResource(R.string.vault_filter_received)) }
@@ -215,35 +215,35 @@ fun VaultScreen(
                 horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs)
             ) {
                 item {
-                    CdFilterChip(
+                    FilterChip(
                         selected = uiState.typeFilter == VaultFilterType.ALL,
                         onClick = { viewModel.setTypeFilter(VaultFilterType.ALL) },
                         label = { Text(stringResource(R.string.vault_filter_type_all)) }
                     )
                 }
                 item {
-                    CdFilterChip(
+                    FilterChip(
                         selected = uiState.typeFilter == VaultFilterType.TEXT,
                         onClick = { viewModel.setTypeFilter(VaultFilterType.TEXT) },
                         label = { Text(stringResource(R.string.vault_filter_type_text)) }
                     )
                 }
                 item {
-                    CdFilterChip(
+                    FilterChip(
                         selected = uiState.typeFilter == VaultFilterType.URL,
                         onClick = { viewModel.setTypeFilter(VaultFilterType.URL) },
                         label = { Text(stringResource(R.string.vault_filter_type_url)) }
                     )
                 }
                 item {
-                    CdFilterChip(
+                    FilterChip(
                         selected = uiState.typeFilter == VaultFilterType.WIFI,
                         onClick = { viewModel.setTypeFilter(VaultFilterType.WIFI) },
                         label = { Text(stringResource(R.string.vault_filter_type_wifi)) }
                     )
                 }
                 item {
-                    CdFilterChip(
+                    FilterChip(
                         selected = uiState.typeFilter == VaultFilterType.CONTACT,
                         onClick = { viewModel.setTypeFilter(VaultFilterType.CONTACT) },
                         label = { Text(stringResource(R.string.vault_filter_type_contact)) }

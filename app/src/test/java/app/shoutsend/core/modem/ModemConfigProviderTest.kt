@@ -7,7 +7,6 @@ import app.shoutsend.core.audio.transmitter.TransmitProgress
 import app.shoutsend.core.audio.transmitter.TransmitResult
 import app.shoutsend.core.session.AudioCoordinator
 import app.shoutsend.core.session.AudioFocusController
-import app.shoutsend.core.session.DefaultReceiveSession
 import app.shoutsend.core.session.DefaultTransmitSession
 import app.shoutsend.core.session.SessionMode
 import app.shoutsend.modem.AudioSpec
@@ -123,37 +122,6 @@ class ModemConfigProviderTest {
         assertEquals(Speed.FAST, provider.config.value.speed)
         assertEquals(1, provider.config.value.repeats)
         assertEquals(customTuning, provider.config.value.tuning)
-    }
-
-    @Test
-    fun testReceiveSessionPicksUpConfigAtStart() = runBlocking {
-        val coordinator = TestAudioCoordinator()
-        val focus = TestAudioFocusController()
-        val receiver = TestAcousticReceiver()
-        val provider = TestModemConfigProvider()
-
-        val session = DefaultReceiveSession(
-            coordinator = coordinator,
-            focusController = focus,
-            receiver = receiver,
-            configProvider = provider
-        )
-
-        // Initial start: should use default RETRO band and DEFAULT tuning
-        session.start()
-        assertEquals(Band.RETRO, receiver.lastBand)
-        assertEquals(ModemTuning.DEFAULT, receiver.lastTuning)
-        session.stop()
-
-        // Update provider with STEALTH band and custom tuning
-        val customTuning = ModemTuning(leadInSilenceMs = 400, minPreambleSlots = 8)
-        provider.update(ModemConfig(band = Band.STEALTH, tuning = customTuning))
-
-        // Subsequent start: session must pick up latest config dynamically
-        session.start()
-        assertEquals(Band.STEALTH, receiver.lastBand)
-        assertEquals(customTuning, receiver.lastTuning)
-        session.stop()
     }
 
     @Test

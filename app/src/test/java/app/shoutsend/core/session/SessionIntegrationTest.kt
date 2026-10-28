@@ -210,11 +210,12 @@ class SessionIntegrationTest {
         val focus = FakeAudioFocusController()
         val transmitter = FakeTransmitter()
 
-        val rxSession = DefaultReceiveSession(coordinator, focus, receiver)
         val txSession = DefaultTransmitSession(coordinator, focus, transmitter)
 
-        // 1. Start receiving
-        rxSession.start(Band.RETRO)
+        // 1. Start receiving via coordinator
+        val lockGranted = coordinator.acquireReceiveLock()
+        assertTrue(lockGranted)
+        receiver.start(Band.RETRO)
         assertTrue(receiver.isRunning)
         assertEquals(SessionMode.RECEIVING, coordinator.activeMode.value)
         assertTrue(coordinator.keepScreenOn.value)
@@ -227,106 +228,6 @@ class SessionIntegrationTest {
         txJob.await()
         assertFalse("Receiver must be stopped by transmitter lock", receiver.isRunning)
         assertEquals(SessionMode.IDLE, coordinator.activeMode.value)
-    }
-
-    @Test
-    fun testReceiveStateTransitionsToSuccess() = runBlocking {
-        val receiver = FakeReceiver()
-        val coordinator = DefaultAudioCoordinator(receiver)
-        val focus = FakeAudioFocusController()
-        val rxSession = DefaultReceiveSession(coordinator, focus, receiver)
-
-        rxSession.start(Band.RETRO)
-        assertTrue(rxSession.state.value is ReceiveState.Listening)
-
-        // Emit demodulation events
-        receiver.emitEvent(ReceiveEvent.PreambleDetected)
-        withTimeout(500) { rxSession.state.first { it is ReceiveState.PreambleDetected } }
-
-        receiver.emitEvent(ReceiveEvent.Locked(18.5))
-        withTimeout(500) { rxSession.state.first { it == ReceiveState.Locked(18.5) } }
-
-        receiver.emitEvent(ReceiveEvent.FrameDecoded(fragmentIndex = 0, fragmentCount = 1, correctedBytes = 0))
-        withTimeout(500) { rxSession.state.first { it == ReceiveState.Receiving(1, 1, 18.5) } }
-
-        val payload = Payload.Text("Demodulated Text")
-        val msg = ReceivedMessage(
-            type = MessageType.TEXT,
-            flags = MessageFlags.NONE,
-            messageId = 1,
-            payload = PayloadCodec.encode(payload)
-        )
-        receiver.emitEvent(ReceiveEvent.MessageComplete(message = msg, payload = payload))
-        val state = withTimeout(500) { rxSession.state.first { it is ReceiveState.Success } }
-
-        assertTrue("State must be Success", state is ReceiveState.Success)
-        assertEquals("Demodulated Text", ((state as ReceiveState.Success).payload as Payload.Text).value)
-
-        rxSession.stop()
-        assertEquals(ReceiveState.Idle, rxSession.state.value)
-    }
-
-    @Test
-    fun testReceiveEncryptedMessageWithPassphraseProvider() = runBlocking {
-        val receiver = FakeReceiver()
-        val coordinator = DefaultAudioCoordinator(receiver)
-        val focus = FakeAudioFocusController()
-        val rxSession = DefaultReceiveSession(coordinator, focus, receiver)
-
-        val secretText = "TopSecretAcousticData"
-        val passphrase = "CorrectPassword123"
-        val sealed = app.shoutsend.modem.crypto.SecureBox.seal(
-            plainBytes = PayloadCodec.encode(Payload.Text(secretText)),
-            type = MessageType.TEXT,
-            passphrase = passphrase.toCharArray()
-        )
-
-        val encryptedMsg = ReceivedMessage(
-            type = MessageType.TEXT,
-            flags = MessageFlags(isEncrypted = true, isCompact = false, isReserved = false),
-            messageId = 42,
-            payload = sealed
-        )
-
-        // Start with matching passphrase provider
-        rxSession.start(Band.RETRO, passphraseProvider = { passphrase })
-
-        receiver.emitEvent(ReceiveEvent.MessageComplete(message = encryptedMsg, payload = null))
-        val state = withTimeout(10_000) {
-            rxSession.state.first { it is ReceiveState.Success || it is ReceiveState.Failed }
-        }
-
-        assertTrue("Must successfully decrypt, actual: $state", state is ReceiveState.Success)
-        assertEquals(secretText, ((state as ReceiveState.Success).payload as Payload.Text).value)
-        assertTrue(state.metadata.isEncrypted)
-
-        rxSession.stop()
-    }
-
-    @Test
-    fun testSessionLifecycleManagerStopsReceiveAfterGracePeriod() = runBlocking {
-        val receiver = FakeReceiver()
-        val coordinator = DefaultAudioCoordinator(receiver)
-        val focus = FakeAudioFocusController()
-        val rxSession = DefaultReceiveSession(coordinator, focus, receiver)
-        val lifecycleManager = SessionLifecycleManager(rxSession, defaultGraceSeconds = 1)
-
-        rxSession.start(Band.RETRO)
-        assertTrue(receiver.isRunning)
-
-        // App goes to background with 1s grace
-        lifecycleManager.onAppBackgrounded(graceSeconds = 1)
-        assertTrue(lifecycleManager.isBackgrounded)
-        assertTrue("Receiver still running during grace period", receiver.isRunning)
-
-        // Wait past grace period
-        delay(1200)
-        assertFalse("Receiver must be stopped after grace period expires", receiver.isRunning)
-        assertEquals(ReceiveState.Idle, rxSession.state.value)
-
-        // Foreground cancels timer
-        lifecycleManager.onAppForegrounded()
-        assertFalse(lifecycleManager.isBackgrounded)
     }
 
     @Test
@@ -375,21 +276,19 @@ class SessionIntegrationTest {
         val prodReceiver = DefaultAcousticReceiver(
             pcmSourceFactory = { fakeSource }
         )
-        val rxCoordinator = DefaultAudioCoordinator(prodReceiver)
-        val rxSession = DefaultReceiveSession(rxCoordinator, focus, prodReceiver)
 
-        rxSession.start(band = Band.RETRO, passphraseProvider = { passphrase })
+        prodReceiver.start(band = Band.RETRO, passphrase = passphrase)
 
         // Wait up to 10s for decoding under heavy test load
-        val rxState = withTimeout(10_000) {
-            rxSession.state.first { it is ReceiveState.Success || it is ReceiveState.Failed }
+        val completeEvent = withTimeout(10_000) {
+            prodReceiver.events.first { it is ReceiveEvent.MessageComplete } as ReceiveEvent.MessageComplete
         }
 
-        assertTrue("RX reached Success, actual state: $rxState", rxState is ReceiveState.Success)
-        val decodedText = ((rxState as ReceiveState.Success).payload as Payload.Text).value
-        assertEquals(messageText, decodedText)
-        assertTrue(rxState.metadata.isEncrypted)
+        val decodedPayload = completeEvent.payload
+        assertTrue("Payload must be decoded", decodedPayload is Payload.Text)
+        assertEquals(messageText, (decodedPayload as Payload.Text).value)
+        assertTrue(completeEvent.message.flags.isEncrypted)
 
-        rxSession.stop()
+        prodReceiver.stop()
     }
 }

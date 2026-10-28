@@ -66,8 +66,8 @@ class TransmitViewModel(
     private val settingsRepository: SettingsRepository,
     private val vaultRepository: VaultRepository,
     private val audioRouteMonitor: AudioRouteMonitor,
-    context: Context? = null,
-    private val audioManager: AudioManager? = context?.getSystemService(Context.AUDIO_SERVICE) as? AudioManager,
+    applicationContext: Context? = null,
+    private val audioManager: AudioManager? = applicationContext?.getSystemService(Context.AUDIO_SERVICE) as? AudioManager,
     private val audioFeedbackPlayer: AudioFeedbackPlayer? = null,
     private val tactileFeedback: TactileFeedbackController? = null
 ) : ViewModel() {

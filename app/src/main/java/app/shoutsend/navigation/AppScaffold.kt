@@ -35,11 +35,12 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TopAppBar
 import app.shoutsend.core.data.settings.SettingsRepository
 import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.core.designsystem.components.AcousticStatus
 import app.shoutsend.core.designsystem.components.BrandMark
-import app.shoutsend.core.designsystem.components.CdAlertDialog
 import app.shoutsend.core.designsystem.components.CdButton
 import app.shoutsend.core.designsystem.components.CdIconButton
 import app.shoutsend.core.designsystem.components.CdNavigationBar
@@ -49,7 +50,6 @@ import app.shoutsend.core.designsystem.components.CdNavigationRailItem
 import app.shoutsend.core.designsystem.components.CdScaffold
 import app.shoutsend.core.designsystem.components.CdSnackbarHost
 import app.shoutsend.core.designsystem.components.CdTextButton
-import app.shoutsend.core.designsystem.components.CdTopAppBar
 import app.shoutsend.core.designsystem.components.StatusPill
 import kotlinx.coroutines.launch
 
@@ -81,7 +81,7 @@ fun AppScaffold(
     }
 
     if (showCancelDialog) {
-        CdAlertDialog(
+        AlertDialog(
             onDismissRequest = { showCancelDialog = false },
             title = {
                 Text(
@@ -122,7 +122,7 @@ fun AppScaffold(
     }
 
     val topBar: @Composable () -> Unit = {
-        CdTopAppBar(
+        TopAppBar(
             title = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically

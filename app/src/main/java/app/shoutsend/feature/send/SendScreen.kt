@@ -27,6 +27,9 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,11 +37,8 @@ import app.shoutsend.R
 import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.core.designsystem.components.AcousticStatus
 import app.shoutsend.core.designsystem.components.ByteMeter
-import app.shoutsend.core.designsystem.components.CdAlertDialog
 import app.shoutsend.core.designsystem.components.CdButton
-import app.shoutsend.core.designsystem.components.CdFilterChip
 import app.shoutsend.core.designsystem.components.CdIconButton
-import app.shoutsend.core.designsystem.components.CdModalBottomSheet
 import app.shoutsend.core.designsystem.components.CdOutlinedButton
 import app.shoutsend.core.designsystem.components.CdOutlinedTextField
 import app.shoutsend.core.designsystem.components.CdSwitch
@@ -74,7 +74,7 @@ fun SendScreen(
 
     // Stealth Band First-Use Warning Dialog
     if (uiState.showStealthWarningDialog) {
-        CdAlertDialog(
+        AlertDialog(
             onDismissRequest = { viewModel.onDismissStealthWarning() },
             title = {
                 Text(
@@ -105,7 +105,7 @@ fun SendScreen(
 
     // Transmission Options Bottom Sheet (Repeats & Volume Tip)
     if (uiState.showSettingsBottomSheet) {
-        CdModalBottomSheet(
+        ModalBottomSheet(
             onDismissRequest = { viewModel.setSettingsBottomSheetVisible(false) }
         ) {
             Column(
@@ -131,7 +131,7 @@ fun SendScreen(
                     horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)
                 ) {
                     listOf(1, 2, 3).forEach { rep ->
-                        CdFilterChip(
+                        FilterChip(
                             selected = uiState.repeats == rep,
                             onClick = { viewModel.onRepeatsSelected(rep) },
                             label = { Text("${rep}x") }
@@ -171,7 +171,7 @@ fun SendScreen(
 
     // Secure Mode Passphrase Dialog (Step 46)
     if (uiState.showPassphraseDialog) {
-        CdAlertDialog(
+        AlertDialog(
             onDismissRequest = { viewModel.dismissPassphraseDialog() },
             title = {
                 Row(
@@ -303,22 +303,22 @@ fun SendScreen(
                 .horizontalScroll(rememberScrollState()),
             horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)
         ) {
-            CdFilterChip(
+            FilterChip(
                 selected = uiState.selectedType == SendPayloadType.TEXT,
                 onClick = { viewModel.selectPayloadType(SendPayloadType.TEXT) },
                 label = { Text(stringResource(R.string.send_type_text)) }
             )
-            CdFilterChip(
+            FilterChip(
                 selected = uiState.selectedType == SendPayloadType.URL,
                 onClick = { viewModel.selectPayloadType(SendPayloadType.URL) },
                 label = { Text(stringResource(R.string.send_type_url)) }
             )
-            CdFilterChip(
+            FilterChip(
                 selected = uiState.selectedType == SendPayloadType.WIFI,
                 onClick = { viewModel.selectPayloadType(SendPayloadType.WIFI) },
                 label = { Text(stringResource(R.string.send_type_wifi)) }
             )
-            CdFilterChip(
+            FilterChip(
                 selected = uiState.selectedType == SendPayloadType.CONTACT,
                 onClick = { viewModel.selectPayloadType(SendPayloadType.CONTACT) },
                 label = { Text(stringResource(R.string.send_type_contact)) }

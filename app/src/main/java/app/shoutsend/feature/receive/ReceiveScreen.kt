@@ -27,11 +27,11 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.material3.FilterChip
 import app.shoutsend.R
 import app.shoutsend.core.audio.permissions.MicPermissionState
 import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.core.designsystem.components.AcousticStatus
-import app.shoutsend.core.designsystem.components.CdFilterChip
 import app.shoutsend.core.designsystem.components.LevelMeter
 import app.shoutsend.core.designsystem.components.MicPermissionCard
 import app.shoutsend.core.designsystem.components.NeonCard
@@ -106,12 +106,12 @@ fun ReceiveScreen(
                 horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                CdFilterChip(
+                FilterChip(
                     selected = uiState.band == Band.RETRO,
                     onClick = { viewModel.setBand(Band.RETRO) },
                     label = { Text(stringResource(R.string.receive_band_retro)) }
                 )
-                CdFilterChip(
+                FilterChip(
                     selected = uiState.band == Band.STEALTH,
                     onClick = { viewModel.setBand(Band.STEALTH) },
                     label = { Text(stringResource(R.string.receive_band_stealth)) }

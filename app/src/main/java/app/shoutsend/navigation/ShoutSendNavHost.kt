@@ -1,5 +1,6 @@
 package app.shoutsend.navigation
 
+import androidx.activity.ComponentActivity
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -12,11 +13,14 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import app.shoutsend.AppViewModelProvider
 import app.shoutsend.core.audio.permissions.MicPermissionState
 import app.shoutsend.core.data.settings.SettingsRepository
 import app.shoutsend.core.designsystem.ChirpTheme
@@ -45,16 +49,16 @@ fun ShoutSendNavHost(
     navController: NavHostController,
     startDestination: Any,
     settingsRepository: SettingsRepository,
-    sendViewModel: SendViewModel,
-    transmitViewModel: TransmitViewModel,
-    receiveViewModel: ReceiveViewModel,
-    vaultViewModel: VaultViewModel,
-    settingsViewModel: SettingsViewModel,
-    calibrationViewModel: CalibrationViewModel,
-    onboardingViewModel: OnboardingViewModel,
     micPermissionState: MicPermissionState = MicPermissionState.Granted,
     onRequestPermission: () -> Unit = {},
     onOpenSettings: () -> Unit = {},
+    sendViewModel: SendViewModel? = null,
+    transmitViewModel: TransmitViewModel? = null,
+    receiveViewModel: ReceiveViewModel? = null,
+    vaultViewModel: VaultViewModel? = null,
+    settingsViewModel: SettingsViewModel? = null,
+    calibrationViewModel: CalibrationViewModel? = null,
+    onboardingViewModel: OnboardingViewModel? = null,
     modifier: Modifier = Modifier
 ) {
     val isReducedMotion = ChirpTheme.isReducedMotion
@@ -208,8 +212,9 @@ fun ShoutSendNavHost(
             popEnterTransition = onboardingEnterTransition,
             popExitTransition = onboardingExitTransition
         ) {
+            val vm = onboardingViewModel ?: viewModel(factory = AppViewModelProvider.Factory)
             OnboardingScreen(
-                viewModel = onboardingViewModel,
+                viewModel = vm,
                 onFinished = {
                     navController.navigate(ReceiveRoute) {
                         popUpTo(OnboardingRoute) { inclusive = true }
@@ -227,13 +232,15 @@ fun ShoutSendNavHost(
             popExitTransition = tabPopExitTransition
         ) { backStackEntry ->
             val route = backStackEntry.toRoute<SendRoute>()
+            val activity = LocalContext.current as ComponentActivity
+            val vm = sendViewModel ?: viewModel(viewModelStoreOwner = activity, factory = AppViewModelProvider.Factory)
             androidx.compose.runtime.LaunchedEffect(route.sharedText, route.sharedType) {
                 if (!route.sharedText.isNullOrEmpty()) {
-                    sendViewModel.consumeSharedRouteArgs(route.sharedText, route.sharedType)
+                    vm.consumeSharedRouteArgs(route.sharedText, route.sharedType)
                 }
             }
             SendScreen(
-                viewModel = sendViewModel,
+                viewModel = vm,
                 onNavigateToTransmit = {
                     navController.navigate(TransmitRoute)
                 }
@@ -247,8 +254,10 @@ fun ShoutSendNavHost(
             popEnterTransition = transmitPopEnterTransition,
             popExitTransition = transmitPopExitTransition
         ) {
+            val activity = LocalContext.current as ComponentActivity
+            val vm = transmitViewModel ?: viewModel(viewModelStoreOwner = activity, factory = AppViewModelProvider.Factory)
             TransmitScreen(
-                viewModel = transmitViewModel,
+                viewModel = vm,
                 onNavigateBack = { navController.popBackStack() }
             )
         }
@@ -260,8 +269,9 @@ fun ShoutSendNavHost(
             popEnterTransition = tabPopEnterTransition,
             popExitTransition = tabPopExitTransition
         ) {
+            val vm = receiveViewModel ?: viewModel(factory = AppViewModelProvider.Factory)
             ReceiveScreen(
-                viewModel = receiveViewModel,
+                viewModel = vm,
                 micPermissionState = micPermissionState,
                 onRequestPermission = onRequestPermission,
                 onOpenSettings = onOpenSettings
@@ -275,8 +285,9 @@ fun ShoutSendNavHost(
             popEnterTransition = tabPopEnterTransition,
             popExitTransition = tabPopExitTransition
         ) {
+            val vm = vaultViewModel ?: viewModel(factory = AppViewModelProvider.Factory)
             VaultScreen(
-                viewModel = vaultViewModel,
+                viewModel = vm,
                 onNavigateToDetail = { id ->
                     navController.navigate(VaultDetailRoute(id))
                 },
@@ -294,13 +305,16 @@ fun ShoutSendNavHost(
             popExitTransition = deepPopExitTransition
         ) { backStackEntry ->
             val route = backStackEntry.toRoute<VaultDetailRoute>()
+            val vm = vaultViewModel ?: viewModel(factory = AppViewModelProvider.Factory)
+            val activity = LocalContext.current as ComponentActivity
+            val sendVm = sendViewModel ?: viewModel(viewModelStoreOwner = activity, factory = AppViewModelProvider.Factory)
             VaultDetailScreen(
                 id = route.id,
-                viewModel = vaultViewModel,
+                viewModel = vm,
                 onNavigateBack = { navController.popBackStack() },
                 onRetransmit = { payload, isSecure ->
-                    sendViewModel.loadPayloadForRetransmit(payload, isSecure)
-                    sendViewModel.startTransmission {
+                    sendVm.loadPayloadForRetransmit(payload, isSecure)
+                    sendVm.startTransmission {
                         navController.navigate(TransmitRoute)
                     }
                 }
@@ -314,8 +328,9 @@ fun ShoutSendNavHost(
             popEnterTransition = deepPopEnterTransition,
             popExitTransition = deepPopExitTransition
         ) {
+            val vm = settingsViewModel ?: viewModel(factory = AppViewModelProvider.Factory)
             SettingsScreen(
-                viewModel = settingsViewModel,
+                viewModel = vm,
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToCalibration = { navController.navigate(CalibrationRoute) },
                 onNavigateToOnboarding = { navController.navigate(OnboardingRoute) }
@@ -329,8 +344,9 @@ fun ShoutSendNavHost(
             popEnterTransition = deepPopEnterTransition,
             popExitTransition = deepPopExitTransition
         ) {
+            val vm = calibrationViewModel ?: viewModel(factory = AppViewModelProvider.Factory)
             CalibrationScreen(
-                viewModel = calibrationViewModel,
+                viewModel = vm,
                 onNavigateBack = { navController.popBackStack() },
                 micPermissionState = micPermissionState,
                 onRequestPermission = onRequestPermission,

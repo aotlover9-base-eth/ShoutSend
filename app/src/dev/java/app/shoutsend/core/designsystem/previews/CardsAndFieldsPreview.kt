@@ -12,19 +12,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.Card
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.InputChip
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.core.designsystem.DesignTokens
-import app.shoutsend.core.designsystem.components.CdAssistChip
-import app.shoutsend.core.designsystem.components.CdCard
-import app.shoutsend.core.designsystem.components.CdElevatedCard
-import app.shoutsend.core.designsystem.components.CdFilterChip
-import app.shoutsend.core.designsystem.components.CdInputChip
-import app.shoutsend.core.designsystem.components.CdOutlinedCard
 import app.shoutsend.core.designsystem.components.CdOutlinedTextField
-import app.shoutsend.core.designsystem.components.CdSuggestionChip
 import app.shoutsend.core.designsystem.components.CdSwitch
 import app.shoutsend.core.designsystem.components.CdTextField
 
@@ -47,7 +47,7 @@ private fun CardsAndFieldsPreviewContent() {
             color = ChirpTheme.colors.onBackground
         )
 
-        CdCard(modifier = Modifier.fillMaxWidth()) {
+        Card(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(ChirpTheme.spacing.md)) {
                 Text(
                     text = "Standard Card (SurfaceContainer)",
@@ -62,7 +62,7 @@ private fun CardsAndFieldsPreviewContent() {
             }
         }
 
-        CdOutlinedCard(modifier = Modifier.fillMaxWidth()) {
+        OutlinedCard(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(ChirpTheme.spacing.md)) {
                 Text(
                     text = "Outlined Card (Border Token)",
@@ -77,7 +77,7 @@ private fun CardsAndFieldsPreviewContent() {
             }
         }
 
-        CdElevatedCard(modifier = Modifier.fillMaxWidth()) {
+        ElevatedCard(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(ChirpTheme.spacing.md)) {
                 Text(
                     text = "Elevated Card",
@@ -133,16 +133,16 @@ private fun CardsAndFieldsPreviewContent() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs)
         ) {
-            CdFilterChip(
+            FilterChip(
                 selected = chipSelected,
                 onClick = { chipSelected = !chipSelected },
                 label = { Text("Stealth") }
             )
-            CdAssistChip(
+            AssistChip(
                 onClick = {},
                 label = { Text("Retro") }
             )
-            CdSuggestionChip(
+            SuggestionChip(
                 onClick = {},
                 label = { Text("Robust") }
             )

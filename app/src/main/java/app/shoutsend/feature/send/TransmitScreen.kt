@@ -27,16 +27,16 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TopAppBar
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.shoutsend.R
 import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.core.designsystem.components.AcousticStatus
-import app.shoutsend.core.designsystem.components.CdAlertDialog
 import app.shoutsend.core.designsystem.components.CdButton
 import app.shoutsend.core.designsystem.components.CdOutlinedButton
 import app.shoutsend.core.designsystem.components.CdScaffold
-import app.shoutsend.core.designsystem.components.CdTopAppBar
 import app.shoutsend.core.designsystem.components.NeonCard
 import app.shoutsend.core.designsystem.components.RadioReadout
 import app.shoutsend.core.designsystem.components.ReadoutScale
@@ -73,7 +73,7 @@ fun TransmitScreen(
     }
 
     if (showCancelConfirmDialog) {
-        CdAlertDialog(
+        AlertDialog(
             onDismissRequest = { showCancelConfirmDialog = false },
             title = {
                 Text(
@@ -113,7 +113,7 @@ fun TransmitScreen(
     CdScaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
-            CdTopAppBar(
+            TopAppBar(
                 title = {
                     Text(
                         text = stringResource(R.string.transmit_screen_title),

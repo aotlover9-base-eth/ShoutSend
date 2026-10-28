@@ -1,5 +1,6 @@
 package app.shoutsend.core.devtools
 
+import androidx.lifecycle.ViewModel
 import app.shoutsend.modem.AudioSpec
 import app.shoutsend.modem.detector.GoertzelBank
 import app.shoutsend.modem.profile.Band
@@ -73,7 +74,7 @@ class DspLabViewModel(
     initialBand: Band = Band.RETRO,
     initialSpeed: Speed = Speed.NORMAL,
     private val audioSpec: AudioSpec = AudioSpec(sampleRateHz = 48000)
-) {
+) : ViewModel() {
     private val _uiState = MutableStateFlow(
         createInitialState(initialBand, initialSpeed)
     )

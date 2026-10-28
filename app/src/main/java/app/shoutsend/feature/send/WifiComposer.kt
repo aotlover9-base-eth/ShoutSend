@@ -15,13 +15,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.password
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.material3.FilterChip
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import app.shoutsend.R
 import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.core.designsystem.components.CdButton
-import app.shoutsend.core.designsystem.components.CdFilterChip
 import app.shoutsend.core.designsystem.components.CdIconButton
 import app.shoutsend.core.designsystem.components.CdOutlinedTextField
 import app.shoutsend.core.designsystem.components.CdSwitch
@@ -75,7 +75,7 @@ fun WifiComposer(
                         WifiSecurity.WPA3 -> stringResource(R.string.send_wifi_sec_wpa3)
                         WifiSecurity.OPEN -> stringResource(R.string.send_wifi_sec_open)
                     }
-                    CdFilterChip(
+                    FilterChip(
                         selected = uiState.wifiSecurity == security,
                         onClick = { viewModel.onWifiSecurityChanged(security) },
                         label = { Text(labelText) }

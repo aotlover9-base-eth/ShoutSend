@@ -1,4 +1,62 @@
 # Style Guard Allowlist
 # Every entry here MUST correspond to an approved entry in docs/DECISIONS.md.
-# Format: <relative-path>:<line-pattern-or-rule>
-# Example: app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml:#[0-9A-Fa-f]{6}
+# Format: <relative-path>:<line-number>
+
+# remove in R3 to R6 (existing v1 anti-slop violations: emoji, monospace, uppercase)
+app/src/main/java/app/shoutsend/core/designsystem/DefaultTokens.kt:332
+app/src/main/java/app/shoutsend/core/designsystem/DefaultTokens.kt:338
+app/src/main/java/app/shoutsend/core/designsystem/DefaultTokens.kt:344
+app/src/main/java/app/shoutsend/core/designsystem/components/RadioReadout.kt:40
+app/src/main/java/app/shoutsend/feature/receive/ReceiveScreen.kt:243
+app/src/main/java/app/shoutsend/feature/receive/ReceiveScreen.kt:355
+app/src/main/java/app/shoutsend/feature/receive/ReceivedPayloadCard.kt:100
+app/src/main/java/app/shoutsend/feature/receive/ReceivedPayloadCard.kt:118
+app/src/main/java/app/shoutsend/feature/receive/ReceivedPayloadCard.kt:169
+app/src/main/java/app/shoutsend/feature/receive/ReceivedPayloadCard.kt:203
+app/src/main/java/app/shoutsend/feature/receive/ReceivedPayloadCard.kt:247
+app/src/main/java/app/shoutsend/feature/receive/ReceivedPayloadCard.kt:301
+app/src/main/java/app/shoutsend/feature/receive/ReceivedPayloadCard.kt:553
+app/src/main/java/app/shoutsend/feature/receive/ReceivedPayloadCard.kt:561
+app/src/main/java/app/shoutsend/feature/receive/ReceivedPayloadCard.kt:568
+app/src/main/java/app/shoutsend/feature/receive/SegmentedProgressBar.kt:158
+app/src/main/java/app/shoutsend/feature/receive/SegmentedProgressBar.kt:189
+app/src/main/java/app/shoutsend/feature/receive/WaterfallCanvas.kt:236
+app/src/main/java/app/shoutsend/feature/receive/WaterfallCanvas.kt:283
+app/src/main/java/app/shoutsend/feature/send/SendScreen.kt:182
+app/src/main/java/app/shoutsend/feature/send/SendScreen.kt:233
+app/src/main/java/app/shoutsend/feature/send/SendScreen.kt:347
+app/src/main/java/app/shoutsend/feature/send/SendScreen.kt:391
+app/src/main/java/app/shoutsend/feature/send/SendScreen.kt:422
+app/src/main/java/app/shoutsend/feature/send/SendScreen.kt:526
+app/src/main/java/app/shoutsend/feature/send/TransmitScreen.kt:237
+app/src/main/java/app/shoutsend/feature/send/WifiComposer.kt:114
+app/src/main/java/app/shoutsend/feature/send/WifiComposer.kt:127
+app/src/main/java/app/shoutsend/feature/settings/SettingsScreen.kt:574
+app/src/main/java/app/shoutsend/feature/vault/VaultDetailScreen.kt:255
+app/src/main/java/app/shoutsend/feature/vault/VaultDetailScreen.kt:272
+app/src/main/java/app/shoutsend/feature/vault/VaultDetailScreen.kt:304
+app/src/main/java/app/shoutsend/feature/vault/VaultDetailScreen.kt:321
+app/src/main/java/app/shoutsend/feature/vault/VaultDetailScreen.kt:338
+app/src/main/java/app/shoutsend/feature/vault/VaultDetailScreen.kt:355
+app/src/main/java/app/shoutsend/feature/vault/VaultDetailScreen.kt:373
+app/src/main/java/app/shoutsend/feature/vault/VaultDetailScreen.kt:394
+app/src/main/java/app/shoutsend/feature/vault/VaultDetailScreen.kt:429
+app/src/main/java/app/shoutsend/feature/vault/VaultDetailScreen.kt:460
+app/src/main/java/app/shoutsend/feature/vault/VaultDetailScreen.kt:492
+app/src/main/java/app/shoutsend/feature/vault/VaultDetailScreen.kt:534
+app/src/main/java/app/shoutsend/feature/vault/VaultDetailScreen.kt:588
+app/src/main/java/app/shoutsend/feature/vault/VaultDetailScreen.kt:701
+app/src/main/java/app/shoutsend/feature/vault/VaultScreen.kt:162
+app/src/main/java/app/shoutsend/feature/vault/VaultScreen.kt:394
+app/src/main/java/app/shoutsend/feature/vault/VaultScreen.kt:406
+app/src/main/java/app/shoutsend/feature/vault/VaultScreen.kt:420
+app/src/main/java/app/shoutsend/feature/vault/VaultScreen.kt:452
+app/src/main/java/app/shoutsend/feature/vault/VaultScreen.kt:500
+app/src/main/java/app/shoutsend/navigation/AppScaffold.kt:165
+app/src/main/java/app/shoutsend/navigation/AppScaffold.kt:174
+app/src/main/java/app/shoutsend/navigation/Routes.kt:47
+app/src/main/java/app/shoutsend/navigation/Routes.kt:48
+app/src/main/java/app/shoutsend/navigation/Routes.kt:49
+app/src/main/res/values/strings.xml:202
+app/src/main/res/values/strings.xml:73
+app/src/main/res/values/strings.xml:80

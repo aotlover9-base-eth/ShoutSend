@@ -5,18 +5,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.core.designsystem.DesignTokens
 import app.shoutsend.core.designsystem.components.CdButton
-import app.shoutsend.core.designsystem.components.CdCenterAlignedTopAppBar
-import app.shoutsend.core.designsystem.components.CdHorizontalDivider
 import app.shoutsend.core.designsystem.components.CdTextButton
-import app.shoutsend.core.designsystem.components.CdTopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,18 +34,18 @@ private fun SurfacesPreviewContent() {
             color = ChirpTheme.colors.onBackground
         )
 
-        CdTopAppBar(
+        TopAppBar(
             title = { Text("ShoutSend Dev") },
             actions = {
                 CdTextButton(onClick = {}) { Text("Help") }
             }
         )
 
-        CdCenterAlignedTopAppBar(
+        CenterAlignedTopAppBar(
             title = { Text("Acoustic Receiver") }
         )
 
-        CdHorizontalDivider()
+        HorizontalDivider()
 
         Text(
             text = "Dialog Layout Preview",

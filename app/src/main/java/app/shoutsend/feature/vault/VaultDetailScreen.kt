@@ -35,11 +35,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import app.shoutsend.R
+import androidx.compose.material3.AlertDialog
 import app.shoutsend.core.data.vault.model.Direction
 import app.shoutsend.core.data.vault.model.VaultItem
 import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.core.designsystem.components.AcousticStatus
-import app.shoutsend.core.designsystem.components.CdAlertDialog
 import app.shoutsend.core.designsystem.components.CdButton
 import app.shoutsend.core.designsystem.components.CdIconButton
 import app.shoutsend.core.designsystem.components.CdOutlinedButton
@@ -116,7 +116,7 @@ fun VaultDetailScreen(
 
     // Wi-Fi Exposure Warning Dialog
     if (showWifiWarningDialog) {
-        CdAlertDialog(
+        AlertDialog(
             onDismissRequest = { showWifiWarningDialog = false },
             title = {
                 Text(
@@ -155,7 +155,7 @@ fun VaultDetailScreen(
 
     // Secure Mode Passphrase Dialog
     if (showPassphraseDialog) {
-        CdAlertDialog(
+        AlertDialog(
             onDismissRequest = { showPassphraseDialog = false },
             title = {
                 Text(

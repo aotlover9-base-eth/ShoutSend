@@ -21,18 +21,10 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.rememberNavController
 import app.shoutsend.core.audio.permissions.createAppSettingsIntent
-import app.shoutsend.core.capability.CapabilityProbe
 import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.core.feedback.LocalTactileFeedback
-import app.shoutsend.feature.calibration.CalibrationViewModel
-import app.shoutsend.feature.onboarding.OnboardingViewModel
-import app.shoutsend.feature.receive.ReceiveViewModel
 import app.shoutsend.feature.send.ParsedSharedContent
-import app.shoutsend.feature.send.SendViewModel
 import app.shoutsend.feature.send.SharedTextParser
-import app.shoutsend.feature.send.TransmitViewModel
-import app.shoutsend.feature.settings.SettingsViewModel
-import app.shoutsend.feature.vault.VaultViewModel
 import app.shoutsend.navigation.AppScaffold
 import app.shoutsend.navigation.OnboardingRoute
 import app.shoutsend.navigation.SendRoute
@@ -52,13 +44,7 @@ class MainActivity : ComponentActivity() {
         val themeController = app.appContainer.themeController
         val settingsRepository = app.appContainer.settingsRepository
         val permissionRepository = app.appContainer.permissionRepository
-        val transmitSession = app.appContainer.transmitSession
-        val acousticReceiver = app.appContainer.acousticReceiver
-        val audioCoordinator = app.appContainer.audioCoordinator
-        val vaultRepository = app.appContainer.vaultRepository
-        val audioRouteMonitor = app.appContainer.audioRouteMonitor
         val devTools = app.appContainer.devTools
-        val audioFeedbackPlayer = app.appContainer.audioFeedbackPlayer
         val tactileFeedbackController = app.appContainer.tactileFeedbackController
 
         setContent {
@@ -87,106 +73,56 @@ class MainActivity : ComponentActivity() {
                     Box(modifier = Modifier.fillMaxSize()) {
                         val navController = rememberNavController()
 
-                        val sendViewModel = remember {
-                            SendViewModel(settingsRepository, transmitSession)
-                        }
-                        val transmitViewModel = remember {
-                            TransmitViewModel(
-                                transmitSession = transmitSession,
-                                settingsRepository = settingsRepository,
-                                vaultRepository = vaultRepository,
-                                audioRouteMonitor = audioRouteMonitor,
-                                context = this@MainActivity,
-                                audioFeedbackPlayer = audioFeedbackPlayer,
-                                tactileFeedback = tactileFeedbackController
-                            )
-                        }
-                        val receiveViewModel = remember {
-                            ReceiveViewModel(
-                                acousticReceiver = acousticReceiver,
-                                audioCoordinator = audioCoordinator,
-                                settingsRepository = settingsRepository,
-                                vaultRepository = vaultRepository,
-                                audioFeedbackPlayer = audioFeedbackPlayer,
-                                tactileFeedback = tactileFeedbackController
-                            )
-                        }
-                    val vaultViewModel = remember { VaultViewModel(vaultRepository) }
-                    val settingsViewModel = remember {
-                        SettingsViewModel(
-                            settingsRepository = settingsRepository,
-                            vaultRepository = vaultRepository,
-                            capabilityProbe = CapabilityProbe(this@MainActivity)
-                        )
-                    }
-                    val calibrationViewModel = remember {
-                        CalibrationViewModel(
-                            calibrationRunner = app.appContainer.calibrationRunner,
-                            settingsRepository = settingsRepository,
-                            audioCoordinator = audioCoordinator
-                        )
-                    }
-                    val onboardingViewModel = remember {
-                        OnboardingViewModel(settingsRepository, permissionRepository)
-                    }
-
-                    DisposableEffect(navController) {
-                        onShareReceived = { parsed ->
-                            navController.navigate(
-                                SendRoute(
-                                    sharedText = parsed.content,
-                                    sharedType = parsed.type.name
-                                )
-                            ) {
-                                launchSingleTop = true
+                        DisposableEffect(navController) {
+                            onShareReceived = { parsed ->
+                                navController.navigate(
+                                    SendRoute(
+                                        sharedText = parsed.content,
+                                        sharedType = parsed.type.name
+                                    )
+                                ) {
+                                    launchSingleTop = true
+                                }
+                            }
+                            handleShareIntent(intent)
+                            onDispose {
+                                onShareReceived = null
                             }
                         }
-                        handleShareIntent(intent)
-                        onDispose {
-                            onShareReceived = null
-                        }
-                    }
 
-                    val startDestination: Any = remember(settings.onboardingCompleted, settings.lastTab) {
-                        if (!settings.onboardingCompleted) {
-                            OnboardingRoute
-                        } else {
-                            TopLevelDestination.fromTabKey(settings.lastTab).route
+                        val startDestination: Any = remember(settings.onboardingCompleted, settings.lastTab) {
+                            if (!settings.onboardingCompleted) {
+                                OnboardingRoute
+                            } else {
+                                TopLevelDestination.fromTabKey(settings.lastTab).route
+                            }
                         }
-                    }
 
-                    AppScaffold(
-                        navController = navController,
-                        settingsRepository = settingsRepository
-                    ) { contentModifier ->
-                        ShoutSendNavHost(
+                        AppScaffold(
                             navController = navController,
-                            startDestination = startDestination,
-                            settingsRepository = settingsRepository,
-                            sendViewModel = sendViewModel,
-                            transmitViewModel = transmitViewModel,
-                            receiveViewModel = receiveViewModel,
-                            vaultViewModel = vaultViewModel,
-                            settingsViewModel = settingsViewModel,
-                            calibrationViewModel = calibrationViewModel,
-                            onboardingViewModel = onboardingViewModel,
-                            micPermissionState = micState,
-                            onRequestPermission = {
-                                micPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                            },
-                            onOpenSettings = {
-                                startActivity(createAppSettingsIntent(this@MainActivity))
-                            },
-                            modifier = contentModifier
-                        )
-                    }
+                            settingsRepository = settingsRepository
+                        ) { contentModifier ->
+                            ShoutSendNavHost(
+                                navController = navController,
+                                startDestination = startDestination,
+                                settingsRepository = settingsRepository,
+                                micPermissionState = micState,
+                                onRequestPermission = {
+                                    micPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                                },
+                                onOpenSettings = {
+                                    startActivity(createAppSettingsIntent(this@MainActivity))
+                                },
+                                modifier = contentModifier
+                            )
+                        }
 
-                    // DevTools overlay (rendered in dev flavor, zero-overhead no-op in user flavor)
-                    devTools.entryPoint?.invoke()
+                        // DevTools overlay (rendered in dev flavor, zero-overhead no-op in user flavor)
+                        devTools.entryPoint?.invoke()
+                    }
                 }
             }
         }
-    }
     }
 
     override fun onNewIntent(intent: Intent) {

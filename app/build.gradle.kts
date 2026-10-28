@@ -120,6 +120,10 @@ dependencies {
     implementation(libs.compose.ui.graphics)
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
+    implementation(libs.compose.material.icons.core)
+    implementation(libs.compose.material.icons.extended)
+    implementation(libs.graphics.shapes)
+    implementation(libs.material.kolor)
 
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.coroutines.android)
@@ -155,10 +159,17 @@ val verifyPermissions = tasks.register<app.shoutsend.buildtools.tasks.VerifyPerm
     )
 }
 
+val checkNoNetworkClients = tasks.register<app.shoutsend.buildtools.tasks.CheckNoNetworkClientsTask>("checkNoNetworkClients") {
+    sourceDirs.from(
+        file("src"),
+        project(":modem").file("src")
+    )
+}
+
 val verifyChirpRules = tasks.register("verifyChirpRules") {
     group = "verification"
-    description = "Runs all ShoutSend architectural guards (style, user APK purity, and offline permissions)."
-    dependsOn(checkNoHardcodedStyle, verifyUserApkClean, verifyPermissions, ":modem:checkModemPurity")
+    description = "Runs all ShoutSend architectural guards (style, user APK purity, network clients, and offline permissions)."
+    dependsOn(checkNoHardcodedStyle, verifyUserApkClean, verifyPermissions, checkNoNetworkClients, ":modem:checkModemPurity")
 }
 
 tasks.named("check") {

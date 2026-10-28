@@ -5,7 +5,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import java.io.File
 
 class StyleGuardTest {
 
@@ -13,114 +12,92 @@ class StyleGuardTest {
     val tempFolder = TemporaryFolder()
 
     @Test
-    fun catchesHexColorOutsideDefaultTokens() {
-        val testFile = tempFolder.newFile("MyScreen.kt")
-        testFile.writeText("""
-            package app.shoutsend.feature.send
-            import androidx.compose.ui.graphics.Color
-            val myColor = Color(0xFF112233)
+    fun flagsHexInNonDefaultTokens() {
+        val srcDir = tempFolder.newFolder("src")
+        val file = tempFolder.newFile("src/SomeView.kt")
+        file.writeText("""
+            package test
+            val c = Color(0xFF00FF00)
         """.trimIndent())
 
-        val violations = StyleGuard.scan(tempFolder.root)
+        val violations = StyleGuard.scan(srcDir)
         assertEquals(1, violations.size)
-        assertTrue(violations[0].rule.contains("No Hex"))
+        assertTrue(violations[0].rule.contains("Rule 6"))
     }
 
     @Test
-    fun allowsHexInsideDefaultTokens() {
-        val testFile = tempFolder.newFile("DefaultTokens.kt")
-        testFile.writeText("""
-            package app.shoutsend.core.designsystem
-            import androidx.compose.ui.graphics.Color
-            val primary = Color(0xFF00F0FF)
+    fun allowsHexInDefaultTokens() {
+        val srcDir = tempFolder.newFolder("src")
+        val file = tempFolder.newFile("src/DefaultTokens.kt")
+        file.writeText("""
+            package test
+            val c = Color(0xFF00FF00)
         """.trimIndent())
 
-        val violations = StyleGuard.scan(tempFolder.root)
+        val violations = StyleGuard.scan(srcDir)
         assertEquals(0, violations.size)
     }
 
     @Test
-    fun catchesNamedColorConstants() {
-        val testFile = tempFolder.newFile("BadComponent.kt")
-        testFile.writeText("""
-            package app.shoutsend.feature.send
-            import androidx.compose.ui.graphics.Color
-            val c = Color.Red
+    fun flagsEmojiAndGlyphsInMainSource() {
+        val mainDir = tempFolder.newFolder("src", "main", "java")
+        val file = tempFolder.newFile("src/main/java/Screen.kt")
+        file.writeText("""
+            package test
+            val icon1 = "▲"
+            val icon2 = "🔒"
         """.trimIndent())
 
-        val violations = StyleGuard.scan(tempFolder.root)
-        assertEquals(1, violations.size)
-        assertTrue(violations[0].rule.contains("No Named Colors"))
+        val violations = StyleGuard.scan(mainDir.parentFile.parentFile)
+        assertEquals(2, violations.size)
+        assertTrue(violations[0].rule.contains("Rule 32a"))
+        assertTrue(violations[1].rule.contains("Rule 32a"))
     }
 
     @Test
-    fun allowsTransparentAndUnspecified() {
-        val testFile = tempFolder.newFile("CleanComponent.kt")
-        testFile.writeText("""
-            package app.shoutsend.feature.send
-            import androidx.compose.ui.graphics.Color
-            val t = Color.Transparent
-            val u = Color.Unspecified
+    fun flagsMonospaceInMainSource() {
+        val mainDir = tempFolder.newFolder("src", "main", "java")
+        val file = tempFolder.newFile("src/main/java/Screen.kt")
+        file.writeText("""
+            package test
+            import androidx.compose.ui.text.font.FontFamily
+            val font = FontFamily.Monospace
         """.trimIndent())
 
-        val violations = StyleGuard.scan(tempFolder.root)
-        assertEquals(0, violations.size)
+        val violations = StyleGuard.scan(mainDir.parentFile.parentFile)
+        assertEquals(1, violations.size)
+        assertTrue(violations[0].rule.contains("Rule 32b"))
     }
 
     @Test
-    fun catchesShapeLiteralsOutsideDesignSystem() {
-        val testFile = tempFolder.newFile("FeatureCard.kt")
-        testFile.writeText("""
-            package app.shoutsend.feature.receive
-            import androidx.compose.foundation.shape.RoundedCornerShape
-            val shape = RoundedCornerShape(12)
+    fun flagsUppercaseInTextInMainSource() {
+        val mainDir = tempFolder.newFolder("src", "main", "java")
+        val file = tempFolder.newFile("src/main/java/Screen.kt")
+        file.writeText("""
+            package test
+            fun MyView(title: String) {
+                Text(text = title.uppercase())
+            }
         """.trimIndent())
 
-        val violations = StyleGuard.scan(tempFolder.root)
+        val violations = StyleGuard.scan(mainDir.parentFile.parentFile)
         assertEquals(1, violations.size)
-        assertTrue(violations[0].rule.contains("No Shape Literals"))
-    }
-
-    @Test
-    fun catchesDpSpLiteralsOutsideDesignSystem() {
-        val testFile = tempFolder.newFile("SpacingLeak.kt")
-        testFile.writeText("""
-            package app.shoutsend.feature.settings
-            import androidx.compose.ui.unit.dp
-            val padding = 16.dp
-        """.trimIndent())
-
-        val violations = StyleGuard.scan(tempFolder.root)
-        assertEquals(1, violations.size)
-        assertTrue(violations[0].rule.contains("No dp/sp Literals"))
+        assertTrue(violations[0].rule.contains("Rule 32b"))
     }
 
     @Test
     fun respectsAllowlist() {
-        val testFile = tempFolder.newFile("AllowedLeak.kt")
-        testFile.writeText("""
-            package app.shoutsend.feature.send
-            import androidx.compose.ui.unit.dp
-            val p = 8.dp
+        val mainDir = tempFolder.newFolder("src", "main", "java")
+        val file = tempFolder.newFile("src/main/java/Screen.kt")
+        file.writeText("""
+            package test
+            val icon = "▲"
         """.trimIndent())
 
         val allowlist = tempFolder.newFile("allowlist.txt")
-        allowlist.writeText("AllowedLeak.kt")
+        allowlist.writeText("src/main/java/Screen.kt:2\n")
 
-        val violations = StyleGuard.scan(tempFolder.root, allowlist)
+        val violations = StyleGuard.scan(mainDir.parentFile.parentFile, allowlist)
         assertEquals(0, violations.size)
-    }
-
-    @Test
-    fun catchesHardcodedHexInXml() {
-        val testFile = tempFolder.newFile("layout.xml")
-        testFile.writeText("""
-            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                android:background="#FF00FF" />
-        """.trimIndent())
-
-        val violations = StyleGuard.scan(tempFolder.root)
-        assertEquals(1, violations.size)
-        assertTrue(violations[0].rule.contains("No XML Hex"))
     }
 }

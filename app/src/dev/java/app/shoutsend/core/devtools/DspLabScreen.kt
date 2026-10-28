@@ -17,13 +17,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.material3.FilterChip
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.core.designsystem.components.CdButton
-import app.shoutsend.core.designsystem.components.CdCard
-import app.shoutsend.core.designsystem.components.CdFilterChip
+import androidx.compose.material3.Card
 import app.shoutsend.core.designsystem.components.CdOutlinedButton
 import app.shoutsend.core.designsystem.components.CdTextButton
 import app.shoutsend.modem.profile.Band
@@ -62,7 +62,7 @@ fun DspLabContent(
                     horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.xs)
                 ) {
                     Band.entries.forEach { b ->
-                        CdFilterChip(
+                        FilterChip(
                             selected = uiState.band == b,
                             onClick = { viewModel.selectBand(b) },
                             label = { Text(b.name) }
@@ -70,7 +70,7 @@ fun DspLabContent(
                     }
                     Spacer(modifier = Modifier.width(ChirpTheme.spacing.sm))
                     Speed.entries.forEach { s ->
-                        CdFilterChip(
+                        FilterChip(
                             selected = uiState.speed == s,
                             onClick = { viewModel.selectSpeed(s) },
                             label = { Text(s.name) }
@@ -82,7 +82,7 @@ fun DspLabContent(
 
         // 2. 16-Bar Goertzel Power Visualizer
         item {
-            CdCard(modifier = Modifier.fillMaxWidth()) {
+            Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -144,7 +144,7 @@ fun DspLabContent(
 
         // 3. Telemetry & Probe Readout
         item {
-            CdCard(modifier = Modifier.fillMaxWidth()) {
+            Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()

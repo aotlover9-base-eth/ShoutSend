@@ -20,6 +20,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.core.designsystem.ThemeController
 import kotlin.math.roundToInt
@@ -32,8 +35,14 @@ fun FloatingDevHandle(
     themeController: ThemeController,
     modifier: Modifier = Modifier
 ) {
-    val scope = rememberCoroutineScope()
-    val viewModel = remember(themeController) { DevPanelViewModel(themeController, scope) }
+    val viewModel: DevPanelViewModel = viewModel(
+        factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return DevPanelViewModel(themeController) as T
+            }
+        }
+    )
     var showPanel by remember { mutableStateOf(false) }
     var offsetY by remember { mutableFloatStateOf(0f) }
 

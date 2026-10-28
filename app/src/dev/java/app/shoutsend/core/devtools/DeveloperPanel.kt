@@ -32,17 +32,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import app.shoutsend.core.designsystem.ChirpTheme
 import app.shoutsend.core.designsystem.DefaultTokens
-import app.shoutsend.core.designsystem.components.CdAlertDialog
 import app.shoutsend.core.designsystem.components.CdButton
-import app.shoutsend.core.designsystem.components.CdCard
-import app.shoutsend.core.designsystem.components.CdFilterChip
-import app.shoutsend.core.designsystem.components.CdHorizontalDivider
+import androidx.compose.material3.Card
 import app.shoutsend.core.designsystem.components.CdIconButton
-import app.shoutsend.core.designsystem.components.CdModalBottomSheet
 import app.shoutsend.core.designsystem.components.CdOutlinedButton
 import app.shoutsend.core.designsystem.components.CdOutlinedTextField
 import app.shoutsend.core.designsystem.components.CdTextButton
@@ -61,7 +61,7 @@ fun DeveloperPanel(
     var importText by remember { mutableStateOf("") }
     var importError by remember { mutableStateOf<String?>(null) }
 
-    CdModalBottomSheet(
+    ModalBottomSheet(
         onDismissRequest = onDismiss,
         modifier = Modifier.fillMaxHeight(0.9f)
     ) {
@@ -119,24 +119,24 @@ fun DeveloperPanel(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(ChirpTheme.spacing.sm)
             ) {
-                CdFilterChip(
+                FilterChip(
                     selected = uiState.activeTab == DevPanelTab.COLORS,
                     onClick = { viewModel.selectTab(DevPanelTab.COLORS) },
                     label = { Text("Colors") }
                 )
-                CdFilterChip(
+                FilterChip(
                     selected = uiState.activeTab == DevPanelTab.SHAPES,
                     onClick = { viewModel.selectTab(DevPanelTab.SHAPES) },
                     label = { Text("Shapes & Radii") }
                 )
-                CdFilterChip(
+                FilterChip(
                     selected = uiState.activeTab == DevPanelTab.DSP_LAB,
                     onClick = { viewModel.selectTab(DevPanelTab.DSP_LAB) },
                     label = { Text("DSP Lab") }
                 )
             }
 
-            CdHorizontalDivider()
+            HorizontalDivider()
 
             // Active Tab Content
             Box(modifier = Modifier.weight(1f)) {
@@ -158,7 +158,7 @@ fun DeveloperPanel(
                 }
             }
 
-            CdHorizontalDivider()
+            HorizontalDivider()
 
             // Footer Actions
             Row(
@@ -195,7 +195,7 @@ fun DeveloperPanel(
 
     // Reset All Confirmation Dialog
     if (showResetDialog) {
-        CdAlertDialog(
+        AlertDialog(
             onDismissRequest = { showResetDialog = false },
             title = { Text("Reset Design Tokens?") },
             text = { Text("This will clear all custom color and radius overrides and restore factory Cyber Radio tokens.") },
@@ -217,7 +217,7 @@ fun DeveloperPanel(
 
     // Import Dialog
     if (showImportDialog) {
-        CdAlertDialog(
+        AlertDialog(
             onDismissRequest = { showImportDialog = false },
             title = { Text("Import Token Overrides") },
             text = {
@@ -310,7 +310,7 @@ private fun ColorRoleRow(
     var brightness by remember(item.currentColor) { mutableFloatStateOf(hsv[2]) }
     var hexText by remember(item.currentColor) { mutableStateOf(ColorUtils.colorToHex(item.currentColor)) }
 
-    CdCard(
+    Card(
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(
@@ -374,7 +374,7 @@ private fun ColorRoleRow(
             }
 
             if (expanded) {
-                CdHorizontalDivider(modifier = Modifier.padding(vertical = ChirpTheme.spacing.xs))
+                HorizontalDivider(modifier = Modifier.padding(vertical = ChirpTheme.spacing.xs))
 
                 // Hex input field
                 CdOutlinedTextField(
@@ -482,7 +482,7 @@ private fun ShapesTabContent(
         radiusItems.forEach { item ->
             var currentRadius by remember(item.currentRadiusDp) { mutableFloatStateOf(item.currentRadiusDp) }
 
-            CdCard(modifier = Modifier.fillMaxWidth()) {
+            Card(modifier = Modifier.fillMaxWidth()) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -531,7 +531,7 @@ private fun ShapesTabContent(
             }
         }
 
-        CdHorizontalDivider()
+        HorizontalDivider()
 
         // Live preview of components with the active shape tokens
         Text(
@@ -540,7 +540,7 @@ private fun ShapesTabContent(
             color = ChirpTheme.colors.primary
         )
 
-        CdCard(modifier = Modifier.fillMaxWidth()) {
+        Card(modifier = Modifier.fillMaxWidth()) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
